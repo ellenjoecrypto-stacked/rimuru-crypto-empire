@@ -1,7 +1,7 @@
 # Rimuru Opportunity Aggregator Requirements
 
 # Core async framework
-aiohttp==3.9.1
+aiohttp==3.13.3
 asyncio==3.4.3
 asyncpg==0.29.0
 
@@ -18,11 +18,11 @@ aioredis==2.0.1
 fastapi==0.109.0
 uvicorn==0.27.0
 pydantic==2.5.3
-python-multipart==0.0.6
+python-multipart==0.0.22
 
 # Cryptography
-cryptography==42.0.2
-pycryptodome==3.19.0
+cryptography==46.0.5
+pycryptodome==3.19.1
 
 # Data processing
 pandas==2.1.3
@@ -46,11 +46,11 @@ rich==13.7.0
 APScheduler==3.10.4
 
 # ML/AI (optional, for analysis)
-scikit-learn==1.3.2
+scikit-learn==1.5.0
 numpy==1.26.3
 
 # Development
-black==23.12.1
+black==24.3.0
 flake8==6.1.0
 isort==5.13.2
 mypy==1.7.1
