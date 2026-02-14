@@ -20,11 +20,13 @@ from shared.models import (
     OrderRequest, OrderResult, Position, PortfolioState,
     EnsembleSignal, ServiceHealth, PositionStatus,
 )
+from shared.security import secure_app
 
 logger = logging.getLogger("rimuru.executor")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
 app = FastAPI(title="Rimuru Executor", version="2.0.0")
+secure_app(app)
 START_TIME = time.time()
 
 # --------------- State ---------------

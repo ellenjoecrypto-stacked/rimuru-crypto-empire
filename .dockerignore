@@ -1,0 +1,15 @@
+__pycache__
+*.pyc
+*.pyo
+.git
+.gitignore
+*.md
+*.txt
+!requirements.txt
+data/
+docker/
+*.log
+test_*.py
+*.pdf
+.env
+node_modules/

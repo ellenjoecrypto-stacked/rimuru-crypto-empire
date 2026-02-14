@@ -24,11 +24,13 @@ from shared.models import (
     OrderRequest, OrderResult, OrderSide, OrderType,
     PortfolioState, ServiceHealth,
 )
+from shared.security import secure_app, get_auth_headers
 
 logger = logging.getLogger("rimuru.orchestrator")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
 app = FastAPI(title="Rimuru Orchestrator", version="2.0.0")
+secure_app(app)
 START_TIME = time.time()
 
 # --------------- Config ---------------
@@ -70,12 +72,16 @@ def _post_json(url: str, data: dict, timeout: int = 15) -> dict:
     body = json.dumps(data).encode("utf-8")
     req = Request(url, data=body, method="POST")
     req.add_header("Content-Type", "application/json")
+    for k, v in get_auth_headers().items():
+        req.add_header(k, v)
     resp = urlopen(req, timeout=timeout)
     return json.loads(resp.read().decode())
 
 
 def _get_json(url: str, timeout: int = 10) -> dict:
     req = Request(url)
+    for k, v in get_auth_headers().items():
+        req.add_header(k, v)
     resp = urlopen(req, timeout=timeout)
     return json.loads(resp.read().decode())
 

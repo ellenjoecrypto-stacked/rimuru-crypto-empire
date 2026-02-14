@@ -1,0 +1,22 @@
+============================================================
+  RIMURU TRADING BOT - MARKET SCAN
+============================================================
+
+  Portfolio: $27.82
+    PEPE: 87782.44000000 ($0.3473)
+    SOL: 0.20757738 ($18.0302)
+    USDG: 2.92870569 ($2.9287)
+    XXBT: 0.00003224 ($2.2417)
+    XXDG: 42.32188928 ($4.2657)
+
+  Pair                Price      Trend    RSI     Signal   Conf
+  ------------ ------------ ---------- ------ ---------- ------
+  SOLUSD       $   86.8600    BULLISH    53       HOLD     0%
+  PEPEUSD      $    0.0000    BULLISH    69       HOLD     0%
+  XDGUSD       $    0.1008    BULLISH    71       HOLD     0%
+  XXBTZUSD     $69530.1000    BEARISH    45       HOLD     0%
+  XETHZUSD     $ 2074.2700    BEARISH    52       HOLD     0%
+
+  No strong opportunities right now. Market is quiet.
+
+============================================================

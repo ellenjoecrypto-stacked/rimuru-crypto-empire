@@ -1,0 +1,18 @@
+{
+  "positions": [],
+  "daily_stats": {
+    "date": "2026-02-14",
+    "starting_balance": 27.8722,
+    "current_balance": 28.4799,
+    "peak_balance": 28.4799,
+    "trades_executed": 0,
+    "trades_won": 0,
+    "trades_lost": 0,
+    "total_pnl_usd": 0,
+    "total_fees_usd": 0,
+    "largest_win": 0,
+    "largest_loss": 0,
+    "last_trade_time": ""
+  },
+  "last_save": "2026-02-14T19:46:57.659960+00:00"
+}

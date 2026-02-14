@@ -29,7 +29,7 @@ class ServiceConfig:
     KRAKEN_KEYS_FILE = os.getenv("KRAKEN_KEYS_FILE", "_SENSITIVE/kraken_keys.txt")
 
     # === Risk Defaults ===
-    PAPER_MODE = os.getenv("PAPER_MODE", "true").lower() in ("true", "1", "yes")
+    PAPER_MODE = os.getenv("PAPER_MODE", "false").lower() in ("true", "1", "yes")
     MAX_POSITION_PCT = float(os.getenv("MAX_POSITION_PCT", "0.80"))
     MAX_DAILY_LOSS_PCT = float(os.getenv("MAX_DAILY_LOSS_PCT", "0.10"))
     MAX_DRAWDOWN_PCT = float(os.getenv("MAX_DRAWDOWN_PCT", "0.15"))
@@ -85,9 +85,10 @@ class ServiceConfig:
                     k, v = line.split("=", 1)
                     k = k.strip().upper()
                     v = v.strip()
-                    if "KEY" in k and "SECRET" not in k:
+                    # Only match KRAKEN_ prefixed keys (ignore Binance, Coinbase, etc.)
+                    if k == "KRAKEN_API_KEY":
                         cls.KRAKEN_API_KEY = v
-                    elif "SECRET" in k:
+                    elif k == "KRAKEN_API_SECRET":
                         cls.KRAKEN_API_SECRET = v
             # Fallback: raw lines
             if not cls.KRAKEN_API_KEY:

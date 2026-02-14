@@ -18,11 +18,13 @@ from shared.models import (
     BacktestRequest, BacktestResult, BacktestTrade,
     OHLCV, IndicatorRequest, ServiceHealth,
 )
+from shared.security import secure_app, get_auth_headers
 
 logger = logging.getLogger("rimuru.backtester")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
 app = FastAPI(title="Rimuru Backtester", version="2.0.0")
+secure_app(app)
 START_TIME = time.time()
 test_count = 0
 
@@ -36,13 +38,18 @@ def _post_json(url, data, timeout=15):
     body = json.dumps(data).encode("utf-8")
     req = urllib.request.Request(url, data=body, method="POST")
     req.add_header("Content-Type", "application/json")
+    for k, v in get_auth_headers().items():
+        req.add_header(k, v)
     resp = urllib.request.urlopen(req, timeout=timeout)
     return json.loads(resp.read().decode())
 
 
 def _get_json(url, timeout=10):
     import urllib.request
-    resp = urllib.request.urlopen(url, timeout=timeout)
+    req = urllib.request.Request(url)
+    for k, v in get_auth_headers().items():
+        req.add_header(k, v)
+    resp = urllib.request.urlopen(req, timeout=timeout)
     return json.loads(resp.read().decode())
 
 

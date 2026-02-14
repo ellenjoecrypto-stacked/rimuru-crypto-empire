@@ -11,9 +11,11 @@ import uvicorn
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 from shared.models import StrategyRequest, StrategySignal, SignalAction, ServiceHealth
+from shared.security import secure_app
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 app = FastAPI(title="Rimuru Strategy - Momentum", version="2.0.0")
+secure_app(app)
 START_TIME = time.time()
 signal_count = 0
 

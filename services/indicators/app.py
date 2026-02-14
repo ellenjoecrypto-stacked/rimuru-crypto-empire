@@ -19,11 +19,13 @@ import uvicorn
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from shared.models import OHLCV, IndicatorRequest, IndicatorResult, ServiceHealth
+from shared.security import secure_app
 
 logger = logging.getLogger("rimuru.indicators")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
 app = FastAPI(title="Rimuru Indicators", version="2.0.0")
+secure_app(app)
 START_TIME = time.time()
 calc_count = 0
 

@@ -1,0 +1,183 @@
+# ============================================
+# RIMURU CRYPTO EMPIRE — TRADE GOD ARMY
+# 5 Auto-Trader Bots Running 24/7
+# ============================================
+#
+# Bot 1: RIMURU-ALPHA   — Full Trade God (all 7 strategies)
+# Bot 2: RIMURU-BETA    — Momentum + Trend focus
+# Bot 3: RIMURU-GAMMA   — Mean Reversion + Stochastic focus
+# Bot 4: RIMURU-DELTA   — Fibonacci + Golden Cross focus
+# Bot 5: RIMURU-OMEGA   — Aggressive Trade God Confluence
+#
+# Each bot shares the same Kraken keys but has its own
+# strategy configuration, data directory, and state.
+#
+# Usage:
+#   docker-compose -f docker-compose.traders.yml up -d
+#   docker-compose -f docker-compose.traders.yml logs -f
+#   docker-compose -f docker-compose.traders.yml down
+#
+# ============================================
+
+version: '3.8'
+
+# Shared config
+x-trader-base: &trader-base
+  build:
+    context: .
+    dockerfile: docker/trader/Dockerfile
+  restart: always
+  environment:
+    RIMURU_DOCKER: "1"
+    RIMURU_LIVE: "1"
+    PYTHONUNBUFFERED: "1"
+  networks:
+    - rimuru-net
+
+services:
+  # ==========================================
+  # BOT 1: RIMURU-ALPHA — The Commander
+  # Full Trade God with all 7 strategies
+  # Default weights, balanced approach
+  # ==========================================
+  rimuru-alpha:
+    <<: *trader-base
+    container_name: rimuru-alpha
+    hostname: rimuru-alpha
+    volumes:
+      - alpha-data:/app/data
+      - ./rimuru_auto_trader.py:/app/rimuru_auto_trader.py:ro
+      - ./_SENSITIVE:/app/_SENSITIVE:ro
+    environment:
+      RIMURU_DOCKER: "1"
+      RIMURU_LIVE: "1"
+      RIMURU_BOT_NAME: "ALPHA"
+      PYTHONUNBUFFERED: "1"
+    command: ["python", "-u", "rimuru_auto_trader.py", "--live"]
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+
+  # ==========================================
+  # BOT 2: RIMURU-BETA — The Momentum Hunter
+  # Focuses on momentum scalp + trend following
+  # Faster scans, lower confidence threshold
+  # ==========================================
+  rimuru-beta:
+    <<: *trader-base
+    container_name: rimuru-beta
+    hostname: rimuru-beta
+    volumes:
+      - beta-data:/app/data
+      - ./rimuru_auto_trader.py:/app/rimuru_auto_trader.py:ro
+      - ./_SENSITIVE:/app/_SENSITIVE:ro
+    environment:
+      RIMURU_DOCKER: "1"
+      RIMURU_LIVE: "1"
+      RIMURU_BOT_NAME: "BETA"
+      RIMURU_STRATEGY_FOCUS: "momentum,trend"
+      PYTHONUNBUFFERED: "1"
+    command: ["python", "-u", "rimuru_auto_trader.py", "--live"]
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+
+  # ==========================================
+  # BOT 3: RIMURU-GAMMA — The Reversal Expert
+  # Mean reversion + stochastic oscillator
+  # Catches oversold bounces and overbought dumps
+  # ==========================================
+  rimuru-gamma:
+    <<: *trader-base
+    container_name: rimuru-gamma
+    hostname: rimuru-gamma
+    volumes:
+      - gamma-data:/app/data
+      - ./rimuru_auto_trader.py:/app/rimuru_auto_trader.py:ro
+      - ./_SENSITIVE:/app/_SENSITIVE:ro
+    environment:
+      RIMURU_DOCKER: "1"
+      RIMURU_LIVE: "1"
+      RIMURU_BOT_NAME: "GAMMA"
+      RIMURU_STRATEGY_FOCUS: "mean_rev,stochastic"
+      PYTHONUNBUFFERED: "1"
+    command: ["python", "-u", "rimuru_auto_trader.py", "--live"]
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+
+  # ==========================================
+  # BOT 4: RIMURU-DELTA — The Pattern Master
+  # Fibonacci retracement + Golden Cross/Death Cross
+  # Patient entries at key mathematical levels
+  # ==========================================
+  rimuru-delta:
+    <<: *trader-base
+    container_name: rimuru-delta
+    hostname: rimuru-delta
+    volumes:
+      - delta-data:/app/data
+      - ./rimuru_auto_trader.py:/app/rimuru_auto_trader.py:ro
+      - ./_SENSITIVE:/app/_SENSITIVE:ro
+    environment:
+      RIMURU_DOCKER: "1"
+      RIMURU_LIVE: "1"
+      RIMURU_BOT_NAME: "DELTA"
+      RIMURU_STRATEGY_FOCUS: "fibonacci,golden_cross"
+      PYTHONUNBUFFERED: "1"
+    command: ["python", "-u", "rimuru_auto_trader.py", "--live"]
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+
+  # ==========================================
+  # BOT 5: RIMURU-OMEGA — The Aggressive God
+  # Trade God confluence at aggressive settings
+  # Lower thresholds, faster scans, bigger positions
+  # ==========================================
+  rimuru-omega:
+    <<: *trader-base
+    container_name: rimuru-omega
+    hostname: rimuru-omega
+    volumes:
+      - omega-data:/app/data
+      - ./rimuru_auto_trader.py:/app/rimuru_auto_trader.py:ro
+      - ./_SENSITIVE:/app/_SENSITIVE:ro
+    environment:
+      RIMURU_DOCKER: "1"
+      RIMURU_LIVE: "1"
+      RIMURU_AGGRESSIVE: "1"
+      RIMURU_BOT_NAME: "OMEGA"
+      RIMURU_STRATEGY_FOCUS: "trade_god"
+      PYTHONUNBUFFERED: "1"
+    command: ["python", "-u", "rimuru_auto_trader.py", "--live", "--aggressive"]
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+
+volumes:
+  alpha-data:
+    name: rimuru-alpha-data
+  beta-data:
+    name: rimuru-beta-data
+  gamma-data:
+    name: rimuru-gamma-data
+  delta-data:
+    name: rimuru-delta-data
+  omega-data:
+    name: rimuru-omega-data
+
+networks:
+  rimuru-net:
+    name: rimuru-trading-network
+    driver: bridge

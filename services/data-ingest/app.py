@@ -25,11 +25,13 @@ from shared.models import (
     OHLCV, TickerData, OrderBook, OrderBookEntry,
     MarketDataRequest, MarketDataResponse, ServiceHealth,
 )
+from shared.security import secure_app
 
 logger = logging.getLogger("rimuru.data-ingest")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
 app = FastAPI(title="Rimuru Data Ingest", version="2.0.0")
+secure_app(app)
 START_TIME = time.time()
 
 # --------------- State ---------------

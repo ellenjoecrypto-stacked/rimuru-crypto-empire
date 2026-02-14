@@ -19,13 +19,15 @@
 #   docker compose -f docker-compose.team.yml down             # Stop all
 #   docker compose -f docker-compose.team.yml up -d --build    # Rebuild
 #
-# Default: PAPER_MODE=true (no real orders). Set PAPER_MODE=false for live.
+# Default: PAPER_MODE=false (live orders). Set PAPER_MODE=true for paper.
 # =====================================================================
 
 x-common: &common
   restart: unless-stopped
   networks:
     - rimuru-team
+  env_file:
+    - .env.security
   logging:
     driver: json-file
     options:
@@ -211,7 +213,7 @@ services:
       - executor-data:/app/data
     environment:
       PORT: "8020"
-      PAPER_MODE: "${PAPER_MODE:-true}"
+      PAPER_MODE: "${PAPER_MODE:-false}"
       MAX_TRADE_USD: "50"
       MAX_OPEN_POSITIONS: "3"
       DAILY_LOSS_LIMIT: "5"
@@ -245,7 +247,7 @@ services:
       - executor
     environment:
       PORT: "8030"
-      PAPER_MODE: "${PAPER_MODE:-true}"
+      PAPER_MODE: "${PAPER_MODE:-false}"
       AUTO_START: "true"
       SCAN_INTERVAL_SEC: "60"
       MIN_CONFIDENCE: "0.45"
