@@ -1,0 +1,21 @@
+[Unit]
+Description=Rimuru Crypto Empire Trading Team
+Documentation=https://github.com/ellenjoecrypto-stacked/rimuru-crypto-empire
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/home/rimuru/rimuru-crypto-empire
+Environment=PAPER_MODE=true
+
+ExecStart=/usr/bin/docker compose -f docker-compose.team.yml up -d
+ExecStop=/usr/bin/docker compose -f docker-compose.team.yml down
+ExecReload=/usr/bin/docker compose -f docker-compose.team.yml restart
+
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

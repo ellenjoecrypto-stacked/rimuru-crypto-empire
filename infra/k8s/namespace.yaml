@@ -1,0 +1,6 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: rimuru-trading
+  labels:
+    app.kubernetes.io/part-of: rimuru-crypto-empire

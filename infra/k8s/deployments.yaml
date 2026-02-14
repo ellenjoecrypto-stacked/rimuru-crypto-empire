@@ -1,0 +1,315 @@
+# Rimuru Trading — Core Service Deployments
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-ingest
+  namespace: rimuru-trading
+  labels:
+    app: data-ingest
+    tier: data
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: data-ingest
+  template:
+    metadata:
+      labels:
+        app: data-ingest
+    spec:
+      containers:
+        - name: data-ingest
+          image: rimuru/data-ingest:latest
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - secretRef:
+                name: kraken-api-keys
+            - configMapRef:
+                name: rimuru-config
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: data-ingest
+  namespace: rimuru-trading
+spec:
+  selector:
+    app: data-ingest
+  ports:
+    - port: 8000
+      targetPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: indicators
+  namespace: rimuru-trading
+  labels:
+    app: indicators
+    tier: compute
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: indicators
+  template:
+    metadata:
+      labels:
+        app: indicators
+    spec:
+      containers:
+        - name: indicators
+          image: rimuru/indicators:latest
+          ports:
+            - containerPort: 8001
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 10
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: indicators
+  namespace: rimuru-trading
+spec:
+  selector:
+    app: indicators
+  ports:
+    - port: 8001
+      targetPort: 8001
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: executor
+  namespace: rimuru-trading
+  labels:
+    app: executor
+    tier: execution
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: executor
+  template:
+    metadata:
+      labels:
+        app: executor
+    spec:
+      containers:
+        - name: executor
+          image: rimuru/executor:latest
+          ports:
+            - containerPort: 8020
+          envFrom:
+            - secretRef:
+                name: kraken-api-keys
+            - configMapRef:
+                name: rimuru-config
+          volumeMounts:
+            - name: executor-data
+              mountPath: /data
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8020
+            initialDelaySeconds: 10
+            periodSeconds: 30
+      volumes:
+        - name: executor-data
+          persistentVolumeClaim:
+            claimName: executor-data-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: executor
+  namespace: rimuru-trading
+spec:
+  selector:
+    app: executor
+  ports:
+    - port: 8020
+      targetPort: 8020
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: executor-data-pvc
+  namespace: rimuru-trading
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orchestrator
+  namespace: rimuru-trading
+  labels:
+    app: orchestrator
+    tier: brain
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: orchestrator
+  template:
+    metadata:
+      labels:
+        app: orchestrator
+    spec:
+      containers:
+        - name: orchestrator
+          image: rimuru/orchestrator:latest
+          ports:
+            - containerPort: 8030
+          envFrom:
+            - secretRef:
+                name: kraken-api-keys
+            - secretRef:
+                name: coingecko-key
+            - configMapRef:
+                name: rimuru-config
+          env:
+            - name: AUTO_START
+              value: "true"
+            - name: DATA_INGEST_URL
+              value: "http://data-ingest:8000"
+            - name: INDICATORS_URL
+              value: "http://indicators:8001"
+            - name: EXECUTOR_URL
+              value: "http://executor:8020"
+            - name: STRATEGY_MA_URL
+              value: "http://strategy-ma:8010"
+            - name: STRATEGY_RSI_URL
+              value: "http://strategy-rsi:8011"
+            - name: STRATEGY_BOLLINGER_URL
+              value: "http://strategy-bollinger:8012"
+            - name: STRATEGY_MOMENTUM_URL
+              value: "http://strategy-momentum:8013"
+            - name: STRATEGY_VOLUME_URL
+              value: "http://strategy-volume:8014"
+            - name: STRATEGY_LSTM_URL
+              value: "http://strategy-lstm:8015"
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "200m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8030
+            initialDelaySeconds: 15
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orchestrator
+  namespace: rimuru-trading
+spec:
+  selector:
+    app: orchestrator
+  ports:
+    - port: 8030
+      targetPort: 8030
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backtester
+  namespace: rimuru-trading
+  labels:
+    app: backtester
+    tier: analysis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backtester
+  template:
+    metadata:
+      labels:
+        app: backtester
+    spec:
+      containers:
+        - name: backtester
+          image: rimuru/backtester:latest
+          ports:
+            - containerPort: 8040
+          envFrom:
+            - configMapRef:
+                name: rimuru-config
+          env:
+            - name: DATA_INGEST_URL
+              value: "http://data-ingest:8000"
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "200m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8040
+            initialDelaySeconds: 10
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backtester
+  namespace: rimuru-trading
+spec:
+  selector:
+    app: backtester
+  ports:
+    - port: 8040
+      targetPort: 8040

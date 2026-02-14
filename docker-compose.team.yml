@@ -1,0 +1,350 @@
+# =====================================================================
+# RIMURU CRYPTO EMPIRE — FULL MICROSERVICES STACK
+# Deployment-Ready Trading Team
+# =====================================================================
+#
+# Architecture:
+#   data-ingest    → Kraken OHLCV / ticker / orderbook feeds
+#   indicators     → SMA, RSI, MACD, BB, ATR, Stoch, ADX, VWAP, Fib...
+#   strategy-*     → 6 independent strategy services (signals JSON)
+#   executor       → Order placement, risk checks, paper/live toggle
+#   orchestrator   → Scheduler, strategy ensemble, position sizing
+#   backtester     → Walk-forward backtests, Sharpe/Sortino/drawdown
+#   prometheus     → Metrics scraping
+#   grafana        → Dashboards for P&L, positions, latency
+#
+# Usage:
+#   docker compose -f docker-compose.team.yml up -d           # Start all
+#   docker compose -f docker-compose.team.yml logs -f          # Tail logs
+#   docker compose -f docker-compose.team.yml down             # Stop all
+#   docker compose -f docker-compose.team.yml up -d --build    # Rebuild
+#
+# Default: PAPER_MODE=true (no real orders). Set PAPER_MODE=false for live.
+# =====================================================================
+
+x-common: &common
+  restart: unless-stopped
+  networks:
+    - rimuru-team
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "3"
+
+services:
+  # ─────────────────────────────────────────────
+  # DATA LAYER
+  # ─────────────────────────────────────────────
+
+  data-ingest:
+    <<: *common
+    build:
+      context: .
+      dockerfile: services/data-ingest/Dockerfile
+    container_name: rimuru-data-ingest
+    ports:
+      - "18000:8000"
+    volumes:
+      - ./_SENSITIVE:/app/_SENSITIVE:ro
+    environment:
+      PORT: "8000"
+      CACHE_TTL: "30"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.25"
+
+  # ─────────────────────────────────────────────
+  # INDICATOR ENGINE
+  # ─────────────────────────────────────────────
+
+  indicators:
+    <<: *common
+    build:
+      context: .
+      dockerfile: services/indicators/Dockerfile
+    container_name: rimuru-indicators
+    ports:
+      - "18001:8001"
+    environment:
+      PORT: "8001"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.25"
+
+  # ─────────────────────────────────────────────
+  # STRATEGY SERVICES (6 independent engines)
+  # ─────────────────────────────────────────────
+
+  strategy-ma:
+    <<: *common
+    build:
+      context: .
+      dockerfile: services/strategies/Dockerfile
+      args:
+        STRATEGY_DIR: ma_crossover
+        PORT: "8010"
+    container_name: rimuru-strategy-ma
+    ports:
+      - "8010:8010"
+    environment:
+      PORT: "8010"
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: "0.15"
+
+  strategy-rsi:
+    <<: *common
+    build:
+      context: .
+      dockerfile: services/strategies/Dockerfile
+      args:
+        STRATEGY_DIR: rsi
+        PORT: "8011"
+    container_name: rimuru-strategy-rsi
+    ports:
+      - "8011:8011"
+    environment:
+      PORT: "8011"
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: "0.15"
+
+  strategy-bollinger:
+    <<: *common
+    build:
+      context: .
+      dockerfile: services/strategies/Dockerfile
+      args:
+        STRATEGY_DIR: bollinger
+        PORT: "8012"
+    container_name: rimuru-strategy-bollinger
+    ports:
+      - "8012:8012"
+    environment:
+      PORT: "8012"
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: "0.15"
+
+  strategy-momentum:
+    <<: *common
+    build:
+      context: .
+      dockerfile: services/strategies/Dockerfile
+      args:
+        STRATEGY_DIR: momentum
+        PORT: "8013"
+    container_name: rimuru-strategy-momentum
+    ports:
+      - "8013:8013"
+    environment:
+      PORT: "8013"
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: "0.15"
+
+  strategy-volume:
+    <<: *common
+    build:
+      context: .
+      dockerfile: services/strategies/Dockerfile
+      args:
+        STRATEGY_DIR: volume
+        PORT: "8014"
+    container_name: rimuru-strategy-volume
+    ports:
+      - "8014:8014"
+    environment:
+      PORT: "8014"
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: "0.15"
+
+  strategy-lstm:
+    <<: *common
+    build:
+      context: .
+      dockerfile: services/strategies/Dockerfile
+      args:
+        STRATEGY_DIR: lstm
+        PORT: "8015"
+    container_name: rimuru-strategy-lstm
+    ports:
+      - "8015:8015"
+    environment:
+      PORT: "8015"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.25"
+
+  # ─────────────────────────────────────────────
+  # EXECUTOR (order placement + risk engine)
+  # ─────────────────────────────────────────────
+
+  executor:
+    <<: *common
+    build:
+      context: .
+      dockerfile: services/executor/Dockerfile
+    container_name: rimuru-executor
+    ports:
+      - "8020:8020"
+    volumes:
+      - ./_SENSITIVE:/app/_SENSITIVE:ro
+      - executor-data:/app/data
+    environment:
+      PORT: "8020"
+      PAPER_MODE: "${PAPER_MODE:-true}"
+      MAX_TRADE_USD: "50"
+      MAX_OPEN_POSITIONS: "3"
+      DAILY_LOSS_LIMIT: "5"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.25"
+
+  # ─────────────────────────────────────────────
+  # ORCHESTRATOR (the brain)
+  # ─────────────────────────────────────────────
+
+  orchestrator:
+    <<: *common
+    build:
+      context: .
+      dockerfile: services/orchestrator/Dockerfile
+    container_name: rimuru-orchestrator
+    ports:
+      - "8030:8030"
+    depends_on:
+      - data-ingest
+      - indicators
+      - strategy-ma
+      - strategy-rsi
+      - strategy-bollinger
+      - strategy-momentum
+      - strategy-volume
+      - strategy-lstm
+      - executor
+    environment:
+      PORT: "8030"
+      PAPER_MODE: "${PAPER_MODE:-true}"
+      AUTO_START: "true"
+      SCAN_INTERVAL_SEC: "60"
+      MIN_CONFIDENCE: "0.45"
+      DATA_INGEST_URL: "http://data-ingest:8000"
+      INDICATORS_URL: "http://indicators:8001"
+      STRATEGY_MA_URL: "http://strategy-ma:8010"
+      STRATEGY_RSI_URL: "http://strategy-rsi:8011"
+      STRATEGY_BOLLINGER_URL: "http://strategy-bollinger:8012"
+      STRATEGY_MOMENTUM_URL: "http://strategy-momentum:8013"
+      STRATEGY_VOLUME_URL: "http://strategy-volume:8014"
+      STRATEGY_LSTM_URL: "http://strategy-lstm:8015"
+      EXECUTOR_URL: "http://executor:8020"
+      # Strategy weights
+      W_MA: "1.0"
+      W_RSI: "1.0"
+      W_BOLLINGER: "1.0"
+      W_MOMENTUM: "1.0"
+      W_VOLUME: "1.0"
+      W_LSTM: "1.5"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.25"
+
+  # ─────────────────────────────────────────────
+  # BACKTESTER
+  # ─────────────────────────────────────────────
+
+  backtester:
+    <<: *common
+    build:
+      context: .
+      dockerfile: services/backtester/Dockerfile
+    container_name: rimuru-backtester
+    ports:
+      - "8040:8040"
+    depends_on:
+      - data-ingest
+      - indicators
+    environment:
+      PORT: "8040"
+      DATA_INGEST_URL: "http://data-ingest:8000"
+      INDICATORS_URL: "http://indicators:8001"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.50"
+
+  # ─────────────────────────────────────────────
+  # MONITORING
+  # ─────────────────────────────────────────────
+
+  prometheus:
+    <<: *common
+    image: prom/prometheus:v2.51.0
+    container_name: rimuru-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./infra/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.retention.time=30d"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.25"
+
+  grafana:
+    <<: *common
+    image: grafana/grafana:10.4.0
+    container_name: rimuru-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./infra/monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./infra/monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: "${GRAFANA_PASSWORD:-rimuru2026}"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    depends_on:
+      - prometheus
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.25"
+
+networks:
+  rimuru-team:
+    driver: bridge
+
+volumes:
+  executor-data:
+  prometheus-data:
+  grafana-data:

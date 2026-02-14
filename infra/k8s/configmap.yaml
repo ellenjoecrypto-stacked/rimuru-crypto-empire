@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rimuru-config
+  namespace: rimuru-trading
+data:
+  PAPER_MODE: "true"
+  LOG_LEVEL: "INFO"
+  MAX_POSITION_PCT: "0.80"
+  DAILY_LOSS_LIMIT: "10.0"
+  SCAN_INTERVAL: "300"
+  STRATEGY_WEIGHTS: "ma_crossover=0.20,rsi=0.18,bollinger=0.15,momentum=0.17,volume=0.12,lstm=0.18"
+  TRADEABLE_PAIRS: "XXBTZUSD,XETHZUSD,SOLUSD,XDGUSD"

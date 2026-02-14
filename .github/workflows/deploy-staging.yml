@@ -1,0 +1,67 @@
+name: Deploy Staging
+
+on:
+  workflow_run:
+    workflows: ["Build & Test Rimuru Services"]
+    types: [completed]
+    branches: [master, main]
+
+  workflow_dispatch:
+    inputs:
+      paper_mode:
+        description: 'Enable paper trading mode'
+        required: true
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+env:
+  DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+  DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+
+jobs:
+  deploy:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    environment: staging
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set paper mode
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "PAPER_MODE=${{ inputs.paper_mode }}" >> $GITHUB_ENV
+          else
+            echo "PAPER_MODE=true" >> $GITHUB_ENV
+          fi
+
+      - name: Deploy via SSH
+        if: env.DEPLOY_HOST != ''
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            cd ~/rimuru-crypto-empire
+            git pull origin master
+            export PAPER_MODE=${{ env.PAPER_MODE }}
+            docker compose -f docker-compose.team.yml build --no-cache
+            docker compose -f docker-compose.team.yml up -d
+            sleep 10
+            echo "=== Service Health Check ==="
+            curl -sf http://localhost:8030/health && echo " [OK] orchestrator" || echo " [FAIL] orchestrator"
+            curl -sf http://localhost:8000/health && echo " [OK] data-ingest" || echo " [FAIL] data-ingest"
+            curl -sf http://localhost:8001/health && echo " [OK] indicators" || echo " [FAIL] indicators"
+            curl -sf http://localhost:8020/health && echo " [OK] executor" || echo " [FAIL] executor"
+
+      - name: Local deploy fallback
+        if: env.DEPLOY_HOST == ''
+        run: |
+          echo "No DEPLOY_HOST secret set — skipping remote deploy."
+          echo "To deploy locally, run:"
+          echo "  PAPER_MODE=${{ env.PAPER_MODE }} docker compose -f docker-compose.team.yml up -d"

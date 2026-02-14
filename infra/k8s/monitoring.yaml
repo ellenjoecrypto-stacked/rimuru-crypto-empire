@@ -1,0 +1,151 @@
+# Rimuru Trading — Monitoring Stack (K8s)
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: rimuru-trading
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 30s
+    scrape_configs:
+      - job_name: data-ingest
+        static_configs: [{ targets: ["data-ingest:8000"] }]
+        metrics_path: /metrics
+      - job_name: indicators
+        static_configs: [{ targets: ["indicators:8001"] }]
+        metrics_path: /metrics
+      - job_name: strategy-ma
+        static_configs: [{ targets: ["strategy-ma:8010"] }]
+        metrics_path: /metrics
+      - job_name: strategy-rsi
+        static_configs: [{ targets: ["strategy-rsi:8011"] }]
+        metrics_path: /metrics
+      - job_name: strategy-bollinger
+        static_configs: [{ targets: ["strategy-bollinger:8012"] }]
+        metrics_path: /metrics
+      - job_name: strategy-momentum
+        static_configs: [{ targets: ["strategy-momentum:8013"] }]
+        metrics_path: /metrics
+      - job_name: strategy-volume
+        static_configs: [{ targets: ["strategy-volume:8014"] }]
+        metrics_path: /metrics
+      - job_name: strategy-lstm
+        static_configs: [{ targets: ["strategy-lstm:8015"] }]
+        metrics_path: /metrics
+      - job_name: executor
+        static_configs: [{ targets: ["executor:8020"] }]
+        metrics_path: /metrics
+      - job_name: orchestrator
+        static_configs: [{ targets: ["orchestrator:8030"] }]
+        metrics_path: /metrics
+      - job_name: backtester
+        static_configs: [{ targets: ["backtester:8040"] }]
+        metrics_path: /metrics
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: rimuru-trading
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      containers:
+        - name: prometheus
+          image: prom/prometheus:v2.51.0
+          ports:
+            - containerPort: 9090
+          volumeMounts:
+            - name: config
+              mountPath: /etc/prometheus/prometheus.yml
+              subPath: prometheus.yml
+            - name: data
+              mountPath: /prometheus
+      volumes:
+        - name: config
+          configMap:
+            name: prometheus-config
+        - name: data
+          persistentVolumeClaim:
+            claimName: prometheus-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: rimuru-trading
+spec:
+  selector: { app: prometheus }
+  ports: [{ port: 9090, targetPort: 9090 }]
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: prometheus-pvc
+  namespace: rimuru-trading
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: rimuru-trading
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+        - name: grafana
+          image: grafana/grafana:10.4.0
+          ports:
+            - containerPort: 3000
+          env:
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              value: rimuru2024
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/grafana
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: grafana-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: rimuru-trading
+spec:
+  type: NodePort
+  selector: { app: grafana }
+  ports: [{ port: 3000, targetPort: 3000, nodePort: 30300 }]
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: grafana-pvc
+  namespace: rimuru-trading
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 2Gi

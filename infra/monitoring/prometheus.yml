@@ -1,0 +1,60 @@
+# Rimuru Crypto Empire — Prometheus Configuration
+global:
+  scrape_interval: 30s
+  evaluation_interval: 30s
+
+scrape_configs:
+  - job_name: "data-ingest"
+    static_configs:
+      - targets: ["data-ingest:8000"]
+    metrics_path: /metrics
+
+  - job_name: "indicators"
+    static_configs:
+      - targets: ["indicators:8001"]
+    metrics_path: /metrics
+
+  - job_name: "strategy-ma"
+    static_configs:
+      - targets: ["strategy-ma:8010"]
+    metrics_path: /metrics
+
+  - job_name: "strategy-rsi"
+    static_configs:
+      - targets: ["strategy-rsi:8011"]
+    metrics_path: /metrics
+
+  - job_name: "strategy-bollinger"
+    static_configs:
+      - targets: ["strategy-bollinger:8012"]
+    metrics_path: /metrics
+
+  - job_name: "strategy-momentum"
+    static_configs:
+      - targets: ["strategy-momentum:8013"]
+    metrics_path: /metrics
+
+  - job_name: "strategy-volume"
+    static_configs:
+      - targets: ["strategy-volume:8014"]
+    metrics_path: /metrics
+
+  - job_name: "strategy-lstm"
+    static_configs:
+      - targets: ["strategy-lstm:8015"]
+    metrics_path: /metrics
+
+  - job_name: "executor"
+    static_configs:
+      - targets: ["executor:8020"]
+    metrics_path: /metrics
+
+  - job_name: "orchestrator"
+    static_configs:
+      - targets: ["orchestrator:8030"]
+    metrics_path: /metrics
+
+  - job_name: "backtester"
+    static_configs:
+      - targets: ["backtester:8040"]
+    metrics_path: /metrics

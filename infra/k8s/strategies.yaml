@@ -1,0 +1,242 @@
+# Rimuru Trading — Strategy Deployments
+# Each strategy runs as its own pod with dedicated port
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: strategy-ma
+  namespace: rimuru-trading
+  labels:
+    app: strategy-ma
+    tier: strategy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: strategy-ma
+  template:
+    metadata:
+      labels:
+        app: strategy-ma
+    spec:
+      containers:
+        - name: strategy-ma
+          image: rimuru/strategy-ma:latest
+          ports:
+            - containerPort: 8010
+          resources:
+            requests: { memory: "64Mi", cpu: "50m" }
+            limits: { memory: "128Mi", cpu: "150m" }
+          livenessProbe:
+            httpGet: { path: /health, port: 8010 }
+            initialDelaySeconds: 10
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: strategy-ma
+  namespace: rimuru-trading
+spec:
+  selector: { app: strategy-ma }
+  ports: [{ port: 8010, targetPort: 8010 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: strategy-rsi
+  namespace: rimuru-trading
+  labels:
+    app: strategy-rsi
+    tier: strategy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: strategy-rsi
+  template:
+    metadata:
+      labels:
+        app: strategy-rsi
+    spec:
+      containers:
+        - name: strategy-rsi
+          image: rimuru/strategy-rsi:latest
+          ports:
+            - containerPort: 8011
+          resources:
+            requests: { memory: "64Mi", cpu: "50m" }
+            limits: { memory: "128Mi", cpu: "150m" }
+          livenessProbe:
+            httpGet: { path: /health, port: 8011 }
+            initialDelaySeconds: 10
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: strategy-rsi
+  namespace: rimuru-trading
+spec:
+  selector: { app: strategy-rsi }
+  ports: [{ port: 8011, targetPort: 8011 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: strategy-bollinger
+  namespace: rimuru-trading
+  labels:
+    app: strategy-bollinger
+    tier: strategy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: strategy-bollinger
+  template:
+    metadata:
+      labels:
+        app: strategy-bollinger
+    spec:
+      containers:
+        - name: strategy-bollinger
+          image: rimuru/strategy-bollinger:latest
+          ports:
+            - containerPort: 8012
+          resources:
+            requests: { memory: "64Mi", cpu: "50m" }
+            limits: { memory: "128Mi", cpu: "150m" }
+          livenessProbe:
+            httpGet: { path: /health, port: 8012 }
+            initialDelaySeconds: 10
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: strategy-bollinger
+  namespace: rimuru-trading
+spec:
+  selector: { app: strategy-bollinger }
+  ports: [{ port: 8012, targetPort: 8012 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: strategy-momentum
+  namespace: rimuru-trading
+  labels:
+    app: strategy-momentum
+    tier: strategy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: strategy-momentum
+  template:
+    metadata:
+      labels:
+        app: strategy-momentum
+    spec:
+      containers:
+        - name: strategy-momentum
+          image: rimuru/strategy-momentum:latest
+          ports:
+            - containerPort: 8013
+          resources:
+            requests: { memory: "64Mi", cpu: "50m" }
+            limits: { memory: "128Mi", cpu: "150m" }
+          livenessProbe:
+            httpGet: { path: /health, port: 8013 }
+            initialDelaySeconds: 10
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: strategy-momentum
+  namespace: rimuru-trading
+spec:
+  selector: { app: strategy-momentum }
+  ports: [{ port: 8013, targetPort: 8013 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: strategy-volume
+  namespace: rimuru-trading
+  labels:
+    app: strategy-volume
+    tier: strategy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: strategy-volume
+  template:
+    metadata:
+      labels:
+        app: strategy-volume
+    spec:
+      containers:
+        - name: strategy-volume
+          image: rimuru/strategy-volume:latest
+          ports:
+            - containerPort: 8014
+          resources:
+            requests: { memory: "64Mi", cpu: "50m" }
+            limits: { memory: "128Mi", cpu: "150m" }
+          livenessProbe:
+            httpGet: { path: /health, port: 8014 }
+            initialDelaySeconds: 10
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: strategy-volume
+  namespace: rimuru-trading
+spec:
+  selector: { app: strategy-volume }
+  ports: [{ port: 8014, targetPort: 8014 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: strategy-lstm
+  namespace: rimuru-trading
+  labels:
+    app: strategy-lstm
+    tier: strategy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: strategy-lstm
+  template:
+    metadata:
+      labels:
+        app: strategy-lstm
+    spec:
+      containers:
+        - name: strategy-lstm
+          image: rimuru/strategy-lstm:latest
+          ports:
+            - containerPort: 8015
+          resources:
+            requests: { memory: "128Mi", cpu: "100m" }
+            limits: { memory: "256Mi", cpu: "250m" }
+          livenessProbe:
+            httpGet: { path: /health, port: 8015 }
+            initialDelaySeconds: 10
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: strategy-lstm
+  namespace: rimuru-trading
+spec:
+  selector: { app: strategy-lstm }
+  ports: [{ port: 8015, targetPort: 8015 }]
