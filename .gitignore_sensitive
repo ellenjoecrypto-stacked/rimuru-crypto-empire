@@ -1,0 +1,87 @@
+# SENSITIVE FILES - NEVER COMMIT TO GIT
+# This folder contains credentials, keys, and secrets
+
+# Entire sensitive folder
+_SENSITIVE/
+!_SENSITIVE/README_SECURITY.txt
+
+# Environment files
+.env
+.env.local
+.env.*.local
+.env.backup
+
+# Vault files
+*.vault
+*.key
+*.crt
+*.pem
+vault.db
+
+# Credential files
+credentials.json
+secrets.json
+credentials.yaml
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+TEMP_vault.txt
+
+# Backup files
+*.backup
+*.restore
+*.recovery
+
+# API keys
+*_api_key.txt
+*_api_secret.txt
+*_token.txt
+
+# Database credentials
+db_password.txt
+db_credentials.txt
+
+# Private keys
+*_private.key
+*_private_key.pem
+id_rsa
+id_ed25519
+
+# SSH keys
+known_hosts
+authorized_keys
+
+# Certificate files
+*.crt
+*.cer
+*.pem
+*.p12
+*.pfx
+
+# OAuth tokens
+*.access_token
+*.refresh_token
+
+# AWS credentials
+credentials
+config
+
+# Azure secrets
+.azure/
+
+# GCP credentials
+*-key.json
+gcloud
+
+# Encryption keys
+encryption.key
+master.key
+
+# Webhook secrets
+webhook_secret.txt
+
+# Session files
+session.txt
+sessions/

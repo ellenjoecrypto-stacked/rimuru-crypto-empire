@@ -1,0 +1,45 @@
+# ============================================
+# RIMURU CRYPTO EMPIRE - Asset Scanner Service
+# Scans files for crypto wallets, API keys, seeds
+# ============================================
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+RUN pip install --no-cache-dir \
+    requests==2.31.0 \
+    python-dotenv==1.0.0 \
+    aiohttp==3.9.1
+
+# Copy scanner code
+COPY tools/full_crypto_scanner.py /app/tools/full_crypto_scanner.py
+COPY tools/balance_checker.py /app/tools/balance_checker.py
+COPY tools/check_balances.py /app/tools/check_balances.py
+COPY tools/generate_report.py /app/tools/generate_report.py
+COPY security/secrets_manager.py /app/security/secrets_manager.py
+
+# Create non-root user
+RUN useradd -m -u 1000 scanner && \
+    mkdir -p /data /logs && \
+    chown -R scanner:scanner /app /data /logs
+
+USER scanner
+
+ENV PYTHONPATH=/app
+ENV SCAN_DATA_DIR=/data
+ENV LOG_DIR=/logs
+
+# Health check
+HEALTHCHECK --interval=60s --timeout=10s --start-period=10s --retries=3 \
+    CMD python -c "import os; exit(0 if os.path.exists('/data') else 1)"
+
+EXPOSE 8001
+
+CMD ["python", "/app/tools/full_crypto_scanner.py"]

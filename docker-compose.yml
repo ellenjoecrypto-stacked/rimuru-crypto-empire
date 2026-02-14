@@ -1,0 +1,324 @@
+version: '3.8'
+
+services:
+  # PostgreSQL - Store opportunities, approvals, claims
+  postgres:
+    image: postgres:15-alpine
+    container_name: rimuru-postgres
+    environment:
+      POSTGRES_DB: rimuru_opportunities
+      POSTGRES_USER: rimuru_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secure_password_here}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init_db.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rimuru_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - rimuru-network
+    restart: unless-stopped
+
+  # Redis for caching
+  redis:
+    image: redis:7-alpine
+    container_name: rimuru-redis
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis_secure_pass}
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - rimuru-network
+    restart: unless-stopped
+
+  # Opportunity Scanner Service
+  scanner:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.scanner
+    container_name: rimuru-scanner
+    environment:
+      DATABASE_URL: postgresql://rimuru_user:${DB_PASSWORD:-secure_password_here}@postgres:5432/rimuru_opportunities
+      REDIS_URL: redis://:${REDIS_PASSWORD:-redis_secure_pass}@redis:6379
+      LOG_LEVEL: INFO
+      SCAN_INTERVAL: 3600
+    volumes:
+      - ./data/scans:/data/scans
+      - ./logs:/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - rimuru-network
+    restart: unless-stopped
+
+  # Analysis Engine
+  analyzer:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.analyzer
+    container_name: rimuru-analyzer
+    environment:
+      DATABASE_URL: postgresql://rimuru_user:${DB_PASSWORD:-secure_password_here}@postgres:5432/rimuru_opportunities
+      REDIS_URL: redis://:${REDIS_PASSWORD:-redis_secure_pass}@redis:6379
+      LOG_LEVEL: INFO
+    volumes:
+      - ./data/analysis:/data/analysis
+      - ./logs:/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - rimuru-network
+    restart: unless-stopped
+
+  # Old Projects Data Integration
+  project-integrator:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.integrator
+    container_name: rimuru-integrator
+    environment:
+      DATABASE_URL: postgresql://rimuru_user:${DB_PASSWORD:-secure_password_here}@postgres:5432/rimuru_opportunities
+      OLD_PROJECT_PATHS: /projects
+      LOG_LEVEL: INFO
+    volumes:
+      - ./data/integrated:/data/integrated
+      - ./logs:/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - rimuru-network
+    restart: unless-stopped
+
+  # API Server - Human approval interface
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.api
+    container_name: rimuru-api
+    environment:
+      DATABASE_URL: postgresql://rimuru_user:${DB_PASSWORD:-secure_password_here}@postgres:5432/rimuru_opportunities
+      REDIS_URL: redis://:${REDIS_PASSWORD:-redis_secure_pass}@redis:6379
+      SECRET_KEY: ${SECRET_KEY:-your-secret-key-here}
+      LOG_LEVEL: INFO
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./logs:/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - rimuru-network
+    restart: unless-stopped
+
+  # Frontend Dashboard
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: rimuru-dashboard
+    ports:
+      - "3000:80"
+    environment:
+      REACT_APP_API_URL: http://localhost:5000
+      NODE_ENV: production
+    depends_on:
+      - api
+    networks:
+      - rimuru-network
+    restart: unless-stopped
+
+  # ============================================
+  # PRICE SERVICE - Live crypto prices from 4 APIs
+  # Port 8100 | REST + WebSocket
+  # ============================================
+  price-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.price
+    container_name: rimuru-price-service
+    environment:
+      PRICE_DB_PATH: /data/prices.db
+      ETHERSCAN_API_KEY: ${ETHERSCAN_API_KEY:-}
+      PRICE_SERVICE_PORT: 8100
+    ports:
+      - "8100:8100"
+    volumes:
+      - ./data:/data
+      - ./logs:/logs
+    networks:
+      - rimuru-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8100/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============================================
+  # WALLET SERVICE - Multi-chain balance tracker
+  # Port 8200 | ETH, BTC, SOL + ERC-20 tokens
+  # ============================================
+  wallet-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.wallet
+    container_name: rimuru-wallet-service
+    environment:
+      WALLET_DB_PATH: /data/wallets.db
+      ETHERSCAN_API_KEY: ${ETHERSCAN_API_KEY:-}
+      SOLANA_RPC_URL: ${SOLANA_RPC_URL:-https://api.mainnet-beta.solana.com}
+      WALLET_SERVICE_PORT: 8200
+    ports:
+      - "8200:8200"
+    volumes:
+      - ./data:/data
+      - ./logs:/logs
+    networks:
+      - rimuru-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8200/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============================================
+  # AI SERVICE - Rimuru AI Core + Ollama
+  # Port 8300 | ML decisions + LLM analysis
+  # ============================================
+  ai-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.ai
+    container_name: rimuru-ai-service
+    environment:
+      OLLAMA_URL: http://ollama:11434
+      AI_MODEL_PATH: /data/ai_models
+      AI_SERVICE_PORT: 8300
+    ports:
+      - "8300:8300"
+    volumes:
+      - ./data:/data
+      - ./logs:/logs
+    depends_on:
+      - ollama
+    networks:
+      - rimuru-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8300/health')"]
+      interval: 30s
+      timeout: 15s
+      retries: 3
+
+  # ============================================
+  # BOT SERVICE - Trading, farming, collection
+  # Port 8400 | Human approval workflow
+  # ============================================
+  bot-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.bot
+    container_name: rimuru-bot-service
+    environment:
+      BOT_DATA_DIR: /data/bots
+      BOT_SERVICE_PORT: 8400
+      KRAKEN_API_KEY: ${KRAKEN_API_KEY:-}
+      KRAKEN_SECRET: ${KRAKEN_SECRET:-}
+      COINBASE_API_KEY: ${COINBASE_API_KEY:-}
+      COINBASE_SECRET: ${COINBASE_SECRET:-}
+    ports:
+      - "8400:8400"
+    volumes:
+      - ./data:/data
+      - ./logs:/logs
+    depends_on:
+      - price-service
+      - ai-service
+    networks:
+      - rimuru-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8400/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============================================
+  # PIPELINE SERVICE - Scanner ↔ Price bridge
+  # Enriches scan findings with live prices
+  # ============================================
+  pipeline-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.pipeline
+    container_name: rimuru-pipeline-service
+    environment:
+      PIPELINE_DATA_DIR: /data
+    volumes:
+      - ./data:/data
+      - ./logs:/logs
+    depends_on:
+      - price-service
+    networks:
+      - rimuru-network
+    restart: unless-stopped
+
+  # ============================================
+  # ASSET SCANNER - File scanner for wallets/keys
+  # Scans mounted project directories
+  # ============================================
+  asset-scanner:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.scanner
+    container_name: rimuru-asset-scanner
+    environment:
+      SCAN_DATA_DIR: /data
+    volumes:
+      - ./data:/data
+      - ./logs:/logs
+    networks:
+      - rimuru-network
+    restart: unless-stopped
+
+  # Ollama for AI Analysis
+  ollama:
+    image: ollama/ollama:latest
+    container_name: rimuru-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - rimuru-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  ollama_data:
+
+networks:
+  rimuru-network:
+    driver: bridge

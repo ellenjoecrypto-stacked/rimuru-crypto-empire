@@ -1,0 +1,50 @@
+# ============================================
+# RIMURU CRYPTO EMPIRE - API Gateway
+# Unified REST API + WebSocket gateway
+# ============================================
+FROM python:3.11-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install dependencies
+RUN pip install --no-cache-dir \
+    fastapi==0.109.0 \
+    uvicorn==0.27.0 \
+    aiohttp==3.9.1 \
+    pydantic==2.5.3 \
+    requests==2.31.0 \
+    sqlalchemy==2.0.23 \
+    redis==5.0.1 \
+    python-dotenv==1.0.0 \
+    websockets==12.0 \
+    httpx==0.25.2 \
+    python-multipart==0.0.6
+
+# Copy API code
+COPY api/ /app/api/
+COPY core/ /app/core/
+COPY services/price_engine.py /app/services/price_engine.py
+COPY security/ /app/security/
+COPY database/ /app/database/
+
+RUN useradd -m -u 1000 apiserver && \
+    mkdir -p /data /logs && \
+    chown -R apiserver:apiserver /app /data /logs
+
+USER apiserver
+
+ENV PYTHONPATH=/app
+ENV API_PORT=5000
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:5000/health || exit 1
+
+EXPOSE 5000
+
+CMD ["python", "-m", "uvicorn", "api.gateway:app", "--host", "0.0.0.0", "--port", "5000"]

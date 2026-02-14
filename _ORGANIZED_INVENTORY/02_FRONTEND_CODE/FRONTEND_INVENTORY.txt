@@ -1,0 +1,416 @@
+================================================================================
+                        FRONTEND CODE INVENTORY
+                         REACT/TYPESCRIPT UI
+================================================================================
+
+LOCATION: c:\Users\Admin\OneDrive\Videos\rimuru_empire\frontend\
+
+📁 STRUCTURE:
+frontend/
+├── Dockerfile                   (492 B)
+├── index.html                   (551 B)
+├── nginx.conf                   (1.4 KB)
+├── package.json                 (851 B)
+├── vite.config.ts               (242 B)
+├── src/
+│   ├── main.tsx                (231 B)
+│   ├── App.tsx                 (1.5 KB)
+│   ├── components/
+│   │   ├── Dashboard.tsx        (8.2 KB)
+│   │   ├── Trading.tsx          (7.8 KB)
+│   │   ├── Bots.tsx             (10.2 KB)
+│   │   ├── Security.tsx         (14.2 KB)
+│   │   └── Navigation.tsx       (2.4 KB)
+│   ├── services/
+│   │   └── websocket.ts         (1.8 KB)
+│   ├── hooks/
+│   │   └── [Custom React hooks - TBD]
+│   └── utils/
+│       └── [Utility functions - TBD]
+
+================================================================================
+                          DETAILED FILE DESCRIPTIONS
+================================================================================
+
+🎨 REACT COMPONENTS - UI Components & Views
+─────────────────────────────────────────────────────────────────────────────
+
+File: App.tsx (1.5 KB)
+Purpose: Root React component - main application shell
+Location: frontend/src/App.tsx
+Responsibilities:
+  • Define application layout structure
+  • Route management (if using React Router)
+  • Global state management setup
+  • Main navigation structure
+  • Provider setup (Theme, Auth, State Management)
+Content:
+  - App component definition
+  - Router configuration
+  - Global layout structure
+
+File: Dashboard.tsx (8.2 KB)
+Purpose: Main dashboard view - portfolio overview and statistics
+Location: frontend/src/components/Dashboard.tsx
+Responsibilities:
+  • Display portfolio summary
+  • Show balance and assets
+  • Display P&L (Profit & Loss)
+  • Show key performance metrics
+  • Recent trade history
+  • Market overview cards
+Features:
+  - Real-time balance updates via WebSocket
+  - Portfolio composition charts
+  - Performance metrics
+  - Quick action buttons
+  - Alert notifications
+  
+File: Trading.tsx (7.8 KB)
+Purpose: Trading interface component - place and manage trades
+Location: frontend/src/components/Trading.tsx
+Responsibilities:
+  • Order placement interface
+  • Trade execution controls
+  • Order type selection (market, limit, etc.)
+  • Position management
+  • Order history display
+  • Real-time price data
+Features:
+  - Cryptocurrency pair selector
+  - Amount/quantity inputs
+  - Price inputs for limit orders
+  - Order preview
+  - Confirmation dialogs
+  - Order status tracking
+UI Elements:
+  - Trading pair selector
+  - Amount input field
+  - Price input field
+  - Order type radio buttons
+  - Execute button
+  - Order history table
+
+File: Bots.tsx (10.2 KB)
+Purpose: Bot management interface - create, configure, and control bots
+Location: frontend/src/components/Bots.tsx
+Responsibilities:
+  • Display list of active bots
+  • Bot creation interface
+  • Bot configuration editor
+  • Bot status monitoring
+  • Start/stop bot controls
+  • Bot performance metrics
+Features:
+  - Bot list with status indicators
+  - Configuration panel
+  • Strategy selection dropdown
+  • Risk parameter adjustments
+  • Exchange credential selection
+  - Performance statistics
+  - Activity logs
+  - Delete bot functionality
+Bot Management:
+  - Create new bot
+  - Edit bot settings
+  - Monitor real-time performance
+  - View bot logs
+  - Enable/disable bot
+  - Delete bot
+
+File: Security.tsx (14.2 KB)
+Purpose: Security settings and credential management interface
+Location: frontend/src/components/Security.tsx
+Responsibilities:
+  • Credential management UI
+  • API key addition/removal
+  • Password/authentication settings
+  • Security settings configuration
+  • Audit logs display
+  • Two-factor authentication setup
+Features:
+  - Add/edit/remove exchange credentials
+  - API key management
+  - Permission scopes display
+  - Last used timestamp
+  - Security alerts
+  - Activity log viewer
+  - 2FA setup wizard
+  - Password change interface
+Security Sections:
+  1. Exchange Credentials
+     - API key input
+     - API secret input
+     - Exchange selection
+     - Permissions display
+  
+  2. Authentication
+     - Password change
+     - 2FA enable/disable
+     - Recovery codes
+  
+  3. Audit Trail
+     - Login history
+     - Credential usage
+     - Permission changes
+     - API key rotations
+
+File: Navigation.tsx (2.4 KB)
+Purpose: Navigation menu and header component
+Location: frontend/src/components/Navigation.tsx
+Responsibilities:
+  • Main navigation menu
+  • Header/top bar
+  • Logo display
+  • Navigation links
+  • User menu
+  • Dark mode toggle
+Navigation Items:
+  - Dashboard link
+  - Trading link
+  - Bots link
+  - Security link
+  - User profile dropdown
+  - Logout button
+  - Settings link
+
+📡 SERVICES - API Communication & WebSocket
+─────────────────────────────────────────────────────────────────────────────
+
+File: websocket.ts (1.8 KB)
+Purpose: WebSocket client for real-time data communication
+Location: frontend/src/services/websocket.ts
+Responsibilities:
+  • Establish WebSocket connection to backend
+  • Handle real-time data streams
+  • Manage connection lifecycle
+  • Auto-reconnect on disconnect
+  • Handle message subscriptions
+Features:
+  - Automatic reconnection
+  - Event-based message handling
+  - Heartbeat/ping-pong
+  - Data parsing and validation
+Real-time Data Streams:
+  - Price updates
+  - Order status changes
+  - Portfolio updates
+  - Bot status changes
+  - Trade execution confirmations
+
+🏗️ CONFIGURATION & SETUP FILES
+─────────────────────────────────────────────────────────────────────────────
+
+File: package.json (851 B)
+Purpose: Node.js/npm project configuration and dependencies
+Location: frontend/package.json
+Content:
+  - Project metadata (name, version, description)
+  - npm scripts (build, dev, preview, etc.)
+  - Dependencies (React, TypeScript, etc.)
+  - Dev dependencies (Vite, ESLint, etc.)
+Scripts:
+  - npm run dev     - Start dev server
+  - npm run build   - Production build
+  - npm run preview - Preview production build
+  - npm run lint    - Code linting
+Dependencies:
+  - react           - UI framework
+  - react-dom       - React DOM renderer
+  - typescript      - Type checking
+  - vite            - Build tool
+  - axios           - HTTP client
+  - chart.js        - Charting library
+
+File: vite.config.ts (242 B)
+Purpose: Vite build tool configuration
+Location: frontend/vite.config.ts
+Configuration:
+  - Build output directory
+  - Development server settings
+  - Plugin configuration
+  - Environment variable setup
+  - Optimization settings
+
+File: index.html (551 B)
+Purpose: HTML entry point for React application
+Location: frontend/index.html
+Content:
+  - Basic HTML structure
+  - Root div for React mounting
+  - Script reference to main.tsx
+  - Meta tags for viewport and charset
+
+File: main.tsx (231 B)
+Purpose: React application entry point
+Location: frontend/src/main.tsx
+Responsibilities:
+  • Bootstrap React application
+  • Mount App component to DOM
+  • Initialize global providers
+Content:
+  - ReactDOM.createRoot()
+  - App component rendering
+
+🐳 DEPLOYMENT CONFIGURATION
+─────────────────────────────────────────────────────────────────────────────
+
+File: Dockerfile (492 B)
+Purpose: Docker container definition for frontend service
+Location: frontend/Dockerfile
+Build Stages:
+  1. Build stage
+     - Node.js image
+     - Install dependencies
+     - Build with Vite
+  2. Runtime stage
+     - Nginx image
+     - Copy built artifacts
+     - Configure Nginx
+  3. Serve stage
+     - Expose port 80
+     - Run Nginx server
+
+File: nginx.conf (1.4 KB)
+Purpose: Nginx reverse proxy and web server configuration
+Location: frontend/nginx.conf
+Configuration Sections:
+  - HTTP server block
+  - Listen port 80
+  - Root directory to /usr/share/nginx/html
+  - Proxy settings to backend API
+  - CORS headers
+  - Cache policies
+  - Compression settings
+Proxy Rules:
+  - /api/* → http://backend:8000
+  - /ws → ws://backend:8000/ws
+  - /* → Static files
+
+📚 SUPPORTING DIRECTORIES
+─────────────────────────────────────────────────────────────────────────────
+
+hooks/
+  Purpose: Custom React hooks for reusable logic
+  Examples: useWebSocket, useFetch, useAuth, useTheme
+  Files: [To be determined]
+  
+utils/
+  Purpose: Utility functions for frontend
+  Examples: Formatters, validators, helpers
+  Files: [To be determined]
+  Examples:
+    - formatCurrency()
+    - formatNumber()
+    - formatDate()
+    - calculatePercentage()
+    - validateInput()
+
+================================================================================
+                          TECHNOLOGIES & LIBRARIES
+================================================================================
+
+Core Framework:
+  ✓ React 18+        - UI library
+  ✓ TypeScript        - Type safety
+  ✓ Vite             - Build tool (fast bundler)
+  ✓ React Router v6  - Client-side routing (likely)
+
+State Management:
+  ✓ Context API      - Global state (likely)
+  ✓ Hooks            - State management hooks
+
+UI & Styling:
+  ✓ CSS Modules      - Component-scoped styles
+  ✓ Tailwind CSS     - Utility-first CSS (likely)
+  ✓ Material-UI      - Component library (likely)
+
+Data Visualization:
+  ✓ Chart.js         - Charting library
+  ✓ Recharts         - React charting (likely)
+
+HTTP & Real-time:
+  ✓ Axios            - HTTP client
+  ✓ WebSocket API    - Real-time communication
+
+Development:
+  ✓ ESLint           - Code quality
+  ✓ Prettier         - Code formatting
+  ✓ Vitest           - Unit testing (likely)
+
+================================================================================
+                          COMPONENT HIERARCHY
+================================================================================
+
+App (Root)
+├── Navigation
+├── Router / Page Container
+│   ├── Dashboard
+│   │   ├── PortfolioCard
+│   │   ├── PerformanceChart
+│   │   ├── AssetsList
+│   │   └── RecentTrades
+│   │
+│   ├── Trading
+│   │   ├── PairSelector
+│   │   ├── OrderForm
+│   │   ├── PriceChart
+│   │   └── OrderHistory
+│   │
+│   ├── Bots
+│   │   ├── BotsList
+│   │   ├── BotCard
+│   │   ├── BotConfiguration
+│   │   ├── BotPerformance
+│   │   └── CreateBotDialog
+│   │
+│   └── Security
+│       ├── CredentialsList
+│       ├── AddCredentialForm
+│       ├── AuthSettings
+│       ├── TwoFactorAuth
+│       └── AuditLog
+
+================================================================================
+                          STATISTICS
+================================================================================
+
+Total Frontend Files: 12
+Total Frontend Size: ~65 KB (excluding node_modules)
+
+File Breakdown:
+  Components: 5 files (42.9 KB)
+  Services: 1 file (1.8 KB)
+  Configuration: 5 files (3.3 KB)
+  Hooks: [TBD]
+  Utils: [TBD]
+
+Component Breakdown:
+  Dashboard: 8.2 KB (Portfolio overview)
+  Trading: 7.8 KB (Trade execution)
+  Bots: 10.2 KB (Bot management)
+  Security: 14.2 KB (Security settings)
+  Navigation: 2.4 KB (Navigation menu)
+
+Code Quality:
+  ✓ TypeScript for type safety
+  ✓ Functional components (modern React)
+  ✓ Hooks-based architecture
+  ✓ Component composition
+  ✓ Responsive design (likely)
+  ✓ Accessibility considerations
+
+================================================================================
+                          FEATURE MATRIX
+================================================================================
+
+Component       | Dashboard | Trading | Bots | Security | Navigation
+────────────────┼───────────┼─────────┼──────┼──────────┼───────────
+Portfolio View  |     ✓     |    ✗    |  ✗   |    ✗     |     ✗
+Order Placement |     ✗     |    ✓    |  ✗   |    ✗     |     ✗
+Bot Management  |     ✗     |    ✗    |  ✓   |    ✗     |     ✗
+Credentials     |     ✗     |    ✗    |  ✗   |    ✓     |     ✗
+Navigation      |     ✓     |    ✓    |  ✓   |    ✓     |     ✓
+Real-time Data  |     ✓     |    ✓    |  ✓   |    ✗     |     ✗
+
+================================================================================

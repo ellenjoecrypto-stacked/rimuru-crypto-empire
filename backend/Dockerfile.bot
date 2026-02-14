@@ -1,0 +1,60 @@
+# ============================================
+# RIMURU CRYPTO EMPIRE - Trading Bot Service
+# Automated trading, farming, collection bots
+# ============================================
+FROM python:3.11-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    gcc g++ make wget \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install TA-Lib for technical analysis
+RUN wget -q http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz \
+    && tar -xzf ta-lib-0.4.0-src.tar.gz \
+    && cd ta-lib/ \
+    && ./configure --prefix=/usr \
+    && make \
+    && make install \
+    && cd .. \
+    && rm -rf ta-lib*
+
+# Install dependencies
+RUN pip install --no-cache-dir \
+    fastapi==0.109.0 \
+    uvicorn==0.27.0 \
+    aiohttp==3.9.1 \
+    pydantic==2.5.3 \
+    requests==2.31.0 \
+    ccxt==4.1.0 \
+    numpy==1.26.2 \
+    pandas==2.1.4 \
+    pandas-ta==0.3.14b0 \
+    TA-Lib==0.4.28 \
+    python-dotenv==1.0.0 \
+    websockets==12.0
+
+# Copy bot code
+COPY bots/ /app/bots/
+COPY core/exchange_manager.py /app/core/exchange_manager.py
+COPY core/risk_manager.py /app/core/risk_manager.py
+COPY services/price_engine.py /app/services/price_engine.py
+
+RUN useradd -m -u 1000 botrunner && \
+    mkdir -p /data /logs && \
+    chown -R botrunner:botrunner /app /data /logs
+
+USER botrunner
+
+ENV PYTHONPATH=/app
+ENV BOT_SERVICE_PORT=8400
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8400/health')"
+
+EXPOSE 8400
+
+CMD ["python", "/app/bots/bot_service.py"]

@@ -1,0 +1,102 @@
+# ============================================
+# RIMURU CRYPTO EMPIRE - .gitignore
+# ============================================
+
+# ===== SECURITY - NEVER COMMIT =====
+_SENSITIVE/
+.env
+.env.local
+.env.*.local
+.env.backup
+*.vault
+*.key
+*.crt
+*.pem
+vault.db
+credentials.json
+secrets.json
+credentials.yaml
+*_api_key.txt
+*_api_secret.txt
+*_token.txt
+db_password.txt
+db_credentials.txt
+*_private.key
+*_private_key.pem
+id_rsa
+id_ed25519
+cdp_api_key_*.json
+TEMP_vault.txt
+*.backup
+*.restore
+*.recovery
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+*.whl
+.venv/
+venv/
+env/
+.Python
+pip-log.txt
+
+# ===== Databases =====
+*.db
+*.sqlite
+*.sqlite3
+!init_db.sql
+
+# ===== Data artifacts =====
+data/*.json
+data/*.csv
+data/*.db
+data/ai_models/
+data/bots/
+data/scans/
+data/analysis/
+data/integrated/
+crypto_findings.db
+crypto_scan_report.json
+balance_report.json
+scan_results.csv
+
+# ===== Logs =====
+logs/
+*.log
+
+# ===== IDE =====
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== Docker =====
+docker-compose.override.yml
+
+# ===== Node =====
+node_modules/
+npm-debug.log*
+.next/
+
+# ===== Performance =====
+*.pyperf
+Performance.pyperf
+
+# ===== Temp =====
+*.tmp
+*.temp
+*.bak

@@ -1,0 +1,32 @@
+# ============================================
+# RIMURU CRYPTO EMPIRE - Scanner-Price Pipeline
+# Bridges scanner findings with live price data
+# ============================================
+FROM python:3.11-slim
+
+WORKDIR /app
+
+RUN pip install --no-cache-dir \
+    aiohttp==3.9.1 \
+    requests==2.31.0 \
+    python-dotenv==1.0.0 \
+    pydantic==2.5.3
+
+# Copy pipeline code
+COPY integrators/scanner_price_pipeline.py /app/integrators/scanner_price_pipeline.py
+COPY integrators/project_scanner.py /app/integrators/project_scanner.py
+COPY services/price_engine.py /app/services/price_engine.py
+
+RUN useradd -m -u 1000 pipeline && \
+    mkdir -p /data /logs && \
+    chown -R pipeline:pipeline /app /data /logs
+
+USER pipeline
+
+ENV PYTHONPATH=/app
+ENV PIPELINE_DATA_DIR=/data
+
+HEALTHCHECK --interval=60s --timeout=10s --start-period=10s --retries=3 \
+    CMD python -c "import os; exit(0 if os.path.exists('/data') else 1)"
+
+CMD ["python", "/app/integrators/scanner_price_pipeline.py"]
