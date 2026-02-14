@@ -173,41 +173,60 @@ def demo_merkle():
 
 
 def demo_wallets():
-    banner("4. WALLETS — Keys & Signatures")
+    banner("4. WALLETS — Real ECDSA (secp256k1)")
     
-    from blockchain.wallet import Wallet
+    from blockchain.wallet import Wallet, validate_address, HDWallet
     
     print("""
-  Wallet security is based on asymmetric cryptography:
+  PRODUCTION wallet using real ECDSA on secp256k1 (same as Bitcoin).
   
-  Private Key  →  Public Key  →  Address
-  (secret)        (shareable)     (public identity)
+  Private Key (32 bytes)  →  Public Key (33 bytes compressed)  →  Address
   
-  • Private key: 256-bit random number (NEVER share!)
-  • Public key: Derived from private key (one-way function)
-  • Address: Hash of public key (what you give people to pay you)
+  • Private key: 256-bit random on secp256k1 curve
+  • Public key:  Elliptic curve point (compressed: 02/03 + x)
+  • Address:     Base58Check(RIPEMD160(SHA256(pubkey)))
+  • Signatures:  DER-encoded ECDSA with SHA-256 digest
   
-  "Not your keys, not your coins" — if you lose your private key,
-  your coins are gone FOREVER. No customer support. No reset button.
+  "Not your keys, not your coins"
     """)
     
     wallet = Wallet()
     
-    print(f"  Private Key: {wallet.private_key[:20]}... (256-bit, KEEP SECRET)")
-    print(f"  Public Key:  {wallet.public_key[:20]}... (derived from private)")
-    print(f"  Address:     {wallet.address} (share freely)")
+    print(f"  Private Key:  {wallet.private_key[:16]}...{wallet.private_key[-8:]}  (32 bytes)")
+    print(f"  Public Key:   {wallet.public_key[:16]}...{wallet.public_key[-8:]}  (33 bytes compressed)")
+    print(f"  Address:      {wallet.address}")
+    print(f"  Valid addr:   {validate_address(wallet.address)}")
     
-    section("Digital Signature")
+    section("ECDSA Signing & Verification")
     message = "Send 10 coins to Bob"
     signature = wallet.sign(message)
     print(f"  Message:   \"{message}\"")
-    print(f"  Signature: {signature[:32]}...")
-    print(f"  This proves you own the private key WITHOUT revealing it!")
+    print(f"  Signature: {signature[:32]}...  (DER encoded, {len(bytes.fromhex(signature))} bytes)")
+    
+    valid = Wallet.verify(wallet.public_key, message, signature)
+    tampered = Wallet.verify(wallet.public_key, "Send 10000 coins to Hacker", signature)
+    print(f"  Valid signature:   {valid}")
+    print(f"  Tampered message:  {tampered}  ← Real crypto catches this!")
     
     section("Key Determinism")
     wallet2 = Wallet(wallet.private_key)
     print(f"  Same private key → Same address: {wallet.address == wallet2.address}")
-    print(f"  This is why you can restore wallets from backup/seed phrase")
+    print(f"  Same private key → Same pubkey:  {wallet.public_key == wallet2.public_key}")
+    
+    section("BIP-39 Seed Phrase")
+    phrase = Wallet.generate_seed_phrase(128)
+    sw = Wallet(seed_phrase=phrase)
+    print(f"  Seed phrase:  {phrase}")
+    print(f"  Address:      {sw.address}")
+    sw2 = Wallet(seed_phrase=phrase)
+    print(f"  Same phrase → Same wallet: {sw.address == sw2.address}")
+    
+    section("HD Wallet (BIP-32/44)")
+    hd = HDWallet()
+    print(f"  1 seed → unlimited addresses:")
+    for i in range(3):
+        w = hd.derive_wallet()
+        print(f"    m/44'/999'/0'/0/{i} → {w.address}")
 
 
 def demo_consensus():
@@ -461,16 +480,18 @@ This demo walks through every component:
     
     banner("DEMO COMPLETE")
     print("""
-  You've seen how a blockchain works from the ground up:
+  You've seen how a PRODUCTION-GRADE blockchain works from the ground up:
   
-  ✓ SHA-256 hashing and proof of work
-  ✓ Transaction creation with the UTXO model
+  ✓ Real ECDSA signatures on secp256k1 (same as Bitcoin)
+  ✓ Base58Check addresses with RIPEMD-160
+  ✓ BIP-39 mnemonic seed phrases
+  ✓ BIP-32/44 HD wallet key derivation
+  ✓ UTXO transaction model with real signature verification
   ✓ Merkle trees for efficient verification
-  ✓ Wallet key generation and digital signatures
-  ✓ Proof of Work vs Proof of Stake consensus
+  ✓ Proof of Work & Proof of Stake consensus
   ✓ P2P networking and chain synchronization
-  ✓ Mining pool reward distribution schemes
-  ✓ Why blockchains are immutable (tamper-proof)
+  ✓ Mining pool reward distribution (PPS/PPLNS/PROP)
+  ✓ Tamper-proof immutability
   
   Next steps:
   • Run individual modules: python -m blockchain.chain

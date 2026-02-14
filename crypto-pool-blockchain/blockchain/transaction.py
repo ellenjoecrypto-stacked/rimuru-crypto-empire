@@ -30,24 +30,31 @@ class TxInput:
     Fields:
         tx_hash:    Hash of the transaction containing the output
         output_idx: Index of the output in that transaction
-        signature:  ECDSA signature proving ownership
+        signature:  ECDSA (DER) signature proving ownership
+        public_key: Compressed public key of the signer (hex, 33 bytes)
     """
 
-    def __init__(self, tx_hash: str, output_idx: int, signature: str = ""):
+    def __init__(self, tx_hash: str, output_idx: int,
+                 signature: str = "", public_key: str = ""):
         self.tx_hash = tx_hash
         self.output_idx = output_idx
         self.signature = signature
+        self.public_key = public_key  # signer's compressed pubkey (hex)
 
     def to_dict(self) -> dict:
         return {
             "tx_hash": self.tx_hash,
             "output_idx": self.output_idx,
             "signature": self.signature,
+            "public_key": self.public_key,
         }
 
     @classmethod
     def from_dict(cls, data: dict) -> "TxInput":
-        return cls(data["tx_hash"], data["output_idx"], data.get("signature", ""))
+        return cls(
+            data["tx_hash"], data["output_idx"],
+            data.get("signature", ""), data.get("public_key", ""),
+        )
 
 
 class TxOutput:
@@ -110,6 +117,23 @@ class Transaction:
             "tx_type": self.tx_type,
         }, sort_keys=True)
         return hashlib.sha256(data.encode()).hexdigest()
+
+    def signable_dict(self) -> dict:
+        """
+        Return the canonical data to be signed (excludes signatures, pubkeys, tx_hash).
+
+        This is what the sender signs with their private key.
+        It's stable — it doesn't change when signatures are attached.
+        """
+        return {
+            "inputs": [
+                {"tx_hash": inp.tx_hash, "output_idx": inp.output_idx}
+                for inp in self.inputs
+            ],
+            "outputs": [out.to_dict() for out in self.outputs],
+            "timestamp": self.timestamp,
+            "tx_type": self.tx_type,
+        }
 
     @classmethod
     def create_coinbase(cls, miner_address: str, reward: float, block_index: int,

@@ -24,7 +24,7 @@ from typing import List, Dict, Optional, Tuple
 
 from blockchain.block import Block
 from blockchain.transaction import Transaction, TxInput, TxOutput
-from blockchain.wallet import Wallet
+from blockchain.wallet import Wallet, pubkey_to_address
 
 logger = logging.getLogger("rimuru.blockchain")
 
@@ -142,6 +142,37 @@ class Blockchain:
                 output_total, input_total,
             )
             return False
+
+        # ── Real ECDSA signature verification ──
+        # For each input, verify:
+        #   1. The public key hashes to the address that owns the UTXO
+        #   2. The signature is valid for this transaction
+        tx_data = tx.signable_dict()
+        for inp in tx.inputs:
+            key = (inp.tx_hash, inp.output_idx)
+            utxo = self.utxo_set.get(key)
+            if not utxo:
+                continue  # already validated above
+
+            if not inp.public_key or not inp.signature:
+                logger.warning("Missing public_key or signature on input %s", key)
+                return False
+
+            # Verify pubkey hashes to the UTXO's owner address
+            derived_addr = pubkey_to_address(bytes.fromhex(inp.public_key))
+            if derived_addr != utxo.address:
+                logger.warning(
+                    "Public key does not match UTXO owner: %s != %s",
+                    derived_addr[:16], utxo.address[:16],
+                )
+                return False
+
+            # Verify ECDSA signature
+            import json as _json
+            clean_data = _json.dumps(tx_data, sort_keys=True)
+            if not Wallet.verify(inp.public_key, clean_data, inp.signature):
+                logger.warning("Invalid ECDSA signature for input %s", key)
+                return False
 
         self.mempool.append(tx)
         logger.info("Transaction added to mempool: %s (fee=%.4f)",
@@ -432,11 +463,12 @@ class Blockchain:
         # Build transaction
         tx = Transaction(inputs, outputs)
 
-        # Sign each input
-        tx_data = tx.to_dict()
+        # Sign each input with sender's ECDSA key
+        tx_data = tx.signable_dict()
         signature = sender_wallet.sign_transaction(tx_data)
         for inp in tx.inputs:
             inp.signature = signature
+            inp.public_key = sender_wallet.public_key  # compressed pubkey
 
         # Recompute hash with signatures
         tx.tx_hash = tx.compute_hash()
