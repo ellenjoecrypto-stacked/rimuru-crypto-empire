@@ -10,12 +10,18 @@ from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker, Session
 import asyncio
 import logging
+import sys
+from pathlib import Path
 from datetime import datetime
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Generator
 from pydantic import BaseModel
 import os
 
-from opportunity_scanner import (
+# Ensure aggregators directory is on the path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "aggregators"))
+
+from aggregators.opportunity_scanner import (
     OpportunityAggregator, 
     Opportunity, 
     OpportunityType,
@@ -51,7 +57,7 @@ DATABASE_URL = os.getenv(
 engine = create_engine(DATABASE_URL, echo=False)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-def get_db() -> Session:
+def get_db() -> Generator[Session, None, None]:
     """Get database session"""
     db = SessionLocal()
     try:

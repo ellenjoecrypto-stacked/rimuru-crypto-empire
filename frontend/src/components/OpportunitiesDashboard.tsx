@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import './OpportunitiesDashboard.css';
 import {
   Table,
   Button,
@@ -28,7 +29,7 @@ import {
   ExclamationCircleOutlined,
   DollarOutlined,
   PercentageOutlined,
-  FileDownloadOutlined,
+  DownloadOutlined,
   ReloadOutlined,
 } from '@ant-design/icons';
 import axios from 'axios';
@@ -305,7 +306,7 @@ const OpportunitiesDashboard: React.FC = () => {
       dataIndex: 'estimated_roi',
       key: 'estimated_roi',
       render: (roi: number) => (
-        <span style={{ color: roi > 1 ? 'green' : 'red' }}>
+        <span className={roi > 1 ? 'roi-positive' : 'roi-negative'}>
           {(roi * 100).toFixed(1)}%
         </span>
       ),
@@ -370,9 +371,9 @@ const OpportunitiesDashboard: React.FC = () => {
   ];
 
   return (
-    <div style={{ padding: '24px' }}>
+    <div className="opportunities-dashboard">
       {/* Header */}
-      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+      <Row gutter={[16, 16]} className="dashboard-header">
         <Col span={24}>
           <Row justify="space-between" align="middle">
             <h1>Rimuru Opportunity Aggregator</h1>
@@ -384,7 +385,7 @@ const OpportunitiesDashboard: React.FC = () => {
               >
                 Refresh Scan
               </Button>
-              <Button icon={<FileDownloadOutlined />} onClick={handleExport}>
+              <Button icon={<DownloadOutlined />} onClick={handleExport}>
                 Export
               </Button>
             </Space>

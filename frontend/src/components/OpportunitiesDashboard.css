@@ -1,0 +1,15 @@
+.opportunities-dashboard {
+  padding: 24px;
+}
+
+.roi-positive {
+  color: green;
+}
+
+.roi-negative {
+  color: red;
+}
+
+.dashboard-header {
+  margin-bottom: 24px;
+}

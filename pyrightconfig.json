@@ -1,0 +1,11 @@
+{
+  "extraPaths": [
+    "backend",
+    "backend/aggregators",
+    "services",
+    "crypto-pool-blockchain"
+  ],
+  "reportMissingImports": "warning",
+  "reportGeneralTypeIssues": "warning",
+  "pythonVersion": "3.11"
+}
