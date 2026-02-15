@@ -258,5 +258,5 @@ async def ollama_status():
 
 if __name__ == "__main__":
     port = int(os.getenv("AI_SERVICE_PORT", "8300"))
-    print(f"🧠 Rimuru AI Service starting on port {port} - ai_service.py:264")
+    print(f"🧠 Rimuru AI Service starting on port {port} - ai_service.py:261")
     uvicorn.run(app, host="0.0.0.0", port=port)

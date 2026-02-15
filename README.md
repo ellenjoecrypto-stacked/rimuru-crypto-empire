@@ -5,12 +5,14 @@ A comprehensive, production-ready cryptocurrency automation platform with AI-pow
 ## ✨ Features
 
 ### 🤖 Multi-Strategy Trading Bots
+
 - **Spot Trading Bot** with 5 strategies (MA Crossover, RSI Reversal, MACD Momentum, Bollinger Breakout, Grid Trading)
 - **DeFi Farming Bot** for yield farming across protocols (Uniswap, Aave, Curve)
 - **Arbitrage Bot** for cross-exchange arbitrage opportunities
 - **Staking Bot** for automated staking management
 
 ### 🧠 AI-Powered Intelligence
+
 - **Rimuru AI Core** with machine learning for signal generation
 - **Ollama Integration** for advanced AI reasoning
 - **Self-Learning System** that improves from trade outcomes
@@ -18,6 +20,7 @@ A comprehensive, production-ready cryptocurrency automation platform with AI-pow
 - **Strategy Optimization** based on performance
 
 ### 🛡️ Military-Grade Security
+
 - **AES-256-GCM Encryption** for all credentials
 - **Secure Credential Vault** with audit logging
 - **2FA Support** for enhanced security
@@ -25,6 +28,7 @@ A comprehensive, production-ready cryptocurrency automation platform with AI-pow
 - **Emergency Stop** mechanism for immediate halting
 
 ### 📊 Modern Dashboard
+
 - **Real-Time Updates** via WebSocket
 - **Interactive Charts** with TradingView integration
 - **Portfolio Tracking** with P&L visualization
@@ -32,6 +36,7 @@ A comprehensive, production-ready cryptocurrency automation platform with AI-pow
 - **Risk Management Center** with alerts
 
 ### 🔗 Multi-Exchange Support
+
 - Binance, Kraken, Coinbase, Bybit, OKX
 - Unified API interface
 - Connection pooling and retry logic
@@ -81,20 +86,20 @@ docker-compose ps
 
 ### 4. Access the Dashboard
 
-- **Frontend Dashboard**: http://localhost:3000
-- **API Gateway**: http://localhost:5000/docs
-- **Price Service**: http://localhost:8100/docs
-- **Wallet Service**: http://localhost:8200/docs
-- **AI Service**: http://localhost:8300/docs
-- **Bot Service**: http://localhost:8400/docs
-- **Ollama AI**: http://localhost:11434
+- **Frontend Dashboard**: <http://localhost:3000>
+- **API Gateway**: <http://localhost:5000/docs>
+- **Price Service**: <http://localhost:8100/docs>
+- **Wallet Service**: <http://localhost:8200/docs>
+- **AI Service**: <http://localhost:8300/docs>
+- **Bot Service**: <http://localhost:8400/docs>
+- **Ollama AI**: <http://localhost:11434>
 
 ## 🧱 Microservice Architecture
 
 Each service runs in its own Docker container. Mix and match based on your needs:
 
 | Service | Port | Dockerfile | Description |
-|---------|------|-----------|-------------|
+| --------- | ------ | ----------- | ------------- |
 | **Price Service** | 8100 | `Dockerfile.price` | Live prices from CoinGecko, CoinCap, Kraken, Etherscan |
 | **Wallet Service** | 8200 | `Dockerfile.wallet` | Multi-chain balance tracker (ETH, BTC, SOL + ERC-20) |
 | **AI Service** | 8300 | `Dockerfile.ai` | Rimuru AI Core + Ollama LLM trading decisions |
@@ -125,7 +130,7 @@ docker-compose up -d
 
 ## 📁 Project Structure
 
-```
+```text
 rimuru_empire/
 ├── backend/
 │   ├── api/              # FastAPI endpoints
@@ -289,18 +294,21 @@ curl http://localhost:8000/api/risk/summary
 ## ⚠️ Warnings
 
 ### Financial Risk
+
 - Cryptocurrency trading is highly volatile
 - You can lose your entire investment
 - Past performance ≠ future results
 - Only trade what you can afford to lose
 
 ### Technical Risks
+
 - Internet connectivity issues
 - Exchange API downtime
 - Software bugs
 - Market manipulation
 
 ### Legal & Compliance
+
 - Understand your local regulations
 - Comply with exchange terms of service
 - Keep records for tax purposes
@@ -310,7 +318,8 @@ curl http://localhost:8000/api/risk/summary
 
 ### Common Issues
 
-**1. Bots not starting**
+#### 1. Bots not starting
+
 ```bash
 # Check backend logs
 docker-compose logs backend
@@ -319,14 +328,16 @@ docker-compose logs backend
 curl http://localhost:8000/api/exchanges
 ```
 
-**2. WebSocket not connecting**
+#### 2. WebSocket not connecting
+
 ```bash
 # Check firewall settings
 # Ensure port 8000 is accessible
 # Verify CORS configuration
 ```
 
-**3. Ollama not responding**
+#### 3. Ollama not responding
+
 ```bash
 # Restart Ollama service
 docker-compose restart ollama
@@ -335,7 +346,8 @@ docker-compose restart ollama
 docker-compose exec ollama ollama list
 ```
 
-**4. Database errors**
+#### 4. Database errors
+
 ```bash
 # Reset database (WARNING: deletes all data)
 docker-compose down -v
@@ -389,7 +401,7 @@ docker-compose exec postgres pg_dump rimuru_db > backup.sql
 
 ### Documentation
 
-- API Documentation: http://localhost:8000/docs
+- API Documentation: <http://localhost:8000/docs>
 - User Manual: See `docs/USER_MANUAL.md`
 - Deployment Guide: See `docs/DEPLOYMENT.md`
 
