@@ -260,14 +260,14 @@ class Transaction:
 # ──────────────────────────────────────────────
 
 if __name__ == "__main__":
-    print("= - transaction.py:264" * 60)
-    print("TRANSACTION DEMO - transaction.py:265")
-    print("= - transaction.py:266" * 60)
+    print("= - transaction.py:263" * 60)
+    print("TRANSACTION DEMO - transaction.py:264")
+    print("= - transaction.py:265" * 60)
 
     # 1. Coinbase (mining reward)
     coinbase = Transaction.create_coinbase("miner_alice_addr", 50.0, 1)
-    print(f"\n1. Mining reward: {coinbase} - transaction.py:270")
-    print(f"Hash: {coinbase.tx_hash[:32]}... - transaction.py:271")
+    print(f"\n1. Mining reward: {coinbase} - transaction.py:269")
+    print(f"Hash: {coinbase.tx_hash[:32]}... - transaction.py:270")
 
     # 2. Alice sends 10 to Bob (spending from coinbase)
     tx = Transaction(
@@ -277,9 +277,9 @@ if __name__ == "__main__":
             TxOutput("alice_address", 39.5),     # 39.5 change to Alice
         ],                                        # 0.5 implicit fee
     )
-    print(f"\n2. Transfer: {tx} - transaction.py:281")
-    print(f"Hash: {tx.tx_hash[:32]}... - transaction.py:282")
+    print(f"\n2. Transfer: {tx} - transaction.py:280")
+    print(f"Hash: {tx.tx_hash[:32]}... - transaction.py:281")
 
     # 3. Check fee
     utxo_set = {(coinbase.tx_hash, 0): coinbase.outputs[0]}
-    print(f"Fee:  {tx.fee(utxo_set):.1f} coins (goes to miner) - transaction.py:286")
+    print(f"Fee:  {tx.fee(utxo_set):.1f} coins (goes to miner) - transaction.py:285")
