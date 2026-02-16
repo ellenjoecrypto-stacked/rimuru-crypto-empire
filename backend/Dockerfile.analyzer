@@ -1,0 +1,31 @@
+# ============================================
+# RIMURU CRYPTO EMPIRE - Opportunity Analyzer
+# Scans airdrops, faucets, whale movements
+# ============================================
+FROM python:3.11-slim
+
+WORKDIR /app
+
+RUN pip install --no-cache-dir \
+    requests==2.31.0 \
+    python-dotenv==1.0.0 \
+    aiohttp==3.9.1 \
+    pydantic==2.5.3
+
+# Copy analyzer code
+COPY aggregators/opportunity_scanner.py /app/aggregators/opportunity_scanner.py
+COPY aggregators/__init__.py /app/aggregators/__init__.py
+
+RUN useradd -m -u 1000 analyzer && \
+    mkdir -p /data/analysis /logs && \
+    chown -R analyzer:analyzer /app /data /logs
+
+USER analyzer
+
+ENV PYTHONPATH=/app
+ENV LOG_DIR=/logs
+
+HEALTHCHECK --interval=60s --timeout=10s --start-period=10s --retries=3 \
+    CMD python -c "import os; exit(0 if os.path.exists('/data') else 1)"
+
+CMD ["python", "/app/aggregators/opportunity_scanner.py"]

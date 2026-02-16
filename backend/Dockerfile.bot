@@ -22,20 +22,19 @@ RUN wget -q http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz \
     && cd .. \
     && rm -rf ta-lib*
 
-# Install dependencies
-RUN pip install --no-cache-dir \
-    fastapi==0.109.0 \
-    uvicorn==0.27.0 \
-    aiohttp==3.9.1 \
-    pydantic==2.5.3 \
-    requests==2.31.0 \
-    ccxt==4.1.0 \
-    numpy==1.26.2 \
-    pandas==2.1.4 \
-    pandas-ta==0.3.14b0 \
+# Install dependencies (numpy first for TA-Lib headers)
+RUN pip install --no-cache-dir numpy==1.26.4 && \
+    pip install --no-cache-dir \
+    fastapi>=0.109.0 \
+    uvicorn>=0.27.0 \
+    aiohttp>=3.9.0 \
+    pydantic>=2.5.0 \
+    requests>=2.31.0 \
+    ccxt>=4.0.0 \
+    pandas>=2.1.0 \
     TA-Lib==0.4.28 \
-    python-dotenv==1.0.0 \
-    websockets==12.0
+    python-dotenv>=1.0.0 \
+    websockets>=12.0
 
 # Copy bot code
 COPY bots/ /app/bots/
