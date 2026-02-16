@@ -4,6 +4,7 @@
 
 # ===== SECURITY - NEVER COMMIT =====
 _SENSITIVE/
+.vault/
 .env
 .env.local
 .env.*.local

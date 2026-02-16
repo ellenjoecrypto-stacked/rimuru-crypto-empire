@@ -111,11 +111,24 @@ class Blockchain:
           3. Input value >= output value (no creating money)
           4. Signatures are valid (simplified)
           5. No double-spending (inputs not already in mempool)
+
+        Vault transactions skip UTXO checks — they carry data only.
         """
         # Coinbase transactions are added directly during mining
         if tx.is_coinbase():
             logger.warning("Cannot manually add coinbase transactions")
             return False
+
+        # Vault transactions: data-only, no UTXO needed
+        if tx.is_vault():
+            if not tx.data:
+                logger.warning("Vault transaction has no data payload")
+                return False
+            self.mempool.append(tx)
+            logger.info("Vault record added to mempool: %s (%s)",
+                         tx.tx_hash[:16],
+                         tx.data.get("vault_type", "unknown"))
+            return True
 
         # Verify inputs exist in UTXO set
         input_total = 0.0
@@ -508,6 +521,56 @@ class Blockchain:
             "block_reward": self.block_reward,
             "chain": [b.to_dict() for b in self.chain],
         }
+
+    # ─── Vault Methods ───
+
+    def add_vault_record(self, owner_address: str, data: dict) -> Optional[Transaction]:
+        """
+        Add a vault (data-only) record to the mempool.
+
+        The data dict is hashed into the transaction and will be
+        permanently embedded in the next mined block's Merkle tree.
+
+        Returns the vault Transaction if accepted, None otherwise.
+        """
+        tx = Transaction.create_vault(owner_address, data)
+        if self.add_transaction(tx):
+            return tx
+        return None
+
+    def get_vault_records(self, vault_type: Optional[str] = None,
+                          owner: Optional[str] = None) -> list:
+        """
+        Query all vault records from the blockchain.
+
+        Args:
+            vault_type: Filter by vault_type (e.g. "wallet", "api_key")
+            owner:      Filter by owner address
+
+        Returns list of dicts with block_index, timestamp, and the tx data.
+        """
+        records = []
+        for block in self.chain:
+            for tx_dict in block.transactions:
+                if tx_dict.get("tx_type") != "vault":
+                    continue
+                data = tx_dict.get("data", {})
+                addr = tx_dict["outputs"][0]["address"] if tx_dict["outputs"] else None
+
+                if vault_type and data.get("vault_type") != vault_type:
+                    continue
+                if owner and addr != owner:
+                    continue
+
+                records.append({
+                    "block_index": block.index,
+                    "block_hash": block.hash,
+                    "tx_hash": tx_dict["tx_hash"],
+                    "timestamp": tx_dict["timestamp"],
+                    "owner": addr,
+                    "data": data,
+                })
+        return records
 
 
 # ──────────────────────────────────────────────

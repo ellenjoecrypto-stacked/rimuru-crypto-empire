@@ -101,22 +101,28 @@ class Transaction:
         outputs: List[TxOutput],
         timestamp: Optional[float] = None,
         tx_type: str = "transfer",
+        data: Optional[dict] = None,
     ):
         self.inputs = inputs
         self.outputs = outputs
         self.timestamp = timestamp or time.time()
-        self.tx_type = tx_type  # "transfer", "coinbase"
+        self.tx_type = tx_type  # "transfer", "coinbase", "vault"
+        self.data = data  # optional metadata (vault records, labels, hashes)
         self.tx_hash = self.compute_hash()
 
     def compute_hash(self) -> str:
         """Unique identifier for this transaction."""
-        data = json.dumps({
+        hash_data = {
             "inputs": [inp.to_dict() for inp in self.inputs],
             "outputs": [out.to_dict() for out in self.outputs],
             "timestamp": self.timestamp,
             "tx_type": self.tx_type,
-        }, sort_keys=True)
-        return hashlib.sha256(data.encode()).hexdigest()
+        }
+        if self.data:
+            hash_data["data"] = self.data
+        return hashlib.sha256(
+            json.dumps(hash_data, sort_keys=True).encode()
+        ).hexdigest()
 
     def signable_dict(self) -> dict:
         """
@@ -125,7 +131,7 @@ class Transaction:
         This is what the sender signs with their private key.
         It's stable — it doesn't change when signatures are attached.
         """
-        return {
+        d = {
             "inputs": [
                 {"tx_hash": inp.tx_hash, "output_idx": inp.output_idx}
                 for inp in self.inputs
@@ -134,6 +140,9 @@ class Transaction:
             "timestamp": self.timestamp,
             "tx_type": self.tx_type,
         }
+        if self.data:
+            d["data"] = self.data
+        return d
 
     @classmethod
     def create_coinbase(cls, miner_address: str, reward: float, block_index: int,
@@ -183,32 +192,67 @@ class Transaction:
         return self.tx_type == "coinbase"
 
     def to_dict(self) -> dict:
-        return {
+        d = {
             "tx_hash": self.tx_hash,
             "tx_type": self.tx_type,
             "timestamp": self.timestamp,
             "inputs": [inp.to_dict() for inp in self.inputs],
             "outputs": [out.to_dict() for out in self.outputs],
         }
+        if self.data:
+            d["data"] = self.data
+        return d
 
     @classmethod
-    def from_dict(cls, data: dict) -> "Transaction":
+    def from_dict(cls, d: dict) -> "Transaction":
         tx = cls(
-            inputs=[TxInput.from_dict(i) for i in data["inputs"]],
-            outputs=[TxOutput.from_dict(o) for o in data["outputs"]],
-            timestamp=data["timestamp"],
-            tx_type=data["tx_type"],
+            inputs=[TxInput.from_dict(i) for i in d["inputs"]],
+            outputs=[TxOutput.from_dict(o) for o in d["outputs"]],
+            timestamp=d["timestamp"],
+            tx_type=d["tx_type"],
+            data=d.get("data"),
         )
-        tx.tx_hash = data["tx_hash"]
+        tx.tx_hash = d["tx_hash"]
         return tx
+
+    @classmethod
+    def create_vault(cls, owner_address: str, data: dict,
+                     timestamp: Optional[float] = None) -> "Transaction":
+        """
+        Create a vault transaction — data-only, no value transfer.
+
+        Vault records anchor data hashes on-chain for tamper-proof provenance.
+        The data dict is embedded directly in the transaction and becomes
+        part of the block's Merkle tree, making it impossible to alter
+        without invalidating the entire chain.
+
+        Typical data fields:
+            vault_type:  "wallet", "api_key", "seed_phrase", "scan_result", etc.
+            data_hash:   SHA-256 of the original sensitive data
+            label:       Human-readable description (non-sensitive)
+            source:      Where the finding came from
+        """
+        return cls(
+            inputs=[],
+            outputs=[TxOutput(owner_address, 0.0)],  # zero-value marker
+            tx_type="vault",
+            timestamp=timestamp,
+            data=data,
+        )
+
+    def is_vault(self) -> bool:
+        """Is this a vault (data-only) transaction?"""
+        return self.tx_type == "vault"
 
     def __repr__(self) -> str:
         if self.is_coinbase():
             return f"CoinbaseTx({self.outputs[0].amount} → {self.outputs[0].address[:12]}...)"
+        if self.is_vault():
+            vtype = self.data.get('vault_type', 'unknown') if self.data else 'unknown'
+            return f"VaultTx({vtype} → {self.outputs[0].address[:12]}...)"
         return (
             f"Tx({len(self.inputs)} inputs → {len(self.outputs)} outputs, "
-            f"total={self.total_output_value():.4f})"
-        )
+            f"total={self.total_output_value():.4f})")
 
 
 # ──────────────────────────────────────────────
@@ -216,14 +260,14 @@ class Transaction:
 # ──────────────────────────────────────────────
 
 if __name__ == "__main__":
-    print("=" * 60)
-    print("TRANSACTION DEMO")
-    print("=" * 60)
+    print("= - transaction.py:264" * 60)
+    print("TRANSACTION DEMO - transaction.py:265")
+    print("= - transaction.py:266" * 60)
 
     # 1. Coinbase (mining reward)
     coinbase = Transaction.create_coinbase("miner_alice_addr", 50.0, 1)
-    print(f"\n1. Mining reward: {coinbase}")
-    print(f"   Hash: {coinbase.tx_hash[:32]}...")
+    print(f"\n1. Mining reward: {coinbase} - transaction.py:270")
+    print(f"Hash: {coinbase.tx_hash[:32]}... - transaction.py:271")
 
     # 2. Alice sends 10 to Bob (spending from coinbase)
     tx = Transaction(
@@ -233,9 +277,9 @@ if __name__ == "__main__":
             TxOutput("alice_address", 39.5),     # 39.5 change to Alice
         ],                                        # 0.5 implicit fee
     )
-    print(f"\n2. Transfer: {tx}")
-    print(f"   Hash: {tx.tx_hash[:32]}...")
+    print(f"\n2. Transfer: {tx} - transaction.py:281")
+    print(f"Hash: {tx.tx_hash[:32]}... - transaction.py:282")
 
     # 3. Check fee
     utxo_set = {(coinbase.tx_hash, 0): coinbase.outputs[0]}
-    print(f"   Fee:  {tx.fee(utxo_set):.1f} coins (goes to miner)")
+    print(f"Fee:  {tx.fee(utxo_set):.1f} coins (goes to miner) - transaction.py:286")
