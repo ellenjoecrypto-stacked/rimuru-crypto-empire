@@ -415,7 +415,10 @@ class AirdropHunter:
         urgency = 0.0
         if ad.deadline:
             try:
-                dl = datetime.fromisoformat(ad.deadline.replace("Z", "+00:00"))
+                dl_str = ad.deadline.replace("Z", "+00:00")
+                dl = datetime.fromisoformat(dl_str)
+                if dl.tzinfo is None:
+                    dl = dl.replace(tzinfo=timezone.utc)
                 days_left = (dl - datetime.now(timezone.utc)).days
                 if days_left < 7:
                     urgency = 2.0
