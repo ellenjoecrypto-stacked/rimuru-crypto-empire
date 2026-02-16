@@ -1,7 +1,7 @@
 {
   "extraPaths": [
+    ".",
     "backend",
-    "backend/aggregators",
     "services",
     "crypto-pool-blockchain"
   ],

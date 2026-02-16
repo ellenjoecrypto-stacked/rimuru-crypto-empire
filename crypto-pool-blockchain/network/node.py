@@ -34,7 +34,8 @@ from typing import Dict, List, Set, Optional
 from copy import deepcopy
 
 import sys
-sys.path.insert(0, str(__import__("pathlib").Path(__file__).resolve().parent.parent))
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from blockchain.chain import Blockchain
 from blockchain.block import Block

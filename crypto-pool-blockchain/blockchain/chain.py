@@ -17,10 +17,14 @@ Key concepts implemented here:
   8. Fork resolution (longest valid chain wins)
 """
 
+import sys
 import time
 import json
 import logging
+from pathlib import Path
 from typing import List, Dict, Optional, Tuple
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from blockchain.block import Block
 from blockchain.transaction import Transaction, TxInput, TxOutput
