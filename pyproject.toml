@@ -1,0 +1,75 @@
+[project]
+name = "rimuru-crypto-empire"
+version = "1.0.0"
+description = "A comprehensive cryptocurrency automation platform with AI-powered trading, DeFi farming, and multi-exchange support"
+requires-python = ">=3.11"
+readme = "README.md"
+license = {text = "MIT"}
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = true
+disallow_untyped_calls = false
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_optional = false
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+    "ccxt.*",
+    "aioredis.*",
+    "asyncpg.*",
+]
+ignore_missing_imports = true
+
+[tool.bandit]
+exclude_dirs = [
+    "tests",
+    "test_*.py",
+    "*_test.py",
+    "venv",
+    ".venv",
+]
+skips = [
+    "B101",  # assert_used (used in tests)
+    "B601",  # paramiko_calls
+]
+
+[tool.coverage.run]
+source = ["backend", "services"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/*_test.py",
+    "*/migrations/*",
+]
+
+[tool.coverage.report]
+precision = 2
+show_missing = true
+skip_covered = false
