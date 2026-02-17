@@ -11,14 +11,14 @@ import math
 import statistics
 import logging
 from pathlib import Path
-from typing import List, Optional, Dict
+from typing import Optional
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 import uvicorn
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from shared.models import OHLCV, IndicatorRequest, IndicatorResult, ServiceHealth
+from shared.models import IndicatorRequest, IndicatorResult, ServiceHealth
 from shared.security import secure_app
 
 logger = logging.getLogger("rimuru.indicators")
@@ -263,8 +263,8 @@ class TA:
             "1.618": swing_high + diff * 0.618,
         }
         fib_position = (current - swing_low) / diff if diff else 0
-        support = max((l for l in levels.values() if l < current), default=swing_low)
-        resistance = min((l for l in levels.values() if l > current), default=swing_high)
+        support = max((lv for lv in levels.values() if lv < current), default=swing_low)
+        resistance = min((lv for lv in levels.values() if lv > current), default=swing_high)
         return {
             "swing_high": round(swing_high, 6),
             "swing_low": round(swing_low, 6),

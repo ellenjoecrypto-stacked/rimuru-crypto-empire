@@ -3,7 +3,10 @@ Rimuru Strategy — Bollinger Bands
 Mean reversion with Bollinger Band bounces.
 """
 
-import os, sys, time, logging
+import os
+import sys
+import time
+import logging
 from pathlib import Path
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
@@ -44,7 +47,7 @@ def generate_signal(req: StrategyRequest):
     reasons = []
     price = ind.current_price
     lower = ind.bollinger.get("lower", 0)
-    middle = ind.bollinger.get("middle", 0)
+    _ = ind.bollinger.get("middle", 0)
     upper = ind.bollinger.get("upper", 0)
     width = ind.bollinger.get("width", 0)
 

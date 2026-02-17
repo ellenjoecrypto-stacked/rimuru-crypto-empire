@@ -4,7 +4,11 @@ Manages order placement, risk checks, paper/live toggle,
 position tracking, and order idempotency.
 """
 
-import os, sys, time, json, logging
+import os
+import sys
+import time
+import json
+import logging
 from pathlib import Path
 from datetime import datetime, timezone
 from typing import Dict, List
@@ -18,7 +22,7 @@ from shared.kraken_client import KrakenClient
 from shared.config import ServiceConfig
 from shared.models import (
     OrderRequest, OrderResult, Position, PortfolioState,
-    EnsembleSignal, ServiceHealth, PositionStatus,
+    ServiceHealth, PositionStatus,
 )
 from shared.security import secure_app
 
@@ -166,7 +170,7 @@ def execute_order(req: OrderRequest):
                 price=req.price,
             )
             txid = api_result.get("txid", [""])[0] if isinstance(api_result.get("txid"), list) else ""
-            descr = api_result.get("descr", {})
+            _ = api_result.get("descr", {})
             result = OrderResult(
                 success=True,
                 order_id=txid,

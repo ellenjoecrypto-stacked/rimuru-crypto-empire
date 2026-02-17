@@ -13,13 +13,12 @@ Inter-service calls must also pass the key.
 
 import os
 import time
-import hashlib
 import hmac
 import logging
 from collections import defaultdict
 from typing import Optional, Set
 
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware

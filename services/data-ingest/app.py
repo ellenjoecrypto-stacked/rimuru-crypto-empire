@@ -7,11 +7,10 @@ Provides a REST API for other services to consume market data.
 import os
 import sys
 import time
-import json
 import logging
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse

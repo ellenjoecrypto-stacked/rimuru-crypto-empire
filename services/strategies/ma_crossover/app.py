@@ -3,7 +3,10 @@ Rimuru Strategy — MA Crossover (Golden Cross / Death Cross)
 50/200 SMA crossover on hourly timeframe.
 """
 
-import os, sys, time, logging
+import os
+import sys
+import time
+import logging
 from pathlib import Path
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
