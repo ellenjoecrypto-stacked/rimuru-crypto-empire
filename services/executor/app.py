@@ -4,21 +4,28 @@ Manages order placement, risk checks, paper/live toggle,
 position tracking, and order idempotency.
 """
 
-import os, sys, time, json, logging
+from datetime import UTC, datetime
+import json
+import logging
+import os
 from pathlib import Path
-from datetime import datetime, timezone
-from typing import Dict, List
+import sys
+import time
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 import uvicorn
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from shared.kraken_client import KrakenClient
 from shared.config import ServiceConfig
+from shared.kraken_client import KrakenClient
 from shared.models import (
-    OrderRequest, OrderResult, Position, PortfolioState,
-    EnsembleSignal, ServiceHealth, PositionStatus,
+    OrderRequest,
+    OrderResult,
+    PortfolioState,
+    Position,
+    PositionStatus,
+    ServiceHealth,
 )
 from shared.security import secure_app
 
@@ -31,8 +38,8 @@ START_TIME = time.time()
 
 # --------------- State ---------------
 kraken: KrakenClient = None
-positions: Dict[str, Position] = {}
-order_ledger: List[dict] = []
+positions: dict[str, Position] = {}
+order_ledger: list[dict] = []
 daily_pnl: float = 0.0
 daily_trades: int = 0
 daily_loss_limit_hit: bool = False
@@ -81,6 +88,7 @@ _load_state()
 
 # --------------- Risk Checks ---------------
 
+
 def _risk_check(req: OrderRequest) -> str:
     """Returns error message if risk check fails, empty string if OK"""
     if daily_loss_limit_hit:
@@ -109,6 +117,7 @@ def _risk_check(req: OrderRequest) -> str:
 
 # --------------- Endpoints ---------------
 
+
 @app.get("/health")
 def health():
     return ServiceHealth(
@@ -129,14 +138,17 @@ def execute_order(req: OrderRequest):
     """Execute an order with risk checks"""
     global daily_trades, daily_pnl
 
-    now = datetime.now(timezone.utc).isoformat()
+    now = datetime.now(UTC).isoformat()
 
     # Risk check
     risk_error = _risk_check(req)
     if risk_error:
         return OrderResult(
-            success=False, pair=req.pair, side=req.side.value,
-            error=risk_error, timestamp=now,
+            success=False,
+            pair=req.pair,
+            side=req.side.value,
+            error=risk_error,
+            timestamp=now,
         )
 
     # Paper mode or validate only
@@ -144,7 +156,7 @@ def execute_order(req: OrderRequest):
         price = req.price or 0
         result = OrderResult(
             success=True,
-            order_id=f"PAPER-{int(time.time()*1000)}",
+            order_id=f"PAPER-{int(time.time() * 1000)}",
             pair=req.pair,
             side=req.side.value,
             volume=req.volume,
@@ -165,7 +177,9 @@ def execute_order(req: OrderRequest):
                 volume=req.volume,
                 price=req.price,
             )
-            txid = api_result.get("txid", [""])[0] if isinstance(api_result.get("txid"), list) else ""
+            txid = (
+                api_result.get("txid", [""])[0] if isinstance(api_result.get("txid"), list) else ""
+            )
             descr = api_result.get("descr", {})
             result = OrderResult(
                 success=True,
@@ -181,16 +195,22 @@ def execute_order(req: OrderRequest):
         except Exception as e:
             logger.error(f"Order failed: {e}")
             return OrderResult(
-                success=False, pair=req.pair, side=req.side.value,
-                error=str(e), timestamp=now,
+                success=False,
+                pair=req.pair,
+                side=req.side.value,
+                error=str(e),
+                timestamp=now,
             )
 
     # Track position
     if result.success and req.side.value == "buy":
         positions[req.pair] = Position(
-            pair=req.pair, side="long",
-            entry_price=result.price, volume=result.volume,
-            entry_time=now, strategy=req.strategy,
+            pair=req.pair,
+            side="long",
+            entry_price=result.price,
+            volume=result.volume,
+            entry_time=now,
+            strategy=req.strategy,
             order_id=result.order_id,
             stop_loss=req.stop_loss or 0,
             take_profit=req.take_profit or 0,
@@ -205,12 +225,19 @@ def execute_order(req: OrderRequest):
     daily_trades += 1
 
     # Audit log
-    order_ledger.append({
-        "time": now, "pair": req.pair, "side": req.side.value,
-        "volume": req.volume, "price": result.price,
-        "success": result.success, "order_id": result.order_id,
-        "strategy": req.strategy, "paper": PAPER_MODE,
-    })
+    order_ledger.append(
+        {
+            "time": now,
+            "pair": req.pair,
+            "side": req.side.value,
+            "volume": req.volume,
+            "price": result.price,
+            "success": result.success,
+            "order_id": result.order_id,
+            "strategy": req.strategy,
+            "paper": PAPER_MODE,
+        }
+    )
     _save_state()
 
     return result
@@ -275,9 +302,9 @@ def emergency_stop():
 @app.get("/metrics")
 def prometheus_metrics():
     lines = [
-        f"rimuru_executor_uptime {time.time()-START_TIME:.1f}",
+        f"rimuru_executor_uptime {time.time() - START_TIME:.1f}",
         f"rimuru_executor_daily_trades {daily_trades}",
-        f'rimuru_executor_daily_pnl {daily_pnl:.4f}',
+        f"rimuru_executor_daily_pnl {daily_pnl:.4f}",
         f"rimuru_executor_open_positions {len(positions)}",
         f"rimuru_executor_paper_mode {int(PAPER_MODE)}",
         f"rimuru_executor_emergency_stop {int(daily_loss_limit_hit)}",

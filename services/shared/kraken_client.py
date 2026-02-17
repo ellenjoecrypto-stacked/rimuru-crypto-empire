@@ -3,14 +3,14 @@ Rimuru Crypto Empire — Kraken API Client
 Extracted for reuse across microservices.
 """
 
-import time
-import json
+import base64
 import hashlib
 import hmac
-import base64
-import urllib.request
-import urllib.parse
+import json
 import logging
+import time
+import urllib.parse
+import urllib.request
 
 logger = logging.getLogger("rimuru.kraken")
 
@@ -114,8 +114,15 @@ class KrakenClient:
         result = self._private("/0/private/ClosedOrders", data)
         return result.get("closed", {})
 
-    def place_order(self, pair: str, side: str, order_type: str,
-                    volume: float, price: float = None, validate: bool = False) -> dict:
+    def place_order(
+        self,
+        pair: str,
+        side: str,
+        order_type: str,
+        volume: float,
+        price: float = None,
+        validate: bool = False,
+    ) -> dict:
         data = {
             "pair": pair,
             "type": side,

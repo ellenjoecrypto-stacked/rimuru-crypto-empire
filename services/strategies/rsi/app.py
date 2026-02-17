@@ -3,14 +3,18 @@ Rimuru Strategy — RSI (Relative Strength Index)
 Oversold/overbought reversals with trend confirmation.
 """
 
-import os, sys, time, logging
+import logging
+import os
 from pathlib import Path
+import sys
+import time
+
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 import uvicorn
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
-from shared.models import StrategyRequest, StrategySignal, SignalAction, ServiceHealth
+from shared.models import ServiceHealth, SignalAction, StrategyRequest, StrategySignal
 from shared.security import secure_app
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -22,9 +26,12 @@ signal_count = 0
 
 @app.get("/health")
 def health():
-    return ServiceHealth(service="strategy-rsi", status="healthy",
-                         uptime_seconds=round(time.time() - START_TIME, 1),
-                         details={"signals_generated": signal_count})
+    return ServiceHealth(
+        service="strategy-rsi",
+        status="healthy",
+        uptime_seconds=round(time.time() - START_TIME, 1),
+        details={"signals_generated": signal_count},
+    )
 
 
 @app.post("/signal")
@@ -33,8 +40,7 @@ def generate_signal(req: StrategyRequest):
     signal_count += 1
 
     ind = req.indicators
-    sig = StrategySignal(pair=req.pair, strategy="rsi", timeframe="15m",
-                         price=ind.current_price)
+    sig = StrategySignal(pair=req.pair, strategy="rsi", timeframe="15m", price=ind.current_price)
 
     if ind.rsi is None:
         sig.reason = "RSI not available"
@@ -113,7 +119,7 @@ def generate_signal(req: StrategyRequest):
 @app.get("/metrics")
 def metrics():
     return JSONResponse(
-        content=f"rimuru_strategy_rsi_signals {signal_count}\nrimuru_strategy_rsi_uptime {time.time()-START_TIME:.1f}",
+        content=f"rimuru_strategy_rsi_signals {signal_count}\nrimuru_strategy_rsi_uptime {time.time() - START_TIME:.1f}",
         media_type="text/plain",
     )
 

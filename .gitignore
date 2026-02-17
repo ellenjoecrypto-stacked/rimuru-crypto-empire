@@ -49,6 +49,14 @@ venv/
 env/
 .Python
 pip-log.txt
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.cover
+.hypothesis/
+.tox/
 
 # ===== Databases =====
 *.db
@@ -92,7 +100,22 @@ docker-compose.override.yml
 # ===== Node =====
 node_modules/
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 .next/
+.nuxt/
+dist/
+.cache/
+.eslintcache
+package-lock.json
+yarn.lock
+.pnp.*
+
+# ===== Frontend Build =====
+frontend/dist/
+frontend/build/
+frontend/.vite/
+frontend/.turbo/
 
 # ===== Performance =====
 *.pyperf

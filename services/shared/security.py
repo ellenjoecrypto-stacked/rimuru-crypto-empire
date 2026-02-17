@@ -11,15 +11,13 @@ Health endpoints are exempt (for Docker healthchecks and Prometheus).
 Inter-service calls must also pass the key.
 """
 
-import os
-import time
-import hashlib
+from collections import defaultdict
 import hmac
 import logging
-from collections import defaultdict
-from typing import Optional, Set
+import os
+import time
 
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -35,7 +33,7 @@ RATE_LIMIT_RPM = int(os.getenv("RATE_LIMIT_RPM", "120"))  # requests per minute
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
 
 # Paths that skip auth (healthchecks, metrics for Prometheus)
-PUBLIC_PATHS: Set[str] = {
+PUBLIC_PATHS: set[str] = {
     "/health",
     "/metrics",
     "/docs",
@@ -47,6 +45,7 @@ PUBLIC_PATHS: Set[str] = {
 # ─────────────────────────────────────────────
 # API KEY AUTH MIDDLEWARE
 # ─────────────────────────────────────────────
+
 
 class APIKeyAuthMiddleware(BaseHTTPMiddleware):
     """
@@ -66,28 +65,27 @@ class APIKeyAuthMiddleware(BaseHTTPMiddleware):
         if not RIMURU_API_KEY:
             logger.error("RIMURU_API_KEY not set — blocking request to %s", path)
             return JSONResponse(
-                status_code=503,
-                content={"error": "service not configured — API key missing"}
+                status_code=503, content={"error": "service not configured — API key missing"}
             )
 
         # Extract and validate the key
         provided_key = request.headers.get("X-Rimuru-Key", "")
         if not provided_key:
-            logger.warning("Unauthenticated request to %s from %s",
-                           path, request.client.host if request.client else "unknown")
-            return JSONResponse(
-                status_code=401,
-                content={"error": "missing X-Rimuru-Key header"}
+            logger.warning(
+                "Unauthenticated request to %s from %s",
+                path,
+                request.client.host if request.client else "unknown",
             )
+            return JSONResponse(status_code=401, content={"error": "missing X-Rimuru-Key header"})
 
         # Constant-time comparison to prevent timing attacks
         if not hmac.compare_digest(provided_key, RIMURU_API_KEY):
-            logger.warning("Invalid API key for %s from %s",
-                           path, request.client.host if request.client else "unknown")
-            return JSONResponse(
-                status_code=403,
-                content={"error": "invalid API key"}
+            logger.warning(
+                "Invalid API key for %s from %s",
+                path,
+                request.client.host if request.client else "unknown",
             )
+            return JSONResponse(status_code=403, content={"error": "invalid API key"})
 
         return await call_next(request)
 
@@ -95,6 +93,7 @@ class APIKeyAuthMiddleware(BaseHTTPMiddleware):
 # ─────────────────────────────────────────────
 # RATE LIMITER MIDDLEWARE
 # ─────────────────────────────────────────────
+
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
     """
@@ -119,22 +118,24 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         window_start = now - 60.0
 
         # Clean old entries and add current
-        self.requests[client_ip] = [
-            t for t in self.requests[client_ip] if t > window_start
-        ]
+        self.requests[client_ip] = [t for t in self.requests[client_ip] if t > window_start]
         self.requests[client_ip].append(now)
 
         if len(self.requests[client_ip]) > self.max_rpm:
-            logger.warning("Rate limit exceeded for %s on %s (%d rpm)",
-                           client_ip, path, len(self.requests[client_ip]))
+            logger.warning(
+                "Rate limit exceeded for %s on %s (%d rpm)",
+                client_ip,
+                path,
+                len(self.requests[client_ip]),
+            )
             return JSONResponse(
                 status_code=429,
                 content={
                     "error": "rate limit exceeded",
                     "limit": self.max_rpm,
-                    "retry_after_seconds": 60
+                    "retry_after_seconds": 60,
                 },
-                headers={"Retry-After": "60"}
+                headers={"Retry-After": "60"},
             )
 
         return await call_next(request)
@@ -143,6 +144,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 # ─────────────────────────────────────────────
 # REQUEST LOGGING MIDDLEWARE
 # ─────────────────────────────────────────────
+
 
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
     """Logs all non-health requests with timing."""
@@ -158,9 +160,14 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
         duration_ms = (time.time() - start) * 1000
 
         client_ip = request.client.host if request.client else "unknown"
-        logger.info("%s %s %s → %d (%.1fms)",
-                    client_ip, request.method, path,
-                    response.status_code, duration_ms)
+        logger.info(
+            "%s %s %s → %d (%.1fms)",
+            client_ip,
+            request.method,
+            path,
+            response.status_code,
+            duration_ms,
+        )
 
         return response
 
@@ -168,6 +175,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
 # ─────────────────────────────────────────────
 # APPLY ALL SECURITY TO A FASTAPI APP
 # ─────────────────────────────────────────────
+
 
 def secure_app(app: FastAPI) -> FastAPI:
     """
@@ -201,10 +209,12 @@ def secure_app(app: FastAPI) -> FastAPI:
     # 4. API key auth (innermost — runs last, closest to route)
     app.add_middleware(APIKeyAuthMiddleware)
 
-    logger.info("Security middleware applied — auth=%s, rate_limit=%d rpm, cors=%s",
-                "ENABLED" if RIMURU_API_KEY else "DISABLED",
-                RATE_LIMIT_RPM,
-                ALLOWED_ORIGINS)
+    logger.info(
+        "Security middleware applied — auth=%s, rate_limit=%d rpm, cors=%s",
+        "ENABLED" if RIMURU_API_KEY else "DISABLED",
+        RATE_LIMIT_RPM,
+        ALLOWED_ORIGINS,
+    )
 
     return app
 
@@ -213,6 +223,7 @@ def secure_app(app: FastAPI) -> FastAPI:
 # HELPER: Add auth header to inter-service calls
 # ─────────────────────────────────────────────
 
+
 def get_auth_headers() -> dict:
     """Returns headers dict with the API key for inter-service calls."""
     if RIMURU_API_KEY:
@@ -220,8 +231,9 @@ def get_auth_headers() -> dict:
     return {}
 
 
-def authenticated_request(url: str, data: Optional[dict] = None,
-                          method: str = "GET", timeout: int = 15) -> dict:
+def authenticated_request(
+    url: str, data: dict | None = None, method: str = "GET", timeout: int = 15
+) -> dict:
     """
     Make an authenticated HTTP request to another Rimuru service.
     Automatically injects X-Rimuru-Key header.
