@@ -1,0 +1,15 @@
+FROM python:3.11-slim
+
+# Minimal sandboxed container for running bots
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    firejail \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+COPY . /app
+
+# Drop to non-root user
+RUN useradd -m qrow_sandbox
+USER qrow_sandbox
+
+CMD ["python", "sandbox_runner.py"]
