@@ -6,10 +6,16 @@ import json
 import time
 import secrets
 import requests
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 # Load key
-KEY_NAME = "organizations/761837f6-e032-4a33-9a7f-20b39bc890b6/apiKeys/c62fad2a-7a0e-4761-8460-beecf4cc615c"
-PRIVATE_KEY = "-----BEGIN EC PRIVATE KEY-----\nMHcCAQEEIG7vP0woDot5TtVm25y811OEkNKJoj6Si0FWhszdOUrsoAoGCCqGSM49\nAwEHoUQDQgAE3/6Cxa66KxrNlAFOJUgjb8F6Dvfg8HvqLnPgAw68asRwEnsH7vo4\notQCCX0XlBfx9VQZKliK7ORZxyp/j9g0Dw==\n-----END EC PRIVATE KEY-----\n"
+KEY_NAME = os.getenv("COINBASE_CDP_KEY_NAME", "")
+PRIVATE_KEY = os.getenv("COINBASE_CDP_PRIVATE_KEY", "").replace("\\n", "\n")
+
+if not KEY_NAME or not PRIVATE_KEY:
+    raise EnvironmentError("COINBASE_CDP_KEY_NAME and COINBASE_CDP_PRIVATE_KEY must be set in .env")
 
 print("=" * 60)
 print("COINBASE FRESH CDP KEY - BALANCE CHECK")

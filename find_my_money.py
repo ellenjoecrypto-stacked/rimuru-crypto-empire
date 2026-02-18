@@ -9,6 +9,9 @@ import base64
 import urllib.parse
 import requests
 import json
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 print("=" * 60)
 print("FIND MY MONEY - Checking ALL Real Credentials")
@@ -21,8 +24,8 @@ print("\n" + "=" * 60)
 print("1. KRAKEN PRIVATE API - Real Keys")
 print("=" * 60)
 
-KRAKEN_API_KEY = "/5zWzBcWS9I8Bhgd6Nuqvn/T4pZKIHmWnz7PA6zRtWaaik5E0nqcRsur"
-KRAKEN_API_SECRET = "jF9J0BIPl3K+obuWb4CK31nQaCYJ9A4LhhjrvCXlBQz0WR52Xbbu/PQi2kYBY3ypXpBcc56EhMeXL2OC6EWPDg=="
+KRAKEN_API_KEY = os.getenv("KRAKEN_API_KEY", "")
+KRAKEN_API_SECRET = os.getenv("KRAKEN_SECRET_KEY", "")
 
 def kraken_signature(urlpath, data, secret):
     """Create Kraken API signature"""
@@ -146,8 +149,8 @@ print("\n" + "=" * 60)
 print("2. COINBASE v2 API - Key/Secret")
 print("=" * 60)
 
-CB_API_KEY = "26839a7a-57f7-4a48-8ef7-231b6499f2d5"
-CB_API_SECRET = "cf0d06f5-0475-4f7e-ad6a-27f5adb6fd6e"
+CB_API_KEY = os.getenv("COINBASE_API_KEY", "")
+CB_API_SECRET = os.getenv("COINBASE_SECRET_KEY", "")
 
 def coinbase_v2_request(path):
     """Make Coinbase v2 API request with API key/secret"""

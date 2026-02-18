@@ -2,20 +2,25 @@
 
 ## Supported Versions
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+The following versions of rimuru-crypto-empire are currently receiving security updates:
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+| latest  | :white_check_mark: |
+| < 1.0   | :x:                |
 
 ## Reporting a Vulnerability
 
-Use this section to tell people how to report a vulnerability.
+If you discover a security vulnerability in this project, please **do not** open a public GitHub issue.
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+Instead, report it responsibly by emailing: **ellenjoecrypto@gmail.com**
+
+Please include:
+- A description of the vulnerability
+- Steps to reproduce the issue
+- Potential impact or severity
+- Any suggested fixes (optional)
+
+You can expect an acknowledgment within **48 hours** and a status update within **7 days**.
+
+If the vulnerability is confirmed, a patch will be released as soon as possible and credit will be given to the reporter (unless anonymity is requested). If the report is declined, you will receive a clear explanation of why.
