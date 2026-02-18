@@ -127,7 +127,13 @@ cd rimuru_empire
 cp .env.example .env
 nano .env  # Edit with your settings
 
-# 3. Deploy
+# 3. Create security configuration (optional)
+# Add sensitive credentials to .env.security if needed
+# This will be automatically sourced by deploy.sh
+echo 'VAULT_PASSWORD="your-secure-password"' > .env.security
+chmod 600 .env.security  # Restrict permissions
+
+# 4. Deploy
 chmod +x deploy.sh
 ./deploy.sh
 ```
@@ -146,6 +152,8 @@ After deployment, access the system at:
 ### 1. Security Configuration
 - [ ] Set strong vault password in `.env`
 - [ ] Configure database password
+- [ ] Create `.env.security` file with sensitive credentials
+- [ ] Ensure `.env.security` is in `.gitignore` (never commit secrets)
 - [ ] Enable IP whitelisting on exchanges
 - [ ] Enable 2FA on all exchange accounts
 
