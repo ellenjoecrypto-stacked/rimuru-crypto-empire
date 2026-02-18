@@ -413,4 +413,4 @@ For issues or questions:
 
 **Built with ❤️ by SuperNinja AI**
 
-**Ready to build your crypto empire? Start trading today! 🚀**
+**Ready to build your crypto empire? Start trading today!**
