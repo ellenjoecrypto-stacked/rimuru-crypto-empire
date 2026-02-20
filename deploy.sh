@@ -21,6 +21,14 @@ if [ ! -f .env ]; then
     read -p "Press Enter after editing .env..."
 fi
 
+# Source security-specific environment variables
+if [ -f .env.security ]; then
+    echo "🔐 Loading security configuration from .env.security..."
+    source ./.env.security
+else
+    echo "⚠️  .env.security not found. Using default environment configuration."
+fi
+
 # Create necessary directories
 echo "📁 Creating directories..."
 mkdir -p data/bot_states data/ai_models logs

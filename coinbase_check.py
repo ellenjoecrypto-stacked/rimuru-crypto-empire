@@ -5,9 +5,15 @@ import hashlib
 import hmac
 import requests
 import json
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
-CB_API_KEY = "c9faf522-e1a1-4de0-805d-160daf2abf75"
-CB_API_SECRET = "1e979c54-0b78-4f62-9c9b-c7c8dd560501"
+CB_API_KEY = os.getenv("COINBASE_API_KEY", "")
+CB_API_SECRET = os.getenv("COINBASE_SECRET_KEY", "")
+
+if not CB_API_KEY or not CB_API_SECRET:
+    raise EnvironmentError("COINBASE_API_KEY and COINBASE_SECRET_KEY must be set in .env")
 
 def coinbase_request(method, path, body=''):
     """Make authenticated Coinbase v2 API request"""

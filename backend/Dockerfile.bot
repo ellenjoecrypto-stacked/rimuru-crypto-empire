@@ -24,6 +24,7 @@ RUN wget -q http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz \
 
 # Install dependencies (numpy first for TA-Lib headers)
 RUN pip install --no-cache-dir numpy==1.26.4 && \
+    pip install --no-cache-dir --no-build-isolation TA-Lib && \
     pip install --no-cache-dir \
     fastapi>=0.109.0 \
     uvicorn>=0.27.0 \
@@ -32,7 +33,6 @@ RUN pip install --no-cache-dir numpy==1.26.4 && \
     requests>=2.31.0 \
     ccxt>=4.0.0 \
     pandas>=2.1.0 \
-    TA-Lib==0.4.28 \
     python-dotenv>=1.0.0 \
     websockets>=12.0
 

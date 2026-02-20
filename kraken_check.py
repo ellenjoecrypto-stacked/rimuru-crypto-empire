@@ -8,9 +8,15 @@ import hmac
 import base64
 import time
 import json
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
-KRAKEN_KEY = "tWIl09svL9gZrfbuJImQZLc05F/OOtjmoQ6H1ONGi0LzPgvI7Xn8/yUw"
-KRAKEN_SECRET = "k9AjtU6jTO/3Yz5l6H3KRcBQP11+/la66QyP9WhMN+GEsojlHzzG0/rtQnIP3a3fAprcvI7CR4JZbc6GVYN9Uw=="
+KRAKEN_KEY = os.getenv("KRAKEN_API_KEY", "")
+KRAKEN_SECRET = os.getenv("KRAKEN_SECRET_KEY", "")
+
+if not KRAKEN_KEY or not KRAKEN_SECRET:
+    raise EnvironmentError("KRAKEN_API_KEY and KRAKEN_SECRET_KEY must be set in .env")
 
 def kraken_signature(urlpath, data, secret):
     postdata = urllib.parse.urlencode(data)
