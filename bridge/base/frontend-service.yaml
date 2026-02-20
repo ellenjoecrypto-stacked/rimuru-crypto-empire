@@ -1,0 +1,21 @@
+#! frontend-service.yaml
+# Generated code, do not edit
+apiVersion: v1
+kind: Service
+metadata:
+    name: frontend-published
+    namespace: rimuru-empire
+    labels:
+        com.docker.compose.project: rimuru_empire
+        com.docker.compose.service: frontend
+spec:
+    selector:
+        com.docker.compose.project: rimuru_empire
+        com.docker.compose.service: frontend
+    ports:
+        - name: frontend-3000
+          port: 3000
+          protocol: TCP
+          targetPort: frontend-80
+
+# check if there is at least one published port

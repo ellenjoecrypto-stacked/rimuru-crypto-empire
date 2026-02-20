@@ -1,0 +1,24 @@
+#! rimuru-network-network-policy.yaml
+# Generated code, do not edit
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+    name: rimuru-network-network-policy
+    namespace: rimuru-empire
+spec:
+    podSelector:
+        matchLabels:
+            com.docker.compose.network.rimuru-network: "true"
+    policyTypes:
+        - Ingress
+        - Egress
+    ingress:
+        - from:
+            - podSelector:
+                matchLabels:
+                    com.docker.compose.network.rimuru-network: "true"
+    egress:
+        - to:
+            - podSelector:
+                matchLabels:
+                    com.docker.compose.network.rimuru-network: "true"

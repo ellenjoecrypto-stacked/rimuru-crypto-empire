@@ -1,0 +1,9 @@
+#! scanner-C:\Users\Admin\OneDrive\Videos\rimuru_empire\data\scans-persistentVolumeClaim.yaml
+# Generated code, do not edit
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: scanner-c--users-admin-onedrive-videos-rimuru-empire-data-scans
+    namespace: rimuru-empire
+spec:
+    storageClassName: "hostpath" # see docker/desktop-storage-provisioner

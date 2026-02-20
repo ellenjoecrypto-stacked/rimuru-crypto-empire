@@ -1,0 +1,49 @@
+#! api-deployment.yaml
+# Generated code, do not edit
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: api
+    namespace: rimuru-empire
+    labels:
+        com.docker.compose.project: rimuru_empire
+        com.docker.compose.service: api
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            com.docker.compose.project: rimuru_empire
+            com.docker.compose.service: api
+    strategy:
+        type: Recreate
+    template:
+        metadata:
+            labels:
+                com.docker.compose.project: rimuru_empire
+                com.docker.compose.service: api
+                com.docker.compose.network.rimuru-network: "true"
+        spec:
+            restartPolicy: unless-stopped
+            containers:
+                - name: rimuru-api
+                  image: rimuru_empire-api
+                  imagePullPolicy: IfNotPresent
+                  env:
+                    - name: DATABASE_URL
+                      value: "postgresql://rimuru_user:secure_password_here@postgres:5432/rimuru_opportunities"
+                    - name: LOG_LEVEL
+                      value: "INFO"
+                    - name: REDIS_URL
+                      value: "redis://:redis_secure_pass@redis:6379"
+                    - name: SECRET_KEY
+                      value: "your-secret-key-here"
+                  ports:
+                    - name: api-5000
+                      containerPort: 5000
+                  volumeMounts:
+                    - name: logs
+                      mountPath: /logs
+            volumes:
+                - name: logs
+                  hostPath:
+                    path: C:\Users\Admin\OneDrive\Videos\rimuru_empire\logs

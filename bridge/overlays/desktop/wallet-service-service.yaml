@@ -1,0 +1,9 @@
+#! wallet-service-service.yaml
+# Generated code, do not edit
+apiVersion: v1
+kind: Service
+metadata:
+    name: wallet-service-published
+    namespace: rimuru-empire
+spec:
+    type: LoadBalancer

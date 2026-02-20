@@ -1,0 +1,18 @@
+#! scanner-C:\Users\Admin\OneDrive\Videos\rimuru_empire\data\scans-persistentVolumeClaim.yaml
+# Generated code, do not edit
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: scanner-c--users-admin-onedrive-videos-rimuru-empire-data-scans
+    namespace: rimuru-empire
+    labels:
+        com.docker.compose.service: scanner
+        com.docker.compose.volume: C:\Users\Admin\OneDrive\Videos\rimuru_empire\data\scans
+spec:
+    accessModes:
+        # TODO would need to check which services use this volume
+        - ReadWriteOnce
+    volumeMode: Filesystem
+    resources:
+        requests:
+            storage: 100Mi

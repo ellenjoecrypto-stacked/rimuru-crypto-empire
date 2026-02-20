@@ -1,0 +1,21 @@
+#! price-service-service.yaml
+# Generated code, do not edit
+apiVersion: v1
+kind: Service
+metadata:
+    name: price-service-published
+    namespace: rimuru-empire
+    labels:
+        com.docker.compose.project: rimuru_empire
+        com.docker.compose.service: price-service
+spec:
+    selector:
+        com.docker.compose.project: rimuru_empire
+        com.docker.compose.service: price-service
+    ports:
+        - name: price-serv-8100
+          port: 8100
+          protocol: TCP
+          targetPort: price-serv-8100
+
+# check if there is at least one published port

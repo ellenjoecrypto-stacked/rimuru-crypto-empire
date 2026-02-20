@@ -1,0 +1,54 @@
+#! scanner-deployment.yaml
+# Generated code, do not edit
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: scanner
+    namespace: rimuru-empire
+    labels:
+        com.docker.compose.project: rimuru_empire
+        com.docker.compose.service: scanner
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            com.docker.compose.project: rimuru_empire
+            com.docker.compose.service: scanner
+    strategy:
+        type: Recreate
+    template:
+        metadata:
+            labels:
+                com.docker.compose.project: rimuru_empire
+                com.docker.compose.service: scanner
+                com.docker.compose.network.rimuru-network: "true"
+        spec:
+            restartPolicy: unless-stopped
+            containers:
+                - name: rimuru-scanner
+                  image: rimuru_empire-scanner
+                  imagePullPolicy: IfNotPresent
+                  env:
+                    - name: DATABASE_URL
+                      value: "postgresql://rimuru_user:secure_password_here@postgres:5432/rimuru_opportunities"
+                    - name: LOG_LEVEL
+                      value: "INFO"
+                    - name: REDIS_URL
+                      value: "redis://:redis_secure_pass@redis:6379"
+                    - name: SCAN_INTERVAL
+                      value: "3600"
+                  ports:
+                    - name: scanner-8001
+                      containerPort: 8001
+                  volumeMounts:
+                    - name: data-scans
+                      mountPath: /data/scans
+                    - name: logs
+                      mountPath: /logs
+            volumes:
+                - name: data-scans
+                  hostPath:
+                    path: C:\Users\Admin\OneDrive\Videos\rimuru_empire\data\scans
+                - name: logs
+                  hostPath:
+                    path: C:\Users\Admin\OneDrive\Videos\rimuru_empire\logs

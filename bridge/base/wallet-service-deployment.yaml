@@ -1,0 +1,60 @@
+#! wallet-service-deployment.yaml
+# Generated code, do not edit
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: wallet-service
+    namespace: rimuru-empire
+    labels:
+        com.docker.compose.project: rimuru_empire
+        com.docker.compose.service: wallet-service
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            com.docker.compose.project: rimuru_empire
+            com.docker.compose.service: wallet-service
+    strategy:
+        type: Recreate
+    template:
+        metadata:
+            labels:
+                com.docker.compose.project: rimuru_empire
+                com.docker.compose.service: wallet-service
+                com.docker.compose.network.rimuru-network: "true"
+        spec:
+            restartPolicy: unless-stopped
+            containers:
+                - name: rimuru-wallet-service
+                  image: rimuru_empire-wallet-service
+                  imagePullPolicy: IfNotPresent
+                  env:
+                    - name: ETHERSCAN_API_KEY
+                      value: ""
+                    - name: SOLANA_RPC_URL
+                      value: "https://api.mainnet-beta.solana.com"
+                    - name: WALLET_DB_PATH
+                      value: "/data/wallets.db"
+                    - name: WALLET_SERVICE_PORT
+                      value: "8200"
+                  livenessProbe:
+                    exec:
+                        command: ['python -c import urllib.request; urllib.request.urlopen(''http://localhost:8200/health'')']
+                    periodSeconds: 30
+                    timeoutSeconds: 10
+                    failureThreshold: 3
+                  ports:
+                    - name: wallet-ser-8200
+                      containerPort: 8200
+                  volumeMounts:
+                    - name: data
+                      mountPath: /data
+                    - name: logs
+                      mountPath: /logs
+            volumes:
+                - name: data
+                  hostPath:
+                    path: C:\Users\Admin\OneDrive\Videos\rimuru_empire\data
+                - name: logs
+                  hostPath:
+                    path: C:\Users\Admin\OneDrive\Videos\rimuru_empire\logs

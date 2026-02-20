@@ -1,0 +1,21 @@
+#! ollama-service.yaml
+# Generated code, do not edit
+apiVersion: v1
+kind: Service
+metadata:
+    name: ollama-published
+    namespace: rimuru-empire
+    labels:
+        com.docker.compose.project: rimuru_empire
+        com.docker.compose.service: ollama
+spec:
+    selector:
+        com.docker.compose.project: rimuru_empire
+        com.docker.compose.service: ollama
+    ports:
+        - name: ollama-11434
+          port: 11434
+          protocol: TCP
+          targetPort: ollama-11434
+
+# check if there is at least one published port

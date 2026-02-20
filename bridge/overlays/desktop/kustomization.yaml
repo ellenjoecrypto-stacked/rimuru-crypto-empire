@@ -1,0 +1,39 @@
+#! kustomization.yaml
+# Generated code, do not edit
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+    - ../../base
+patches:
+    - path: ai-service-C:\Users\Admin\OneDrive\Videos\rimuru_empire\data-persistentVolumeClaim.yaml
+    - path: ai-service-C:\Users\Admin\OneDrive\Videos\rimuru_empire\logs-persistentVolumeClaim.yaml
+    - path: ai-service-service.yaml
+    - path: analyzer-C:\Users\Admin\OneDrive\Videos\rimuru_empire\data\analysis-persistentVolumeClaim.yaml
+    - path: analyzer-C:\Users\Admin\OneDrive\Videos\rimuru_empire\logs-persistentVolumeClaim.yaml
+    - path: api-C:\Users\Admin\OneDrive\Videos\rimuru_empire\logs-persistentVolumeClaim.yaml
+    - path: api-service.yaml
+    - path: asset-scanner-C:\Users\Admin\OneDrive\Videos\rimuru_empire\data-persistentVolumeClaim.yaml
+    - path: asset-scanner-C:\Users\Admin\OneDrive\Videos\rimuru_empire\logs-persistentVolumeClaim.yaml
+    - path: bot-service-C:\Users\Admin\OneDrive\Videos\rimuru_empire\data-persistentVolumeClaim.yaml
+    - path: bot-service-C:\Users\Admin\OneDrive\Videos\rimuru_empire\logs-persistentVolumeClaim.yaml
+    - path: bot-service-service.yaml
+    - path: frontend-service.yaml
+    - path: ollama-ollama_data-persistentVolumeClaim.yaml
+    - path: ollama-service.yaml
+    - path: pipeline-service-C:\Users\Admin\OneDrive\Videos\rimuru_empire\data-persistentVolumeClaim.yaml
+    - path: pipeline-service-C:\Users\Admin\OneDrive\Videos\rimuru_empire\logs-persistentVolumeClaim.yaml
+    - path: postgres-C:\Users\Admin\OneDrive\Videos\rimuru_empire\init_db.sql-persistentVolumeClaim.yaml
+    - path: postgres-postgres_data-persistentVolumeClaim.yaml
+    - path: postgres-service.yaml
+    - path: price-service-C:\Users\Admin\OneDrive\Videos\rimuru_empire\data-persistentVolumeClaim.yaml
+    - path: price-service-C:\Users\Admin\OneDrive\Videos\rimuru_empire\logs-persistentVolumeClaim.yaml
+    - path: price-service-service.yaml
+    - path: project-integrator-C:\Users\Admin\OneDrive\Videos\rimuru_empire\data\integrated-persistentVolumeClaim.yaml
+    - path: project-integrator-C:\Users\Admin\OneDrive\Videos\rimuru_empire\logs-persistentVolumeClaim.yaml
+    - path: redis-redis_data-persistentVolumeClaim.yaml
+    - path: redis-service.yaml
+    - path: scanner-C:\Users\Admin\OneDrive\Videos\rimuru_empire\data\scans-persistentVolumeClaim.yaml
+    - path: scanner-C:\Users\Admin\OneDrive\Videos\rimuru_empire\logs-persistentVolumeClaim.yaml
+    - path: wallet-service-C:\Users\Admin\OneDrive\Videos\rimuru_empire\data-persistentVolumeClaim.yaml
+    - path: wallet-service-C:\Users\Admin\OneDrive\Videos\rimuru_empire\logs-persistentVolumeClaim.yaml
+    - path: wallet-service-service.yaml

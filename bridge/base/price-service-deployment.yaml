@@ -1,0 +1,58 @@
+#! price-service-deployment.yaml
+# Generated code, do not edit
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: price-service
+    namespace: rimuru-empire
+    labels:
+        com.docker.compose.project: rimuru_empire
+        com.docker.compose.service: price-service
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            com.docker.compose.project: rimuru_empire
+            com.docker.compose.service: price-service
+    strategy:
+        type: Recreate
+    template:
+        metadata:
+            labels:
+                com.docker.compose.project: rimuru_empire
+                com.docker.compose.service: price-service
+                com.docker.compose.network.rimuru-network: "true"
+        spec:
+            restartPolicy: unless-stopped
+            containers:
+                - name: rimuru-price-service
+                  image: rimuru_empire-price-service
+                  imagePullPolicy: IfNotPresent
+                  env:
+                    - name: ETHERSCAN_API_KEY
+                      value: ""
+                    - name: PRICE_DB_PATH
+                      value: "/data/prices.db"
+                    - name: PRICE_SERVICE_PORT
+                      value: "8100"
+                  livenessProbe:
+                    exec:
+                        command: ['python -c import urllib.request; urllib.request.urlopen(''http://localhost:8100/health'')']
+                    periodSeconds: 30
+                    timeoutSeconds: 10
+                    failureThreshold: 3
+                  ports:
+                    - name: price-serv-8100
+                      containerPort: 8100
+                  volumeMounts:
+                    - name: data
+                      mountPath: /data
+                    - name: logs
+                      mountPath: /logs
+            volumes:
+                - name: data
+                  hostPath:
+                    path: C:\Users\Admin\OneDrive\Videos\rimuru_empire\data
+                - name: logs
+                  hostPath:
+                    path: C:\Users\Admin\OneDrive\Videos\rimuru_empire\logs

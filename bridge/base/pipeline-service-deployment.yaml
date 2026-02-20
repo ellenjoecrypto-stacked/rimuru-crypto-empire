@@ -1,0 +1,45 @@
+#! pipeline-service-deployment.yaml
+# Generated code, do not edit
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: pipeline-service
+    namespace: rimuru-empire
+    labels:
+        com.docker.compose.project: rimuru_empire
+        com.docker.compose.service: pipeline-service
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            com.docker.compose.project: rimuru_empire
+            com.docker.compose.service: pipeline-service
+    strategy:
+        type: Recreate
+    template:
+        metadata:
+            labels:
+                com.docker.compose.project: rimuru_empire
+                com.docker.compose.service: pipeline-service
+                com.docker.compose.network.rimuru-network: "true"
+        spec:
+            restartPolicy: unless-stopped
+            containers:
+                - name: rimuru-pipeline-service
+                  image: rimuru_empire-pipeline-service
+                  imagePullPolicy: IfNotPresent
+                  env:
+                    - name: PIPELINE_DATA_DIR
+                      value: "/data"
+                  volumeMounts:
+                    - name: data
+                      mountPath: /data
+                    - name: logs
+                      mountPath: /logs
+            volumes:
+                - name: data
+                  hostPath:
+                    path: C:\Users\Admin\OneDrive\Videos\rimuru_empire\data
+                - name: logs
+                  hostPath:
+                    path: C:\Users\Admin\OneDrive\Videos\rimuru_empire\logs

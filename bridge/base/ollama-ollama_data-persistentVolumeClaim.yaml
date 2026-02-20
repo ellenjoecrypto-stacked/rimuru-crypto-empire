@@ -1,0 +1,18 @@
+#! ollama-ollama_data-persistentVolumeClaim.yaml
+# Generated code, do not edit
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: ollama-ollama-data
+    namespace: rimuru-empire
+    labels:
+        com.docker.compose.service: ollama
+        com.docker.compose.volume: ollama_data
+spec:
+    accessModes:
+        # TODO would need to check which services use this volume
+        - ReadWriteOnce
+    volumeMode: Filesystem
+    resources:
+        requests:
+            storage: 100Mi

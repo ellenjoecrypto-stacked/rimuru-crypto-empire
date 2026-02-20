@@ -1,0 +1,23 @@
+# check if there is at least one published port
+
+#! ai-service-service.yaml
+# Generated code, do not edit
+apiVersion: v1
+kind: Service
+metadata:
+    name: ai-service-published
+    namespace: rimuru-empire
+    labels:
+        com.docker.compose.project: rimuru_empire
+        com.docker.compose.service: ai-service
+spec:
+    selector:
+        com.docker.compose.project: rimuru_empire
+        com.docker.compose.service: ai-service
+    ports:
+        - name: ai-service-8300
+          port: 8300
+          protocol: TCP
+          targetPort: ai-service-8300
+
+# check if there is at least one published port
