@@ -3,10 +3,9 @@ Rimuru Crypto Empire — Shared Data Models
 All microservices use these Pydantic models for API communication.
 """
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from typing import Dict, List, Optional
 from enum import Enum
-from datetime import datetime
 
 
 # ============================================

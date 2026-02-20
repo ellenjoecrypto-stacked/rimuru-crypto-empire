@@ -5,12 +5,16 @@ strategy fanout, signal aggregation, position sizing, and execution.
 Runs the 24/7 trading loop.
 """
 
-import os, sys, time, json, math, logging, threading
+import os
+import sys
+import time
+import json
+import logging
+import threading
 from pathlib import Path
 from datetime import datetime, timezone
 from typing import Dict, List, Optional
 from urllib.request import Request, urlopen
-from urllib.error import URLError
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
@@ -19,10 +23,8 @@ import uvicorn
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from shared.config import ServiceConfig
 from shared.models import (
-    OHLCV, IndicatorRequest, IndicatorResult, StrategyRequest,
     StrategySignal, EnsembleSignal, SignalAction,
-    OrderRequest, OrderResult, OrderSide, OrderType,
-    PortfolioState, ServiceHealth,
+    ServiceHealth,
 )
 from shared.security import secure_app, get_auth_headers
 

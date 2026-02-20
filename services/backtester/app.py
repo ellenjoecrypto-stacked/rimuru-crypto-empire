@@ -3,9 +3,14 @@ Rimuru Crypto Empire — Backtester Service
 Walk-forward backtesting engine with metrics: Sharpe, Sortino, Max Drawdown, Profit Factor.
 """
 
-import os, sys, time, json, math, statistics, logging
+import os
+import sys
+import time
+import json
+import math
+import statistics
+import logging
 from pathlib import Path
-from datetime import datetime, timezone
 from typing import List
 
 from fastapi import FastAPI, HTTPException
@@ -13,10 +18,9 @@ from fastapi.responses import JSONResponse
 import uvicorn
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from shared.config import ServiceConfig
 from shared.models import (
     BacktestRequest, BacktestResult, BacktestTrade,
-    OHLCV, IndicatorRequest, ServiceHealth,
+    OHLCV, ServiceHealth,
 )
 from shared.security import secure_app, get_auth_headers
 

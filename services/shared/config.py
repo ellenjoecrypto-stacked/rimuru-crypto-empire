@@ -92,7 +92,7 @@ class ServiceConfig:
                         cls.KRAKEN_API_SECRET = v
             # Fallback: raw lines
             if not cls.KRAKEN_API_KEY:
-                data_lines = [l.strip() for l in lines if l.strip() and not l.startswith("#")]
+                data_lines = [line.strip() for line in lines if line.strip() and not line.startswith("#")]
                 if len(data_lines) >= 2:
                     cls.KRAKEN_API_KEY = data_lines[-2]
                     cls.KRAKEN_API_SECRET = data_lines[-1]
