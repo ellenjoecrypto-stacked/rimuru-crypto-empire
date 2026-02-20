@@ -5,7 +5,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import SecurityIcon from '@mui/icons-material/Security';
-import MenuBookIcon from '@mui/icons-material/MenuBook';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 const Navigation: React.FC = () => {
   const navigate = useNavigate();
@@ -16,6 +16,7 @@ const Navigation: React.FC = () => {
     { text: 'Trading', icon: <ShowChartIcon />, path: '/trading' },
     { text: 'Bots', icon: <SmartToyIcon />, path: '/bots' },
     { text: 'Security', icon: <SecurityIcon />, path: '/security' },
+    { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
   ];
 
   return (
