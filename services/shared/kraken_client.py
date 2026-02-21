@@ -15,6 +15,10 @@ import urllib.request
 logger = logging.getLogger("rimuru.kraken")
 
 
+class KrakenAPIError(Exception):
+    """Raised when the Kraken API returns an error response."""
+
+
 class KrakenClient:
     BASE_URL = "https://api.kraken.com"
 
@@ -23,6 +27,10 @@ class KrakenClient:
         self.secret = secret
         self._call_count = 0
         self._last_call = 0.0
+
+    @property
+    def call_count(self) -> int:
+        return self._call_count
 
     def _rate_limit(self):
         elapsed = time.time() - self._last_call
@@ -38,7 +46,7 @@ class KrakenClient:
         mac = hmac.new(base64.b64decode(self.secret), message, hashlib.sha512)
         return base64.b64encode(mac.digest()).decode("utf-8")
 
-    def _private(self, endpoint: str, data: dict = None) -> dict:
+    def _private(self, endpoint: str, data: dict | None = None) -> dict:
         self._rate_limit()
         url = f"{self.BASE_URL}{endpoint}"
         if data is None:
@@ -55,10 +63,10 @@ class KrakenClient:
         resp = urllib.request.urlopen(req, timeout=15)
         result = json.loads(resp.read().decode())
         if result.get("error"):
-            raise Exception(f"Kraken API: {result['error']}")
+            raise KrakenAPIError(f"Kraken API: {result['error']}")
         return result.get("result", {})
 
-    def _public(self, endpoint: str, params: dict = None) -> dict:
+    def _public(self, endpoint: str, params: dict | None = None) -> dict:
         self._rate_limit()
         url = f"{self.BASE_URL}{endpoint}"
         if params:
@@ -67,7 +75,7 @@ class KrakenClient:
         resp = urllib.request.urlopen(req, timeout=10)
         result = json.loads(resp.read().decode())
         if result.get("error"):
-            raise Exception(f"Kraken API: {result['error']}")
+            raise KrakenAPIError(f"Kraken API: {result['error']}")
         return result.get("result", {})
 
     # ----- Public endpoints -----
@@ -75,7 +83,7 @@ class KrakenClient:
     def ticker(self, pairs: list) -> dict:
         return self._public("/0/public/Ticker", {"pair": ",".join(pairs)})
 
-    def ohlc(self, pair: str, interval: int = 5, since: int = None) -> list:
+    def ohlc(self, pair: str, interval: int = 5, since: int | None = None) -> list:
         params = {"pair": pair, "interval": interval}
         if since:
             params["since"] = since
@@ -107,7 +115,7 @@ class KrakenClient:
         result = self._private("/0/private/OpenOrders")
         return result.get("open", {})
 
-    def closed_orders(self, start: int = None) -> dict:
+    def closed_orders(self, start: int | None = None) -> dict:
         data = {}
         if start:
             data["start"] = start
@@ -120,7 +128,7 @@ class KrakenClient:
         side: str,
         order_type: str,
         volume: float,
-        price: float = None,
+        price: float | None = None,
         validate: bool = False,
     ) -> dict:
         data = {

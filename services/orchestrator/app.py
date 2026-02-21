@@ -101,9 +101,10 @@ def _get_fear_greed() -> int:
         val = int(data["data"][0]["value"])
         fear_greed_cache["value"] = val
         fear_greed_cache["timestamp"] = time.time()
-        return val
     except Exception:
         return fear_greed_cache["value"]
+    else:
+        return val
 
 
 # --------------- Core Logic ---------------
@@ -113,8 +114,8 @@ def _fetch_candles(pair: str) -> dict:
     """Fetch multi-timeframe candles from data-ingest"""
     try:
         return _get_json(f"{DATA_URL}/multi-ohlc/{pair}")
-    except Exception as e:
-        logger.error(f"Data fetch error for {pair}: {e}")
+    except Exception:
+        logger.exception("Data fetch error for %s", pair)
         return {}
 
 
@@ -129,8 +130,8 @@ def _compute_indicators(pair: str, candles: list[dict]) -> dict | None:
                 "indicators": ["all"],
             },
         )
-    except Exception as e:
-        logger.error(f"Indicator error for {pair}: {e}")
+    except Exception:
+        logger.exception("Indicator error for %s", pair)
         return None
 
 
@@ -139,7 +140,7 @@ def _get_strategy_signal(strategy: str, url: str, req_data: dict) -> dict | None
     try:
         return _post_json(f"{url}/signal", req_data, timeout=10)
     except Exception as e:
-        logger.warning(f"Strategy {strategy} error: {e}")
+        logger.warning("Strategy %s error: %s", strategy, e)
         return None
 
 
@@ -153,7 +154,7 @@ def _kelly_size(confidence: float, available_usd: float) -> float:
 
 
 def _scan_pair(
-    pair: str, pair_name: str, available_usd: float, open_positions: int
+    pair: str, _pair_name: str, available_usd: float, open_positions: int
 ) -> EnsembleSignal | None:
     """Full analysis pipeline for a single pair"""
     # 1. Fetch candles
@@ -272,14 +273,18 @@ def _execute_signal(signal: EnsembleSignal):
 
     if signal.confidence < MIN_CONFIDENCE:
         logger.info(
-            f"{signal.pair}: {signal.action.value} confidence {signal.confidence:.2f} < {MIN_CONFIDENCE} — skip"
+            "%s: %s confidence %.2f < %s — skip",
+            signal.pair,
+            signal.action.value,
+            signal.confidence,
+            MIN_CONFIDENCE,
         )
         return
 
     # Fear & Greed filter: extreme fear = buy more, extreme greed = buy less
     fg = signal.fear_greed
     if signal.action == SignalAction.BUY and fg > 80:
-        logger.info(f"{signal.pair}: Extreme greed ({fg}) — reducing position")
+        logger.info("%s: Extreme greed (%s) — reducing position", signal.pair, fg)
         signal.suggested_volume *= 0.5
 
     order = {
@@ -299,14 +304,18 @@ def _execute_signal(signal: EnsembleSignal):
         result = _post_json(f"{EXECUTOR_URL}/execute", order)
         if result.get("success"):
             logger.info(
-                f"EXECUTED {signal.action.value.upper()} {signal.pair} "
-                f"vol={signal.suggested_volume:.6f} via {signal.best_strategy} "
-                f"({signal.strategies_agree}/{signal.strategies_total} agree)"
+                "EXECUTED %s %s vol=%s via %s (%s/%s agree)",
+                signal.action.value.upper(),
+                signal.pair,
+                f"{signal.suggested_volume:.6f}",
+                signal.best_strategy,
+                signal.strategies_agree,
+                signal.strategies_total,
             )
         else:
-            logger.warning(f"Execution failed: {result.get('error', 'unknown')}")
-    except Exception as e:
-        logger.error(f"Executor call failed: {e}")
+            logger.warning("Execution failed: %s", result.get("error", "unknown"))
+    except Exception:
+        logger.exception("Executor call failed")
 
 
 def _scan_loop():
@@ -314,13 +323,15 @@ def _scan_loop():
     global scan_count, running
     running = True
     logger.info(
-        f"Scan loop started [{'PAPER' if PAPER_MODE else 'LIVE'}] — interval {SCAN_INTERVAL}s"
+        "Scan loop started [%s] — interval %ss",
+        "PAPER" if PAPER_MODE else "LIVE",
+        SCAN_INTERVAL,
     )
 
     while running:
         try:
             scan_count += 1
-            logger.info(f"--- Scan #{scan_count} ---")
+            logger.info("--- Scan #%s ---", scan_count)
 
             # Get portfolio state
             try:
@@ -338,13 +349,13 @@ def _scan_loop():
                     if signal:
                         last_signals[pair] = signal
                         _execute_signal(signal)
-                except Exception as e:
-                    logger.error(f"Error scanning {name}: {e}")
+                except Exception:
+                    logger.exception("Error scanning %s", name)
 
                 time.sleep(2)  # Rate limit between pairs
 
-        except Exception as e:
-            logger.error(f"Scan loop error: {e}")
+        except Exception:
+            logger.exception("Scan loop error")
 
         time.sleep(SCAN_INTERVAL)
 
@@ -401,7 +412,6 @@ def manual_scan(pair: str):
 
 @app.post("/start")
 def start_scanning():
-    global running
     if running:
         return {"status": "already running"}
     thread = threading.Thread(target=_scan_loop, daemon=True)
@@ -474,5 +484,5 @@ def startup():
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "8030"))
-    logger.info(f"Rimuru Orchestrator starting on port {port}")
+    logger.info("Rimuru Orchestrator starting on port %s", port)
     uvicorn.run(app, host="0.0.0.0", port=port)

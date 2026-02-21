@@ -11,6 +11,7 @@ from pathlib import Path
 import statistics
 import sys
 import time
+import urllib.request
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
@@ -40,8 +41,6 @@ INDICATOR_URL = os.getenv("INDICATORS_URL", "http://indicators:8001")
 
 
 def _post_json(url, data, timeout=15):
-    import urllib.request
-
     body = json.dumps(data).encode("utf-8")
     req = urllib.request.Request(url, data=body, method="POST")
     req.add_header("Content-Type", "application/json")
@@ -52,8 +51,6 @@ def _post_json(url, data, timeout=15):
 
 
 def _get_json(url, timeout=10):
-    import urllib.request
-
     req = urllib.request.Request(url)
     for k, v in get_auth_headers().items():
         req.add_header(k, v)
@@ -155,7 +152,7 @@ class SimpleBacktester:
             bb = self._bollinger(closes)
             if bb is None:
                 continue
-            lower, mid, upper = bb
+            lower, mid, _ = bb
             if self.position is None and close < lower:
                 vol = (self.capital * 0.5) / close
                 self.position = {"entry_price": close, "volume": vol, "entry_idx": i}
@@ -315,10 +312,10 @@ def run_backtest(req: BacktestRequest):
     try:
         data = _get_json(f"{DATA_URL}/ohlc/{req.pair}?interval={req.interval}&count=720")
         candles = data.get("candles", []) if isinstance(data, dict) else []
-        if not candles:
-            raise HTTPException(status_code=400, detail="No candle data")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Data fetch error: {e}")
+        raise HTTPException(status_code=500, detail=f"Data fetch error: {e}") from e
+    if not candles:
+        raise HTTPException(status_code=400, detail="No candle data")
 
     # Convert to OHLCV
     ohlcv = [OHLCV(**c) if isinstance(c, dict) else c for c in candles]
@@ -356,10 +353,10 @@ def walk_forward(req: BacktestRequest):
     try:
         data = _get_json(f"{DATA_URL}/ohlc/{req.pair}?interval={req.interval}&count=720")
         candles = data.get("candles", []) if isinstance(data, dict) else []
-        if len(candles) < 100:
-            raise HTTPException(status_code=400, detail="Need 100+ candles")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
+    if len(candles) < 100:
+        raise HTTPException(status_code=400, detail="Need 100+ candles")
 
     ohlcv = [OHLCV(**c) if isinstance(c, dict) else c for c in candles]
     split = int(len(ohlcv) * 0.7)
@@ -399,5 +396,5 @@ def metrics():
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "8040"))
-    logger.info(f"Rimuru Backtester starting on port {port}")
+    logger.info("Rimuru Backtester starting on port %s", port)
     uvicorn.run(app, host="0.0.0.0", port=port)

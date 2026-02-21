@@ -48,8 +48,6 @@ select = [
 # Ignore rules
 ignore = [
     "E501",    # line-too-long (handled by formatter)
-    "ANN101",  # missing-type-self
-    "ANN102",  # missing-type-cls
     "ANN401",  # any-type (too strict for crypto project)
     "S101",    # assert (used in tests)
     "S603",    # subprocess-without-shell-equals-true
@@ -60,6 +58,18 @@ ignore = [
     "TRY003",  # raise-vanilla-args
     "EM101",   # raw-string-in-exception
     "EM102",   # f-string-in-exception
+    # Intentional patterns for crypto trading service:
+    "PLR2004", # magic-value-comparison — trading thresholds are intentional constants
+    "PLW0603", # global-statement — intentional for app-level state management
+    "S104",    # hardcoded-bind-all-interfaces — intentional for Docker containers
+    "S310",    # suspicious-url-open-usage — urllib URL opens are acceptable here
+    # Type annotations are optional at this stage:
+    "ANN001",
+    "ANN201",
+    "ANN202",
+    "ANN204",
+    "ANN205",
+    "ANN206",
 ]
 
 # Allow autofix for all enabled rules

@@ -27,7 +27,8 @@ x-common: &common
   networks:
     - rimuru-team
   env_file:
-    - .env.security
+    - path: .env.security
+      required: false
   logging:
     driver: json-file
     options:

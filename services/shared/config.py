@@ -5,6 +5,7 @@ Loaded from environment variables for Docker/K8s deployment.
 
 import os
 from pathlib import Path
+from typing import ClassVar
 
 
 class ServiceConfig:
@@ -40,7 +41,7 @@ class ServiceConfig:
     DAILY_LOSS_LIMIT = float(os.getenv("DAILY_LOSS_LIMIT", "5.00"))
 
     # === Tradeable Pairs ===
-    TRADEABLE_PAIRS = {
+    TRADEABLE_PAIRS: ClassVar[dict] = {
         "SOL": "SOLUSD",
         "PEPE": "PEPEUSD",
         "DOGE": "XDGUSD",
@@ -48,7 +49,7 @@ class ServiceConfig:
         "ETH": "XETHZUSD",
     }
 
-    MIN_ORDER = {
+    MIN_ORDER: ClassVar[dict] = {
         "SOLUSD": 0.05,
         "PEPEUSD": 100000,
         "XDGUSD": 50,
@@ -56,7 +57,7 @@ class ServiceConfig:
         "XETHZUSD": 0.004,
     }
 
-    ASSET_MAP = {
+    ASSET_MAP: ClassVar[dict] = {
         "SOL": "SOL",
         "PEPE": "PEPE",
         "DOGE": "XXDG",
@@ -80,8 +81,8 @@ class ServiceConfig:
         keys_file = Path(cls.KRAKEN_KEYS_FILE)
         if keys_file.exists():
             lines = keys_file.read_text().strip().splitlines()
-            for line in lines:
-                line = line.strip()
+            for raw_line in lines:
+                line = raw_line.strip()
                 if not line or line.startswith("#"):
                     continue
                 if "=" in line:
@@ -95,7 +96,7 @@ class ServiceConfig:
                         cls.KRAKEN_API_SECRET = v
             # Fallback: raw lines
             if not cls.KRAKEN_API_KEY:
-                data_lines = [l.strip() for l in lines if l.strip() and not l.startswith("#")]
+                data_lines = [ln.strip() for ln in lines if ln.strip() and not ln.startswith("#")]
                 if len(data_lines) >= 2:
                     cls.KRAKEN_API_KEY = data_lines[-2]
                     cls.KRAKEN_API_SECRET = data_lines[-1]

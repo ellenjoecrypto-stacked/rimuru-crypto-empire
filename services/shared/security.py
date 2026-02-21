@@ -13,9 +13,12 @@ Inter-service calls must also pass the key.
 
 from collections import defaultdict
 import hmac
+import json
 import logging
 import os
 import time
+from urllib.request import Request as UrllibRequest
+from urllib.request import urlopen
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -238,21 +241,18 @@ def authenticated_request(
     Make an authenticated HTTP request to another Rimuru service.
     Automatically injects X-Rimuru-Key header.
     """
-    import json as _json
-    from urllib.request import Request, urlopen
-
     headers = {"Content-Type": "application/json"}
     headers.update(get_auth_headers())
 
     if data is not None:
-        body = _json.dumps(data).encode()
-        req = Request(url, data=body, headers=headers, method=method or "POST")
+        body = json.dumps(data).encode()
+        req = UrllibRequest(url, data=body, headers=headers, method=method or "POST")
     else:
-        req = Request(url, headers=headers, method=method)
+        req = UrllibRequest(url, headers=headers, method=method)
 
     try:
         with urlopen(req, timeout=timeout) as resp:
-            return _json.loads(resp.read().decode())
-    except Exception as e:
-        logger.error("Service call failed: %s %s — %s", method, url, e)
+            return json.loads(resp.read().decode())
+    except Exception:
+        logger.exception("Service call failed: %s %s", method, url)
         raise
