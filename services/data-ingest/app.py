@@ -85,7 +85,7 @@ def get_ticker(pair: str):
     kc = get_kraken()
     try:
         result = kc.ticker([pair])
-        for k, v in result.items():
+        for v in result.values():
             ask = float(v["a"][0])
             bid = float(v["b"][0])
             last = float(v["c"][0])
@@ -104,7 +104,7 @@ def get_ticker(pair: str):
                 spread_pct=round(spread, 4),
             )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @app.get("/ticker")
@@ -120,9 +120,10 @@ def get_all_tickers():
             last = float(v["c"][0])
             vol = float(v["v"][1])
             tickers[k] = {"ask": ask, "bid": bid, "last": last, "volume_24h": vol}
-        return tickers
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
+    else:
+        return tickers
 
 
 @app.get("/ohlc/{pair}")
@@ -134,25 +135,25 @@ def get_ohlc(pair: str, interval: int = 5, count: int = 200):
     kc = get_kraken()
     try:
         raw = kc.ohlc(pair, interval)
-        candles = []
-        for c in raw[-count:]:
-            candles.append(
-                OHLCV(
-                    timestamp=float(c[0]),
-                    open=float(c[1]),
-                    high=float(c[2]),
-                    low=float(c[3]),
-                    close=float(c[4]),
-                    vwap=float(c[5]) if c[5] else 0,
-                    volume=float(c[6]),
-                    count=int(c[7]) if len(c) > 7 else 0,
-                )
+        candles = [
+            OHLCV(
+                timestamp=float(c[0]),
+                open=float(c[1]),
+                high=float(c[2]),
+                low=float(c[3]),
+                close=float(c[4]),
+                vwap=float(c[5]) if c[5] else 0,
+                volume=float(c[6]),
+                count=int(c[7]) if len(c) > 7 else 0,
             )
+            for c in raw[-count:]
+        ]
         resp = MarketDataResponse(pair=pair, interval=interval, candles=candles)
         cache[ck] = {"data": resp.model_dump(), "timestamp": time.time()}
-        return resp
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
+    else:
+        return resp
 
 
 @app.get("/orderbook/{pair}")
@@ -164,23 +165,20 @@ def get_orderbook(pair: str, depth: int = 10):
         bids = [OrderBookEntry(price=float(b[0]), volume=float(b[1])) for b in raw.get("bids", [])]
         return OrderBook(pair=pair, asks=asks, bids=bids)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @app.post("/market-data")
 def get_market_data(req: MarketDataRequest):
     """Full market data bundle: OHLCV + ticker for a pair"""
     ohlc_data = get_ohlc(req.pair, req.interval, req.count)
-    if isinstance(ohlc_data, dict):
-        resp = MarketDataResponse(**ohlc_data)
-    else:
-        resp = ohlc_data
+    resp = MarketDataResponse(**ohlc_data) if isinstance(ohlc_data, dict) else ohlc_data
 
     try:
         ticker = get_ticker(req.pair)
         resp.ticker = ticker
     except Exception:
-        pass
+        logger.debug("Could not fetch ticker for %s", req.pair)
     return resp
 
 
@@ -195,7 +193,7 @@ def get_multi_timeframe(pair: str):
             "1h": get_ohlc(pair, 60, 200),
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @app.get("/balance")
@@ -210,7 +208,7 @@ def get_balance():
             "equivalent_usd": float(tb.get("eb", 0)),
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 # --------------- Metrics ---------------
@@ -229,12 +227,12 @@ def prometheus_metrics():
         f"rimuru_data_ingest_cache_entries {len(cache)}",
         "# HELP rimuru_data_ingest_kraken_calls Total Kraken API calls",
         "# TYPE rimuru_data_ingest_kraken_calls counter",
-        f"rimuru_data_ingest_kraken_calls {kraken._call_count if kraken else 0}",
+        f"rimuru_data_ingest_kraken_calls {kraken.call_count if kraken else 0}",
     ]
     return JSONResponse(content="\n".join(lines), media_type="text/plain")
 
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "8000"))
-    logger.info(f"Rimuru Data Ingest starting on port {port}")
+    logger.info("Rimuru Data Ingest starting on port %s", port)
     uvicorn.run(app, host="0.0.0.0", port=port)

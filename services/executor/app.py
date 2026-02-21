@@ -67,7 +67,7 @@ def _save_state():
 
 
 def _load_state():
-    global positions, daily_pnl, daily_trades, order_ledger
+    global daily_pnl, daily_trades, order_ledger
     path = DATA_DIR / "executor_state.json"
     if path.exists():
         try:
@@ -77,9 +77,9 @@ def _load_state():
             daily_pnl = state.get("daily_pnl", 0)
             daily_trades = state.get("daily_trades", 0)
             order_ledger = state.get("order_ledger", [])
-            logger.info(f"Loaded state: {len(positions)} positions, {daily_trades} trades today")
-        except Exception as e:
-            logger.error(f"Failed to load state: {e}")
+            logger.info("Loaded state: %s positions, %s trades today", len(positions), daily_trades)
+        except Exception:
+            logger.exception("Failed to load state")
 
 
 # Load on startup
@@ -101,18 +101,18 @@ def _risk_check(req: OrderRequest) -> str:
         return f"Max open positions reached ({ServiceConfig.MAX_OPEN_POSITIONS})"
 
     vol_usd = req.volume * (req.price or 0)
-    if vol_usd > ServiceConfig.MAX_TRADE_USD:
-        return f"Order ${vol_usd:.2f} exceeds max trade ${ServiceConfig.MAX_TRADE_USD}"
-
-    if vol_usd < ServiceConfig.MIN_TRADE_USD:
-        return f"Order ${vol_usd:.2f} below min trade ${ServiceConfig.MIN_TRADE_USD}"
-
-    # Check min Kraken order size
     min_vol = ServiceConfig.MIN_ORDER.get(req.pair, 0)
-    if req.volume < min_vol:
-        return f"Volume {req.volume} below Kraken minimum {min_vol} for {req.pair}"
 
-    return ""
+    if vol_usd > ServiceConfig.MAX_TRADE_USD:
+        error = f"Order ${vol_usd:.2f} exceeds max trade ${ServiceConfig.MAX_TRADE_USD}"
+    elif vol_usd < ServiceConfig.MIN_TRADE_USD:
+        error = f"Order ${vol_usd:.2f} below min trade ${ServiceConfig.MIN_TRADE_USD}"
+    elif req.volume < min_vol:
+        error = f"Volume {req.volume} below Kraken minimum {min_vol} for {req.pair}"
+    else:
+        error = ""
+
+    return error
 
 
 # --------------- Endpoints ---------------
@@ -165,7 +165,9 @@ def execute_order(req: OrderRequest):
             fee=req.volume * price * 0.0026,  # Kraken taker fee
             timestamp=now,
         )
-        logger.info(f"[PAPER] {req.side.value.upper()} {req.volume} {req.pair} @ ${price:.6f}")
+        logger.info(
+            "[PAPER] %s %s %s @ $%s", req.side.value.upper(), req.volume, req.pair, f"{price:.6f}"
+        )
     else:
         # LIVE order
         kc = get_kraken()
@@ -180,7 +182,6 @@ def execute_order(req: OrderRequest):
             txid = (
                 api_result.get("txid", [""])[0] if isinstance(api_result.get("txid"), list) else ""
             )
-            descr = api_result.get("descr", {})
             result = OrderResult(
                 success=True,
                 order_id=txid,
@@ -191,9 +192,9 @@ def execute_order(req: OrderRequest):
                 cost_usd=req.volume * (req.price or 0),
                 timestamp=now,
             )
-            logger.info(f"[LIVE] {req.side.value.upper()} {req.volume} {req.pair} -> {txid}")
+            logger.info("[LIVE] %s %s %s -> %s", req.side.value.upper(), req.volume, req.pair, txid)
         except Exception as e:
-            logger.error(f"Order failed: {e}")
+            logger.exception("Order failed")
             return OrderResult(
                 success=False,
                 pair=req.pair,
@@ -263,7 +264,7 @@ def get_portfolio():
             balances={k: float(v) for k, v in bal.items() if float(v) > 0},
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @app.get("/ledger")
@@ -275,7 +276,7 @@ def get_ledger(limit: int = 50):
 def set_paper_mode(enabled: bool):
     global PAPER_MODE
     PAPER_MODE = enabled
-    logger.warning(f"Paper mode {'ENABLED' if enabled else 'DISABLED'}")
+    logger.warning("Paper mode %s", "ENABLED" if enabled else "DISABLED")
     return {"paper_mode": PAPER_MODE}
 
 
@@ -292,9 +293,9 @@ def emergency_stop():
             open_orders = kc.open_orders()
             for txid in open_orders:
                 kc.cancel_order(txid)
-                logger.info(f"Cancelled order {txid}")
-        except Exception as e:
-            logger.error(f"Error cancelling orders: {e}")
+                logger.info("Cancelled order %s", txid)
+        except Exception:
+            logger.exception("Error cancelling orders")
 
     return {"status": "EMERGENCY STOP ACTIVE", "positions_frozen": len(positions)}
 
@@ -314,5 +315,5 @@ def prometheus_metrics():
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "8020"))
-    logger.info(f"Rimuru Executor starting on port {port} [{'PAPER' if PAPER_MODE else 'LIVE'}]")
+    logger.info("Rimuru Executor starting on port %s [%s]", port, "PAPER" if PAPER_MODE else "LIVE")
     uvicorn.run(app, host="0.0.0.0", port=port)

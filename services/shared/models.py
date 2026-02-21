@@ -3,7 +3,7 @@ Rimuru Crypto Empire — Shared Data Models
 All microservices use these Pydantic models for API communication.
 """
 
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import BaseModel
 
@@ -12,30 +12,30 @@ from pydantic import BaseModel
 # ============================================
 
 
-class SignalAction(str, Enum):
+class SignalAction(StrEnum):
     BUY = "buy"
     SELL = "sell"
     HOLD = "hold"
 
 
-class OrderSide(str, Enum):
+class OrderSide(StrEnum):
     BUY = "buy"
     SELL = "sell"
 
 
-class OrderType(str, Enum):
+class OrderType(StrEnum):
     MARKET = "market"
     LIMIT = "limit"
 
 
-class MarketRegime(str, Enum):
+class MarketRegime(StrEnum):
     TRENDING = "TRENDING"
     RANGING = "RANGING"
     VOLATILE = "VOLATILE"
     MIXED = "MIXED"
 
 
-class PositionStatus(str, Enum):
+class PositionStatus(StrEnum):
     OPEN = "open"
     CLOSED = "closed"
     STOPPED = "stopped"

@@ -115,7 +115,7 @@ def _heuristic_prediction(ind) -> dict:
         else:
             signals["adx"] = -min(1, ind.adx["adx"] / 50)
 
-    # Williams %R
+    # Williams Percent Range
     if ind.williams_r is not None:
         signals["williams"] = (-ind.williams_r - 50) / 50
 

@@ -52,7 +52,6 @@ def generate_signal(req: StrategyRequest):
     reasons = []
     price = ind.current_price
     lower = ind.bollinger.get("lower", 0)
-    middle = ind.bollinger.get("middle", 0)
     upper = ind.bollinger.get("upper", 0)
     width = ind.bollinger.get("width", 0)
 
@@ -61,10 +60,7 @@ def generate_signal(req: StrategyRequest):
         return sig
 
     bb_range = upper - lower
-    if bb_range > 0:
-        position = (price - lower) / bb_range
-    else:
-        position = 0.5
+    position = (price - lower) / bb_range if bb_range > 0 else 0.5
 
     # Price near or below lower band — BUY signal
     if price < lower:
@@ -102,10 +98,9 @@ def generate_signal(req: StrategyRequest):
             reasons.append(f"RSI confirms overbought {ind.rsi:.0f}")
 
     # VWAP confirmation
-    if ind.vwap:
-        if ind.vwap.get("below_vwap") and score > 0:
-            score += 0.10
-            reasons.append("Below VWAP (institutional support)")
+    if ind.vwap and ind.vwap.get("below_vwap") and score > 0:
+        score += 0.10
+        reasons.append("Below VWAP (institutional support)")
 
     sig.reason = " | ".join(reasons)
     if score > 0.25:

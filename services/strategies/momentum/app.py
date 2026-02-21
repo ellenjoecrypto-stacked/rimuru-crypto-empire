@@ -93,10 +93,9 @@ def generate_signal(req: StrategyRequest):
             reasons.append(f"Vol declining {ind.volume_trend:.0f}%")
 
     # ADX trend strength filter
-    if ind.adx:
-        if ind.adx.get("strong_trend") and ind.adx.get("bullish") and score > 0:
-            score += 0.10
-            reasons.append(f"ADX strong trend {ind.adx['adx']}")
+    if ind.adx and ind.adx.get("strong_trend") and ind.adx.get("bullish") and score > 0:
+        score += 0.10
+        reasons.append(f"ADX strong trend {ind.adx['adx']}")
 
     sig.reason = " | ".join(reasons)
     if score > 0.3:
