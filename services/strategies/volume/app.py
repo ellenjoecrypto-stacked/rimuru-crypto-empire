@@ -3,14 +3,18 @@ Rimuru Strategy — Volume Surge Detection
 Detects unusual volume patterns that precede price moves.
 """
 
-import os, sys, time, logging
+import logging
+import os
 from pathlib import Path
+import sys
+import time
+
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 import uvicorn
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
-from shared.models import StrategyRequest, StrategySignal, SignalAction, ServiceHealth
+from shared.models import ServiceHealth, SignalAction, StrategyRequest, StrategySignal
 from shared.security import secure_app
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -22,9 +26,12 @@ signal_count = 0
 
 @app.get("/health")
 def health():
-    return ServiceHealth(service="strategy-volume", status="healthy",
-                         uptime_seconds=round(time.time() - START_TIME, 1),
-                         details={"signals_generated": signal_count})
+    return ServiceHealth(
+        service="strategy-volume",
+        status="healthy",
+        uptime_seconds=round(time.time() - START_TIME, 1),
+        details={"signals_generated": signal_count},
+    )
 
 
 @app.post("/signal")
@@ -33,8 +40,7 @@ def generate_signal(req: StrategyRequest):
     signal_count += 1
 
     ind = req.indicators
-    sig = StrategySignal(pair=req.pair, strategy="volume", timeframe="15m",
-                         price=ind.current_price)
+    sig = StrategySignal(pair=req.pair, strategy="volume", timeframe="15m", price=ind.current_price)
 
     score = 0.0
     reasons = []

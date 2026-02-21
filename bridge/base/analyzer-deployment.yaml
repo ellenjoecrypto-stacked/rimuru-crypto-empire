@@ -1,0 +1,49 @@
+#! analyzer-deployment.yaml
+# Generated code, do not edit
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: analyzer
+    namespace: rimuru-empire
+    labels:
+        com.docker.compose.project: rimuru_empire
+        com.docker.compose.service: analyzer
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            com.docker.compose.project: rimuru_empire
+            com.docker.compose.service: analyzer
+    strategy:
+        type: Recreate
+    template:
+        metadata:
+            labels:
+                com.docker.compose.project: rimuru_empire
+                com.docker.compose.service: analyzer
+                com.docker.compose.network.rimuru-network: "true"
+        spec:
+            restartPolicy: unless-stopped
+            containers:
+                - name: rimuru-analyzer
+                  image: rimuru_empire-analyzer
+                  imagePullPolicy: IfNotPresent
+                  env:
+                    - name: DATABASE_URL
+                      value: "postgresql://rimuru_user:secure_password_here@postgres:5432/rimuru_opportunities"
+                    - name: LOG_LEVEL
+                      value: "INFO"
+                    - name: REDIS_URL
+                      value: "redis://:redis_secure_pass@redis:6379"
+                  volumeMounts:
+                    - name: data-analysis
+                      mountPath: /data/analysis
+                    - name: logs
+                      mountPath: /logs
+            volumes:
+                - name: data-analysis
+                  hostPath:
+                    path: C:\Users\Admin\OneDrive\Videos\rimuru_empire\data\analysis
+                - name: logs
+                  hostPath:
+                    path: C:\Users\Admin\OneDrive\Videos\rimuru_empire\logs

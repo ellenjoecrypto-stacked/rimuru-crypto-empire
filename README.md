@@ -44,11 +44,23 @@ A comprehensive, production-ready cryptocurrency automation platform with AI-pow
 
 ## 📋 Prerequisites
 
-- Docker & Docker Compose
+- Docker & Docker Compose (v24.0+)
+- Python 3.11+ (for local development)
+- Node.js 18+ (for frontend development)
 - 4GB+ RAM
 - 20GB+ Storage
 - Stable internet connection
 - (Optional) GPU for AI training
+
+## 🎯 Latest Updates (2026-02)
+
+- ✅ **All dependencies updated** to latest stable versions
+- ✅ **Zero security vulnerabilities** (upgraded from 31 Python + 2 npm vulnerabilities)
+- ✅ **Modern tooling**: Ruff linter/formatter, ESLint, Prettier
+- ✅ **Enhanced security documentation** with comprehensive best practices
+- ✅ **Python 3.11+** with modern type hints and patterns
+- ✅ **FastAPI 0.129.0** with latest Starlette security fixes
+- ✅ **React 18.3** with TypeScript 5.7 and Vite 6.0
 
 ## 🚀 Quick Start
 
@@ -380,11 +392,57 @@ docker-compose up -d
 # Pull latest changes
 git pull origin main
 
+# Update Python dependencies
+pip install -r requirements.txt --upgrade
+
+# Update frontend dependencies
+cd frontend && npm install
+
 # Rebuild containers
 docker-compose build
 
 # Restart services
 docker-compose up -d
+```
+
+### Code Quality
+
+The project now includes modern linting and formatting tools:
+
+```bash
+# Python - Run ruff linter
+ruff check services/ backend/
+
+# Python - Auto-fix issues
+ruff check services/ backend/ --fix
+
+# Python - Format code
+ruff format services/ backend/
+
+# Frontend - Run ESLint
+cd frontend && npm run lint
+
+# Frontend - Fix linting issues
+cd frontend && npm run lint:fix
+
+# Frontend - Format code
+cd frontend && npm run format
+
+# Type checking
+mypy services/shared/models.py
+cd frontend && npm run type-check
+```
+
+### Pre-commit Hooks
+
+Install pre-commit hooks for automatic code quality checks:
+
+```bash
+pip install pre-commit
+pre-commit install
+
+# Run manually on all files
+pre-commit run --all-files
 ```
 
 ### Backup Data
@@ -395,6 +453,46 @@ tar -czf backup_$(date +%Y%m%d).tar.gz data/
 
 # Backup database
 docker-compose exec postgres pg_dump rimuru_db > backup.sql
+```
+
+## 🧪 Development
+
+### Local Development Setup
+
+```bash
+# Install Python dependencies
+python3 -m venv venv
+source venv/bin/activate  # or `venv\Scripts\activate` on Windows
+pip install -r requirements.txt
+
+# Install frontend dependencies
+cd frontend
+npm install
+
+# Run frontend dev server
+npm run dev
+
+# Run linting
+ruff check services/ backend/
+cd frontend && npm run lint
+
+# Run formatting
+ruff format services/ backend/
+cd frontend && npm run format
+
+# Run type checking
+mypy services/shared/models.py
+cd frontend && npm run type-check
+```
+
+### Testing
+
+```bash
+# Run Python tests
+pytest tests/ -v
+
+# Run frontend tests (if configured)
+cd frontend && npm test
 ```
 
 ## 📞 Support

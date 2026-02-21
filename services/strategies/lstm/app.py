@@ -6,14 +6,18 @@ For now, uses a heuristic ensemble as a placeholder until training data
 is collected by the backtester service.
 """
 
-import os, sys, time, math, logging
+import logging
+import os
 from pathlib import Path
+import sys
+import time
+
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 import uvicorn
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
-from shared.models import StrategyRequest, StrategySignal, SignalAction, ServiceHealth
+from shared.models import ServiceHealth, SignalAction, StrategyRequest, StrategySignal
 from shared.security import secure_app
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -27,7 +31,8 @@ MODEL_LOADED = False
 @app.get("/health")
 def health():
     return ServiceHealth(
-        service="strategy-lstm", status="healthy",
+        service="strategy-lstm",
+        status="healthy",
         uptime_seconds=round(time.time() - START_TIME, 1),
         details={"signals_generated": signal_count, "model_loaded": MODEL_LOADED},
     )
@@ -40,9 +45,16 @@ def _heuristic_prediction(ind) -> dict:
     This acts as a stand-in until a real LSTM model is trained.
     """
     weights = {
-        "rsi": 0.15, "bollinger": 0.15, "macd": 0.12, "stochastic": 0.12,
-        "ema": 0.12, "volume": 0.10, "fibonacci": 0.08, "vwap": 0.07,
-        "adx": 0.05, "williams": 0.04,
+        "rsi": 0.15,
+        "bollinger": 0.15,
+        "macd": 0.12,
+        "stochastic": 0.12,
+        "ema": 0.12,
+        "volume": 0.10,
+        "fibonacci": 0.08,
+        "vwap": 0.07,
+        "adx": 0.05,
+        "williams": 0.04,
     }
     signals = {}
 
@@ -125,8 +137,7 @@ def generate_signal(req: StrategyRequest):
     signal_count += 1
 
     ind = req.indicators
-    sig = StrategySignal(pair=req.pair, strategy="lstm", timeframe="15m",
-                         price=ind.current_price)
+    sig = StrategySignal(pair=req.pair, strategy="lstm", timeframe="15m", price=ind.current_price)
 
     result = _heuristic_prediction(ind)
     prediction = result["prediction"]

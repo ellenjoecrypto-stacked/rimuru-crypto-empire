@@ -1,0 +1,19 @@
+#! wallet-service-service.yaml
+# Generated code, do not edit
+apiVersion: v1
+kind: Service
+metadata:
+    name: wallet-service-published
+    namespace: rimuru-empire
+    labels:
+        com.docker.compose.project: rimuru_empire
+        com.docker.compose.service: wallet-service
+spec:
+    selector:
+        com.docker.compose.project: rimuru_empire
+        com.docker.compose.service: wallet-service
+    ports:
+        - name: wallet-ser-8200
+          port: 8200
+          protocol: TCP
+          targetPort: wallet-ser-8200

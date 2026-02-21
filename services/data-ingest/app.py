@@ -4,14 +4,12 @@ Fetches OHLCV, ticker, and orderbook data from Kraken.
 Provides a REST API for other services to consume market data.
 """
 
+from datetime import UTC, datetime
+import logging
 import os
+from pathlib import Path
 import sys
 import time
-import json
-import logging
-from datetime import datetime, timezone
-from pathlib import Path
-from typing import Dict, List
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
@@ -19,11 +17,16 @@ import uvicorn
 
 # Add shared lib
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from shared.kraken_client import KrakenClient
 from shared.config import ServiceConfig
+from shared.kraken_client import KrakenClient
 from shared.models import (
-    OHLCV, TickerData, OrderBook, OrderBookEntry,
-    MarketDataRequest, MarketDataResponse, ServiceHealth,
+    OHLCV,
+    MarketDataRequest,
+    MarketDataResponse,
+    OrderBook,
+    OrderBookEntry,
+    ServiceHealth,
+    TickerData,
 )
 from shared.security import secure_app
 
@@ -36,7 +39,7 @@ START_TIME = time.time()
 
 # --------------- State ---------------
 kraken: KrakenClient = None
-cache: Dict[str, dict] = {}  # pair_interval -> {data, timestamp}
+cache: dict[str, dict] = {}  # pair_interval -> {data, timestamp}
 CACHE_TTL = int(os.getenv("CACHE_TTL", "30"))  # seconds
 
 
@@ -60,13 +63,14 @@ def _is_fresh(key: str) -> bool:
 
 # --------------- Endpoints ---------------
 
+
 @app.get("/health")
 def health():
     return ServiceHealth(
         service="data-ingest",
         status="healthy",
         uptime_seconds=round(time.time() - START_TIME, 1),
-        last_activity=datetime.now(timezone.utc).isoformat(),
+        last_activity=datetime.now(UTC).isoformat(),
         details={"cache_entries": len(cache), "pairs": list(ServiceConfig.TRADEABLE_PAIRS.keys())},
     )
 
@@ -90,8 +94,14 @@ def get_ticker(pair: str):
             low = float(v["l"][1])
             spread = (ask - bid) / ask * 100 if ask > 0 else 0
             return TickerData(
-                pair=pair, ask=ask, bid=bid, last=last,
-                volume_24h=vol, high_24h=high, low_24h=low, spread_pct=round(spread, 4),
+                pair=pair,
+                ask=ask,
+                bid=bid,
+                last=last,
+                volume_24h=vol,
+                high_24h=high,
+                low_24h=low,
+                spread_pct=round(spread, 4),
             )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -126,16 +136,18 @@ def get_ohlc(pair: str, interval: int = 5, count: int = 200):
         raw = kc.ohlc(pair, interval)
         candles = []
         for c in raw[-count:]:
-            candles.append(OHLCV(
-                timestamp=float(c[0]),
-                open=float(c[1]),
-                high=float(c[2]),
-                low=float(c[3]),
-                close=float(c[4]),
-                vwap=float(c[5]) if c[5] else 0,
-                volume=float(c[6]),
-                count=int(c[7]) if len(c) > 7 else 0,
-            ))
+            candles.append(
+                OHLCV(
+                    timestamp=float(c[0]),
+                    open=float(c[1]),
+                    high=float(c[2]),
+                    low=float(c[3]),
+                    close=float(c[4]),
+                    vwap=float(c[5]) if c[5] else 0,
+                    volume=float(c[6]),
+                    count=int(c[7]) if len(c) > 7 else 0,
+                )
+            )
         resp = MarketDataResponse(pair=pair, interval=interval, candles=candles)
         cache[ck] = {"data": resp.model_dump(), "timestamp": time.time()}
         return resp
@@ -202,6 +214,7 @@ def get_balance():
 
 
 # --------------- Metrics ---------------
+
 
 @app.get("/metrics")
 def prometheus_metrics():

@@ -1,0 +1,18 @@
+#! asset-scanner-expose.yaml
+# Generated code, do not edit
+apiVersion: v1
+kind: Service
+metadata:
+    name: asset-scanner
+    namespace: rimuru-empire
+    labels:
+        com.docker.compose.project: rimuru_empire
+        com.docker.compose.service: asset-scanner
+spec:
+    selector:
+        com.docker.compose.project: rimuru_empire
+        com.docker.compose.service: asset-scanner
+    ports:
+        - name: asset-scan-8001
+          port: 8001
+          targetPort: asset-scan-8001

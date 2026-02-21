@@ -6,6 +6,7 @@ import Dashboard from './components/Dashboard';
 import Trading from './components/Trading';
 import Bots from './components/Bots';
 import Security from './components/Security';
+import AccountSettings from './components/AccountSettings';
 import Navigation from './components/Navigation';
 import { WebSocketProvider } from './services/websocket';
 
@@ -43,6 +44,7 @@ function App() {
                 <Route path="/trading" element={<Trading />} />
                 <Route path="/bots" element={<Bots />} />
                 <Route path="/security" element={<Security />} />
+                <Route path="/settings" element={<AccountSettings />} />
               </Routes>
             </main>
           </div>

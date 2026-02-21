@@ -57,8 +57,11 @@ class ServiceConfig:
     }
 
     ASSET_MAP = {
-        "SOL": "SOL", "PEPE": "PEPE", "DOGE": "XXDG",
-        "BTC": "XXBT", "ETH": "XETH",
+        "SOL": "SOL",
+        "PEPE": "PEPE",
+        "DOGE": "XXDG",
+        "BTC": "XXBT",
+        "ETH": "XETH",
     }
 
     # === Timing ===

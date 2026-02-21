@@ -1,0 +1,9 @@
+#! wallet-service-C:\Users\Admin\OneDrive\Videos\rimuru_empire\data-persistentVolumeClaim.yaml
+# Generated code, do not edit
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: wallet-service-c--users-admin-onedrive-videos-rimuru-empire-data
+    namespace: rimuru-empire
+spec:
+    storageClassName: "hostpath" # see docker/desktop-storage-provisioner

@@ -24,9 +24,11 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install lint tools
-        run: pip install ruff mypy pydantic fastapi
-      - name: Ruff lint
-        run: ruff check services/ --ignore E501
+        run: pip install ruff mypy pydantic fastapi starlette
+      - name: Ruff lint and format check
+        run: |
+          ruff check services/ --ignore E501
+          ruff format services/ --check
       - name: Type check shared models
         run: mypy services/shared/models.py --ignore-missing-imports || true
 

@@ -1,0 +1,48 @@
+#! asset-scanner-deployment.yaml
+# Generated code, do not edit
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: asset-scanner
+    namespace: rimuru-empire
+    labels:
+        com.docker.compose.project: rimuru_empire
+        com.docker.compose.service: asset-scanner
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            com.docker.compose.project: rimuru_empire
+            com.docker.compose.service: asset-scanner
+    strategy:
+        type: Recreate
+    template:
+        metadata:
+            labels:
+                com.docker.compose.project: rimuru_empire
+                com.docker.compose.service: asset-scanner
+                com.docker.compose.network.rimuru-network: "true"
+        spec:
+            restartPolicy: unless-stopped
+            containers:
+                - name: rimuru-asset-scanner
+                  image: rimuru_empire-asset-scanner
+                  imagePullPolicy: IfNotPresent
+                  env:
+                    - name: SCAN_DATA_DIR
+                      value: "/data"
+                  ports:
+                    - name: asset-scan-8001
+                      containerPort: 8001
+                  volumeMounts:
+                    - name: data
+                      mountPath: /data
+                    - name: logs
+                      mountPath: /logs
+            volumes:
+                - name: data
+                  hostPath:
+                    path: C:\Users\Admin\OneDrive\Videos\rimuru_empire\data
+                - name: logs
+                  hostPath:
+                    path: C:\Users\Admin\OneDrive\Videos\rimuru_empire\logs

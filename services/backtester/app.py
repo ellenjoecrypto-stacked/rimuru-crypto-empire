@@ -3,22 +3,28 @@ Rimuru Crypto Empire — Backtester Service
 Walk-forward backtesting engine with metrics: Sharpe, Sortino, Max Drawdown, Profit Factor.
 """
 
-import os, sys, time, json, math, statistics, logging
+import json
+import logging
+import math
+import os
 from pathlib import Path
-from datetime import datetime, timezone
-from typing import List
+import statistics
+import sys
+import time
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 import uvicorn
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from shared.config import ServiceConfig
 from shared.models import (
-    BacktestRequest, BacktestResult, BacktestTrade,
-    OHLCV, IndicatorRequest, ServiceHealth,
+    OHLCV,
+    BacktestRequest,
+    BacktestResult,
+    BacktestTrade,
+    ServiceHealth,
 )
-from shared.security import secure_app, get_auth_headers
+from shared.security import get_auth_headers, secure_app
 
 logger = logging.getLogger("rimuru.backtester")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -35,6 +41,7 @@ INDICATOR_URL = os.getenv("INDICATORS_URL", "http://indicators:8001")
 
 def _post_json(url, data, timeout=15):
     import urllib.request
+
     body = json.dumps(data).encode("utf-8")
     req = urllib.request.Request(url, data=body, method="POST")
     req.add_header("Content-Type", "application/json")
@@ -46,6 +53,7 @@ def _post_json(url, data, timeout=15):
 
 def _get_json(url, timeout=10):
     import urllib.request
+
     req = urllib.request.Request(url)
     for k, v in get_auth_headers().items():
         req.add_header(k, v)
@@ -55,21 +63,22 @@ def _get_json(url, timeout=10):
 
 # --------------- Backtest Engine ---------------
 
+
 class SimpleBacktester:
     """Walk-forward backtesting with configurable strategy rules"""
 
-    def __init__(self, candles: List[OHLCV], capital: float = 100.0):
+    def __init__(self, candles: list[OHLCV], capital: float = 100.0):
         self.candles = candles
         self.initial_capital = capital
         self.capital = capital
         self.position = None  # {entry_price, volume, entry_idx}
-        self.trades: List[BacktestTrade] = []
-        self.equity_curve: List[float] = [capital]
+        self.trades: list[BacktestTrade] = []
+        self.equity_curve: list[float] = [capital]
 
     def _rsi(self, closes, period=14):
         if len(closes) < period + 1:
             return None
-        deltas = [closes[i] - closes[i-1] for i in range(1, len(closes))]
+        deltas = [closes[i] - closes[i - 1] for i in range(1, len(closes))]
         gains = [d if d > 0 else 0 for d in deltas[-period:]]
         losses = [-d if d < 0 else 0 for d in deltas[-period:]]
         avg_gain = sum(gains) / period
@@ -96,7 +105,7 @@ class SimpleBacktester:
         if len(prices) < period:
             return None
         sma = sum(prices[-period:]) / period
-        var = sum((p - sma)**2 for p in prices[-period:]) / period
+        var = sum((p - sma) ** 2 for p in prices[-period:]) / period
         std = math.sqrt(var)
         return sma - std_dev * std, sma, sma + std_dev * std
 
@@ -116,7 +125,7 @@ class SimpleBacktester:
                 self._close_position(i, close, "rsi")
             self.equity_curve.append(self._equity(close))
         if self.position:
-            self._close_position(len(self.candles)-1, closes[-1], "rsi")
+            self._close_position(len(self.candles) - 1, closes[-1], "rsi")
 
     def run_ma_crossover(self, fast=50, slow=200):
         """MA crossover backtest"""
@@ -135,7 +144,7 @@ class SimpleBacktester:
                 self._close_position(i, close, "ma_crossover")
             self.equity_curve.append(self._equity(close))
         if self.position:
-            self._close_position(len(self.candles)-1, closes[-1], "ma_crossover")
+            self._close_position(len(self.candles) - 1, closes[-1], "ma_crossover")
 
     def run_bollinger(self):
         """Bollinger band mean reversion backtest"""
@@ -154,7 +163,7 @@ class SimpleBacktester:
                 self._close_position(i, close, "bollinger")
             self.equity_curve.append(self._equity(close))
         if self.position:
-            self._close_position(len(self.candles)-1, closes[-1], "bollinger")
+            self._close_position(len(self.candles) - 1, closes[-1], "bollinger")
 
     def run_momentum(self, period=10):
         """Momentum strategy backtest"""
@@ -173,7 +182,7 @@ class SimpleBacktester:
                 self._close_position(i, close, "momentum")
             self.equity_curve.append(self._equity(close))
         if self.position:
-            self._close_position(len(self.candles)-1, closes[-1], "momentum")
+            self._close_position(len(self.candles) - 1, closes[-1], "momentum")
 
     def run_volume(self, surge_pct=50):
         """Volume surge strategy backtest"""
@@ -200,7 +209,7 @@ class SimpleBacktester:
                     self._close_position(i, close, "volume")
             self.equity_curve.append(self._equity(close))
         if self.position:
-            self._close_position(len(self.candles)-1, closes[-1], "volume")
+            self._close_position(len(self.candles) - 1, closes[-1], "volume")
 
     def _close_position(self, idx, price, strategy):
         if not self.position:
@@ -210,18 +219,20 @@ class SimpleBacktester:
         fee = abs(pnl_usd) * 0.0026 * 2  # entry + exit
         pnl_usd -= fee
         self.capital += pnl_usd
-        self.trades.append(BacktestTrade(
-            entry_time=str(self.position["entry_idx"]),
-            exit_time=str(idx),
-            pair="",
-            side="long",
-            entry_price=self.position["entry_price"],
-            exit_price=price,
-            volume=self.position["volume"],
-            pnl_pct=round(pnl_pct * 100, 4),
-            pnl_usd=round(pnl_usd, 4),
-            strategy=strategy,
-        ))
+        self.trades.append(
+            BacktestTrade(
+                entry_time=str(self.position["entry_idx"]),
+                exit_time=str(idx),
+                pair="",
+                side="long",
+                entry_price=self.position["entry_price"],
+                exit_price=price,
+                volume=self.position["volume"],
+                pnl_pct=round(pnl_pct * 100, 4),
+                pnl_usd=round(pnl_usd, 4),
+                strategy=strategy,
+            )
+        )
         self.position = None
 
     def _equity(self, current_price):
@@ -251,15 +262,15 @@ class SimpleBacktester:
         max_dd = 0
         peak = self.initial_capital
         for eq in self.equity_curve:
-            if eq > peak:
-                peak = eq
+            peak = max(peak, eq)
             dd = (peak - eq) / peak
-            if dd > max_dd:
-                max_dd = dd
+            max_dd = max(max_dd, dd)
 
         gross_profit = sum(t.pnl_usd for t in wins)
         gross_loss = abs(sum(t.pnl_usd for t in losses))
-        profit_factor = gross_profit / gross_loss if gross_loss > 0 else float("inf") if gross_profit > 0 else 0
+        profit_factor = (
+            gross_profit / gross_loss if gross_loss > 0 else float("inf") if gross_profit > 0 else 0
+        )
 
         return BacktestResult(
             strategy=strategy,
@@ -268,7 +279,9 @@ class SimpleBacktester:
             winning_trades=len(wins),
             losing_trades=len(losses),
             win_rate=len(wins) / len(self.trades) * 100 if self.trades else 0,
-            total_pnl_pct=round((self.capital - self.initial_capital) / self.initial_capital * 100, 2),
+            total_pnl_pct=round(
+                (self.capital - self.initial_capital) / self.initial_capital * 100, 2
+            ),
             total_pnl_usd=round(self.capital - self.initial_capital, 2),
             sharpe_ratio=round(sharpe, 2),
             sortino_ratio=round(sortino, 2),
@@ -282,10 +295,12 @@ class SimpleBacktester:
 
 # --------------- Endpoints ---------------
 
+
 @app.get("/health")
 def health():
     return ServiceHealth(
-        service="backtester", status="healthy",
+        service="backtester",
+        status="healthy",
         uptime_seconds=round(time.time() - START_TIME, 1),
         details={"tests_run": test_count},
     )
@@ -366,7 +381,9 @@ def walk_forward(req: BacktestRequest):
         results[strat] = {
             "train": train_result.model_dump(),
             "test": test_result.model_dump(),
-            "overfit_risk": "HIGH" if train_result.total_pnl_pct > 0 and test_result.total_pnl_pct < 0 else "LOW",
+            "overfit_risk": "HIGH"
+            if train_result.total_pnl_pct > 0 and test_result.total_pnl_pct < 0
+            else "LOW",
         }
 
     return {"pair": req.pair, "train_size": len(train), "test_size": len(test), "results": results}
@@ -375,7 +392,7 @@ def walk_forward(req: BacktestRequest):
 @app.get("/metrics")
 def metrics():
     return JSONResponse(
-        content=f"rimuru_backtester_tests {test_count}\nrimuru_backtester_uptime {time.time()-START_TIME:.1f}",
+        content=f"rimuru_backtester_tests {test_count}\nrimuru_backtester_uptime {time.time() - START_TIME:.1f}",
         media_type="text/plain",
     )
 

@@ -1,0 +1,21 @@
+#! bot-service-service.yaml
+# Generated code, do not edit
+apiVersion: v1
+kind: Service
+metadata:
+    name: bot-service-published
+    namespace: rimuru-empire
+    labels:
+        com.docker.compose.project: rimuru_empire
+        com.docker.compose.service: bot-service
+spec:
+    selector:
+        com.docker.compose.project: rimuru_empire
+        com.docker.compose.service: bot-service
+    ports:
+        - name: bot-servic-8400
+          port: 8400
+          protocol: TCP
+          targetPort: bot-servic-8400
+
+# check if there is at least one published port

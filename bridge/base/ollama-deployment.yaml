@@ -1,0 +1,40 @@
+#! ollama-deployment.yaml
+# Generated code, do not edit
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: ollama
+    namespace: rimuru-empire
+    labels:
+        com.docker.compose.project: rimuru_empire
+        com.docker.compose.service: ollama
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            com.docker.compose.project: rimuru_empire
+            com.docker.compose.service: ollama
+    strategy:
+        type: Recreate
+    template:
+        metadata:
+            labels:
+                com.docker.compose.project: rimuru_empire
+                com.docker.compose.service: ollama
+                com.docker.compose.network.rimuru-network: "true"
+        spec:
+            restartPolicy: unless-stopped
+            containers:
+                - name: rimuru-ollama
+                  image: ollama/ollama:latest
+                  imagePullPolicy: IfNotPresent
+                  ports:
+                    - name: ollama-11434
+                      containerPort: 11434
+                  volumeMounts:
+                    - name: root--ollama
+                      mountPath: /root/.ollama
+            volumes:
+                - name: root--ollama
+                  persistentVolumeClaim:
+                    claimName: ollama-ollama-data

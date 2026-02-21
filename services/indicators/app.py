@@ -4,21 +4,20 @@ Computes all technical analysis indicators from OHLCV data.
 Exposes a REST API consumed by strategy services.
 """
 
+import logging
+import math
 import os
+from pathlib import Path
+import statistics
 import sys
 import time
-import math
-import statistics
-import logging
-from pathlib import Path
-from typing import List, Optional, Dict
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 import uvicorn
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from shared.models import OHLCV, IndicatorRequest, IndicatorResult, ServiceHealth
+from shared.models import IndicatorRequest, IndicatorResult, ServiceHealth
 from shared.security import secure_app
 
 logger = logging.getLogger("rimuru.indicators")
@@ -34,15 +33,16 @@ calc_count = 0
 # Technical Analysis Library
 # ============================================
 
+
 class TA:
     @staticmethod
-    def sma(prices: list, period: int) -> Optional[float]:
+    def sma(prices: list, period: int) -> float | None:
         if len(prices) < period:
             return None
         return sum(prices[-period:]) / period
 
     @staticmethod
-    def ema(prices: list, period: int) -> Optional[float]:
+    def ema(prices: list, period: int) -> float | None:
         if len(prices) < period:
             return None
         multiplier = 2 / (period + 1)
@@ -52,7 +52,7 @@ class TA:
         return ema
 
     @staticmethod
-    def rsi(prices: list, period: int = 14) -> Optional[float]:
+    def rsi(prices: list, period: int = 14) -> float | None:
         if len(prices) < period + 1:
             return None
         deltas = [prices[i] - prices[i - 1] for i in range(1, len(prices))]
@@ -80,13 +80,13 @@ class TA:
         }
 
     @staticmethod
-    def momentum(prices: list, period: int = 10) -> Optional[float]:
+    def momentum(prices: list, period: int = 10) -> float | None:
         if len(prices) < period + 1:
             return None
         return (prices[-1] - prices[-period - 1]) / prices[-period - 1] * 100
 
     @staticmethod
-    def atr(candles: list, period: int = 14) -> Optional[float]:
+    def atr(candles: list, period: int = 14) -> float | None:
         if len(candles) < period + 1:
             return None
         trs = []
@@ -99,11 +99,11 @@ class TA:
         return sum(trs[-period:]) / period
 
     @staticmethod
-    def volume_trend(candles: list, period: int = 10) -> Optional[float]:
+    def volume_trend(candles: list, period: int = 10) -> float | None:
         if len(candles) < period * 2:
             return None
         recent_vol = sum(c.volume for c in candles[-period:]) / period
-        older_vol = sum(c.volume for c in candles[-period * 2:-period]) / period
+        older_vol = sum(c.volume for c in candles[-period * 2 : -period]) / period
         if older_vol == 0:
             return 0
         return (recent_vol - older_vol) / older_vol * 100
@@ -123,17 +123,19 @@ class TA:
             se = TA.ema(prices[: i + 1], slow)
             if fe and se:
                 macd_values.append(fe - se)
-        signal_line = TA.ema(macd_values, signal_period) if len(macd_values) >= signal_period else None
+        signal_line = (
+            TA.ema(macd_values, signal_period) if len(macd_values) >= signal_period else None
+        )
         histogram = macd_line - signal_line if signal_line else None
         return {"macd": macd_line, "signal": signal_line, "histogram": histogram}
 
     @staticmethod
-    def stochastic(candles: list, k_period: int = 14, d_period: int = 3) -> Optional[dict]:
+    def stochastic(candles: list, k_period: int = 14, d_period: int = 3) -> dict | None:
         if len(candles) < k_period + d_period:
             return None
         k_values = []
         for i in range(k_period - 1, len(candles)):
-            window = candles[i - k_period + 1: i + 1]
+            window = candles[i - k_period + 1 : i + 1]
             highest = max(c.high for c in window)
             lowest = min(c.low for c in window)
             close = candles[i].close
@@ -146,7 +148,11 @@ class TA:
         k_current = k_values[-1]
         k_prev = k_values[-2] if len(k_values) >= 2 else k_current
         d_current = sum(k_values[-d_period:]) / d_period
-        d_prev = sum(k_values[-d_period - 1:-1]) / d_period if len(k_values) >= d_period + 1 else d_current
+        d_prev = (
+            sum(k_values[-d_period - 1 : -1]) / d_period
+            if len(k_values) >= d_period + 1
+            else d_current
+        )
         return {
             "k": round(k_current, 2),
             "d": round(d_current, 2),
@@ -156,11 +162,13 @@ class TA:
             "oversold": k_current < 20,
             "bullish_cross": k_prev <= d_prev and k_current > d_current,
             "bearish_cross": k_prev >= d_prev and k_current < d_current,
-            "zone": "overbought" if k_current > 80 else ("oversold" if k_current < 20 else "neutral"),
+            "zone": "overbought"
+            if k_current > 80
+            else ("oversold" if k_current < 20 else "neutral"),
         }
 
     @staticmethod
-    def adx(candles: list, period: int = 14) -> Optional[dict]:
+    def adx(candles: list, period: int = 14) -> dict | None:
         if len(candles) < period * 2 + 1:
             return None
         plus_dm_list, minus_dm_list, tr_list = [], [], []
@@ -203,7 +211,7 @@ class TA:
         }
 
     @staticmethod
-    def vwap(candles: list, period: int = 20) -> Optional[dict]:
+    def vwap(candles: list, period: int = 20) -> dict | None:
         if len(candles) < period:
             return None
         recent = candles[-period:]
@@ -223,7 +231,7 @@ class TA:
         }
 
     @staticmethod
-    def williams_r(candles: list, period: int = 14) -> Optional[float]:
+    def williams_r(candles: list, period: int = 14) -> float | None:
         if len(candles) < period:
             return None
         recent = candles[-period:]
@@ -235,7 +243,7 @@ class TA:
         return round((highest - close) / (highest - lowest) * -100, 2)
 
     @staticmethod
-    def fibonacci(candles: list, lookback: int = 50) -> Optional[dict]:
+    def fibonacci(candles: list, lookback: int = 50) -> dict | None:
         if not candles or len(candles) < lookback:
             return None
         recent = candles[-lookback:]
@@ -278,11 +286,13 @@ class TA:
         }
 
     @staticmethod
-    def market_regime(candles: list, lookback: int = 50) -> Optional[dict]:
+    def market_regime(candles: list, lookback: int = 50) -> dict | None:
         if len(candles) < lookback:
             return None
         closes = [c.close for c in candles[-lookback:]]
-        recent_returns = [(closes[i] - closes[i - 1]) / closes[i - 1] for i in range(1, len(closes))]
+        recent_returns = [
+            (closes[i] - closes[i - 1]) / closes[i - 1] for i in range(1, len(closes))
+        ]
         if len(recent_returns) < 20:
             return None
         recent_vol = statistics.stdev(recent_returns[-10:])
@@ -316,6 +326,7 @@ class TA:
 # ============================================
 # API Endpoints
 # ============================================
+
 
 @app.get("/health")
 def health():

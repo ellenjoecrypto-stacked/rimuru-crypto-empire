@@ -1,0 +1,64 @@
+#! bot-service-deployment.yaml
+# Generated code, do not edit
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: bot-service
+    namespace: rimuru-empire
+    labels:
+        com.docker.compose.project: rimuru_empire
+        com.docker.compose.service: bot-service
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            com.docker.compose.project: rimuru_empire
+            com.docker.compose.service: bot-service
+    strategy:
+        type: Recreate
+    template:
+        metadata:
+            labels:
+                com.docker.compose.project: rimuru_empire
+                com.docker.compose.service: bot-service
+                com.docker.compose.network.rimuru-network: "true"
+        spec:
+            restartPolicy: unless-stopped
+            containers:
+                - name: rimuru-bot-service
+                  image: rimuru_empire-bot-service
+                  imagePullPolicy: IfNotPresent
+                  env:
+                    - name: BOT_DATA_DIR
+                      value: "/data/bots"
+                    - name: BOT_SERVICE_PORT
+                      value: "8400"
+                    - name: COINBASE_API_KEY
+                      value: "your_coinbase_api_key_here"
+                    - name: COINBASE_SECRET
+                      value: ""
+                    - name: KRAKEN_API_KEY
+                      value: "your_kraken_api_key_here"
+                    - name: KRAKEN_SECRET
+                      value: ""
+                  livenessProbe:
+                    exec:
+                        command: ['python -c import urllib.request; urllib.request.urlopen(''http://localhost:8400/health'')']
+                    periodSeconds: 30
+                    timeoutSeconds: 10
+                    failureThreshold: 3
+                  ports:
+                    - name: bot-servic-8400
+                      containerPort: 8400
+                  volumeMounts:
+                    - name: data
+                      mountPath: /data
+                    - name: logs
+                      mountPath: /logs
+            volumes:
+                - name: data
+                  hostPath:
+                    path: C:\Users\Admin\OneDrive\Videos\rimuru_empire\data
+                - name: logs
+                  hostPath:
+                    path: C:\Users\Admin\OneDrive\Videos\rimuru_empire\logs

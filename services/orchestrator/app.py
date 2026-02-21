@@ -5,12 +5,15 @@ strategy fanout, signal aggregation, position sizing, and execution.
 Runs the 24/7 trading loop.
 """
 
-import os, sys, time, json, math, logging, threading
+from datetime import UTC, datetime
+import json
+import logging
+import os
 from pathlib import Path
-from datetime import datetime, timezone
-from typing import Dict, List, Optional
+import sys
+import threading
+import time
 from urllib.request import Request, urlopen
-from urllib.error import URLError
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
@@ -19,12 +22,12 @@ import uvicorn
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from shared.config import ServiceConfig
 from shared.models import (
-    OHLCV, IndicatorRequest, IndicatorResult, StrategyRequest,
-    StrategySignal, EnsembleSignal, SignalAction,
-    OrderRequest, OrderResult, OrderSide, OrderType,
-    PortfolioState, ServiceHealth,
+    EnsembleSignal,
+    ServiceHealth,
+    SignalAction,
+    StrategySignal,
 )
-from shared.security import secure_app, get_auth_headers
+from shared.security import get_auth_headers, secure_app
 
 logger = logging.getLogger("rimuru.orchestrator")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -61,12 +64,13 @@ STRATEGY_URLS = {
 
 # State
 scan_count = 0
-last_signals: Dict[str, EnsembleSignal] = {}
+last_signals: dict[str, EnsembleSignal] = {}
 running = False
 fear_greed_cache = {"value": 50, "timestamp": 0}
 
 
 # --------------- HTTP helpers ---------------
+
 
 def _post_json(url: str, data: dict, timeout: int = 15) -> dict:
     body = json.dumps(data).encode("utf-8")
@@ -88,6 +92,7 @@ def _get_json(url: str, timeout: int = 10) -> dict:
 
 # --------------- Fear & Greed ---------------
 
+
 def _get_fear_greed() -> int:
     if time.time() - fear_greed_cache["timestamp"] < 3600:
         return fear_greed_cache["value"]
@@ -103,6 +108,7 @@ def _get_fear_greed() -> int:
 
 # --------------- Core Logic ---------------
 
+
 def _fetch_candles(pair: str) -> dict:
     """Fetch multi-timeframe candles from data-ingest"""
     try:
@@ -112,20 +118,23 @@ def _fetch_candles(pair: str) -> dict:
         return {}
 
 
-def _compute_indicators(pair: str, candles: List[dict]) -> Optional[dict]:
+def _compute_indicators(pair: str, candles: list[dict]) -> dict | None:
     """Send candles to indicators service"""
     try:
-        return _post_json(f"{INDICATOR_URL}/compute", {
-            "pair": pair,
-            "candles": candles,
-            "indicators": ["all"],
-        })
+        return _post_json(
+            f"{INDICATOR_URL}/compute",
+            {
+                "pair": pair,
+                "candles": candles,
+                "indicators": ["all"],
+            },
+        )
     except Exception as e:
         logger.error(f"Indicator error for {pair}: {e}")
         return None
 
 
-def _get_strategy_signal(strategy: str, url: str, req_data: dict) -> Optional[dict]:
+def _get_strategy_signal(strategy: str, url: str, req_data: dict) -> dict | None:
     """Get signal from a strategy service"""
     try:
         return _post_json(f"{url}/signal", req_data, timeout=10)
@@ -143,7 +152,9 @@ def _kelly_size(confidence: float, available_usd: float) -> float:
     return available_usd * kelly
 
 
-def _scan_pair(pair: str, pair_name: str, available_usd: float, open_positions: int) -> Optional[EnsembleSignal]:
+def _scan_pair(
+    pair: str, pair_name: str, available_usd: float, open_positions: int
+) -> EnsembleSignal | None:
     """Full analysis pipeline for a single pair"""
     # 1. Fetch candles
     multi = _fetch_candles(pair)
@@ -214,11 +225,13 @@ def _scan_pair(pair: str, pair_name: str, available_usd: float, open_positions: 
             price=current_price,
             stop_loss=best.get("stop_loss", 0),
             take_profit=best.get("take_profit", 0),
-            suggested_volume=_kelly_size(best.get("confidence", 0), available_usd) / current_price if current_price > 0 else 0,
+            suggested_volume=_kelly_size(best.get("confidence", 0), available_usd) / current_price
+            if current_price > 0
+            else 0,
             individual_signals=[StrategySignal(**s) for s in signals],
             market_regime=regime.get("regime", "") if isinstance(regime, dict) else "",
             fear_greed=fear_greed,
-            timestamp=datetime.now(timezone.utc).isoformat(),
+            timestamp=datetime.now(UTC).isoformat(),
         )
     elif len(sell_signals) > len(buy_signals) and sell_signals:
         best = max(sell_signals, key=lambda s: s.get("confidence", 0))
@@ -234,7 +247,7 @@ def _scan_pair(pair: str, pair_name: str, available_usd: float, open_positions: 
             individual_signals=[StrategySignal(**s) for s in signals],
             market_regime=regime.get("regime", "") if isinstance(regime, dict) else "",
             fear_greed=fear_greed,
-            timestamp=datetime.now(timezone.utc).isoformat(),
+            timestamp=datetime.now(UTC).isoformat(),
         )
     else:
         ensemble = EnsembleSignal(
@@ -246,7 +259,7 @@ def _scan_pair(pair: str, pair_name: str, available_usd: float, open_positions: 
             individual_signals=[StrategySignal(**s) for s in signals],
             market_regime=regime.get("regime", "") if isinstance(regime, dict) else "",
             fear_greed=fear_greed,
-            timestamp=datetime.now(timezone.utc).isoformat(),
+            timestamp=datetime.now(UTC).isoformat(),
         )
 
     return ensemble
@@ -258,7 +271,9 @@ def _execute_signal(signal: EnsembleSignal):
         return
 
     if signal.confidence < MIN_CONFIDENCE:
-        logger.info(f"{signal.pair}: {signal.action.value} confidence {signal.confidence:.2f} < {MIN_CONFIDENCE} — skip")
+        logger.info(
+            f"{signal.pair}: {signal.action.value} confidence {signal.confidence:.2f} < {MIN_CONFIDENCE} — skip"
+        )
         return
 
     # Fear & Greed filter: extreme fear = buy more, extreme greed = buy less
@@ -298,7 +313,9 @@ def _scan_loop():
     """Main 24/7 scanning loop"""
     global scan_count, running
     running = True
-    logger.info(f"Scan loop started [{'PAPER' if PAPER_MODE else 'LIVE'}] — interval {SCAN_INTERVAL}s")
+    logger.info(
+        f"Scan loop started [{'PAPER' if PAPER_MODE else 'LIVE'}] — interval {SCAN_INTERVAL}s"
+    )
 
     while running:
         try:
@@ -333,6 +350,7 @@ def _scan_loop():
 
 
 # --------------- API Endpoints ---------------
+
 
 @app.get("/health")
 def health():
@@ -422,8 +440,10 @@ def get_status():
             "uptime": round(time.time() - START_TIME, 1),
         },
         "services": services,
-        "last_signals": {k: {"action": v.action.value, "confidence": v.confidence, "pair": v.pair}
-                        for k, v in last_signals.items()},
+        "last_signals": {
+            k: {"action": v.action.value, "confidence": v.confidence, "pair": v.pair}
+            for k, v in last_signals.items()
+        },
         "fear_greed": fear_greed_cache["value"],
     }
 
@@ -431,7 +451,7 @@ def get_status():
 @app.get("/metrics")
 def prometheus_metrics():
     lines = [
-        f"rimuru_orchestrator_uptime {time.time()-START_TIME:.1f}",
+        f"rimuru_orchestrator_uptime {time.time() - START_TIME:.1f}",
         f"rimuru_orchestrator_scans {scan_count}",
         f"rimuru_orchestrator_running {int(running)}",
         f"rimuru_orchestrator_paper_mode {int(PAPER_MODE)}",

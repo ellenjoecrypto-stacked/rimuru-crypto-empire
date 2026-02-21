@@ -1,0 +1,64 @@
+#! kustomization.yaml
+# Generated code, do not edit
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+    - 0-rimuru-empire-namespace.yaml
+    - ai-service-C:\Users\Admin\OneDrive\Videos\rimuru_empire\data-persistentVolumeClaim.yaml
+    - ai-service-C:\Users\Admin\OneDrive\Videos\rimuru_empire\logs-persistentVolumeClaim.yaml
+    - ai-service-deployment.yaml
+    - ai-service-expose.yaml
+    - ai-service-service.yaml
+    - analyzer-C:\Users\Admin\OneDrive\Videos\rimuru_empire\data\analysis-persistentVolumeClaim.yaml
+    - analyzer-C:\Users\Admin\OneDrive\Videos\rimuru_empire\logs-persistentVolumeClaim.yaml
+    - analyzer-deployment.yaml
+    - api-C:\Users\Admin\OneDrive\Videos\rimuru_empire\logs-persistentVolumeClaim.yaml
+    - api-deployment.yaml
+    - api-expose.yaml
+    - api-service.yaml
+    - asset-scanner-C:\Users\Admin\OneDrive\Videos\rimuru_empire\data-persistentVolumeClaim.yaml
+    - asset-scanner-C:\Users\Admin\OneDrive\Videos\rimuru_empire\logs-persistentVolumeClaim.yaml
+    - asset-scanner-deployment.yaml
+    - asset-scanner-expose.yaml
+    - bot-service-C:\Users\Admin\OneDrive\Videos\rimuru_empire\data-persistentVolumeClaim.yaml
+    - bot-service-C:\Users\Admin\OneDrive\Videos\rimuru_empire\logs-persistentVolumeClaim.yaml
+    - bot-service-deployment.yaml
+    - bot-service-expose.yaml
+    - bot-service-service.yaml
+    - frontend-deployment.yaml
+    - frontend-expose.yaml
+    - frontend-service.yaml
+    - ollama-deployment.yaml
+    - ollama-expose.yaml
+    - ollama-ollama_data-persistentVolumeClaim.yaml
+    - ollama-service.yaml
+    - pipeline-service-C:\Users\Admin\OneDrive\Videos\rimuru_empire\data-persistentVolumeClaim.yaml
+    - pipeline-service-C:\Users\Admin\OneDrive\Videos\rimuru_empire\logs-persistentVolumeClaim.yaml
+    - pipeline-service-deployment.yaml
+    - postgres-C:\Users\Admin\OneDrive\Videos\rimuru_empire\init_db.sql-persistentVolumeClaim.yaml
+    - postgres-deployment.yaml
+    - postgres-expose.yaml
+    - postgres-postgres_data-persistentVolumeClaim.yaml
+    - postgres-service.yaml
+    - price-service-C:\Users\Admin\OneDrive\Videos\rimuru_empire\data-persistentVolumeClaim.yaml
+    - price-service-C:\Users\Admin\OneDrive\Videos\rimuru_empire\logs-persistentVolumeClaim.yaml
+    - price-service-deployment.yaml
+    - price-service-expose.yaml
+    - price-service-service.yaml
+    - project-integrator-C:\Users\Admin\OneDrive\Videos\rimuru_empire\data\integrated-persistentVolumeClaim.yaml
+    - project-integrator-C:\Users\Admin\OneDrive\Videos\rimuru_empire\logs-persistentVolumeClaim.yaml
+    - project-integrator-deployment.yaml
+    - redis-deployment.yaml
+    - redis-expose.yaml
+    - redis-redis_data-persistentVolumeClaim.yaml
+    - redis-service.yaml
+    - rimuru-network-network-policy.yaml
+    - scanner-C:\Users\Admin\OneDrive\Videos\rimuru_empire\data\scans-persistentVolumeClaim.yaml
+    - scanner-C:\Users\Admin\OneDrive\Videos\rimuru_empire\logs-persistentVolumeClaim.yaml
+    - scanner-deployment.yaml
+    - scanner-expose.yaml
+    - wallet-service-C:\Users\Admin\OneDrive\Videos\rimuru_empire\data-persistentVolumeClaim.yaml
+    - wallet-service-C:\Users\Admin\OneDrive\Videos\rimuru_empire\logs-persistentVolumeClaim.yaml
+    - wallet-service-deployment.yaml
+    - wallet-service-expose.yaml
+    - wallet-service-service.yaml
