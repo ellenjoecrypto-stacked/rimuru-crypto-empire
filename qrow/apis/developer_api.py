@@ -17,17 +17,14 @@ class DeveloperAPI:
                 "contributors": 0,
                 "source": "safe_mode",
             }
-        # TODO: real GitHub API call
-        return {}
+        raise NotImplementedError("Real GitHub API call not yet implemented")
 
     def get_contract_deploys(self, chain: str = "ethereum") -> list:
         if SAFE_MODE:
             return []
-        # TODO: scan for new verified contracts
-        return []
+        raise NotImplementedError("Contract deploy scan not yet implemented")
 
     def get_protocol_updates(self) -> list:
         if SAFE_MODE:
             return []
-        # TODO: aggregate governance proposals + protocol changelogs
-        return []
+        raise NotImplementedError("Protocol update aggregation not yet implemented")

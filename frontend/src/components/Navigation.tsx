@@ -1,5 +1,5 @@
 import React from 'react';
-import { Drawer, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
+import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
@@ -12,11 +12,11 @@ const Navigation: React.FC = () => {
   const location = useLocation();
 
   const menuItems = [
-    { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
-    { text: 'Trading', icon: <ShowChartIcon />, path: '/trading' },
-    { text: 'Bots', icon: <SmartToyIcon />, path: '/bots' },
-    { text: 'Security', icon: <SecurityIcon />, path: '/security' },
-    { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
+    { text: 'Dashboard', icon: <DashboardIcon aria-hidden="true" />, path: '/' },
+    { text: 'Trading', icon: <ShowChartIcon aria-hidden="true" />, path: '/trading' },
+    { text: 'Bots', icon: <SmartToyIcon aria-hidden="true" />, path: '/bots' },
+    { text: 'Security', icon: <SecurityIcon aria-hidden="true" />, path: '/security' },
+    { text: 'Settings', icon: <SettingsIcon aria-hidden="true" />, path: '/settings' },
   ];
 
   return (
@@ -35,16 +35,16 @@ const Navigation: React.FC = () => {
     >
       <List>
         <ListItem sx={{ mb: 2 }}>
-          <Typography variant="h6" sx={{ color: '#00ff88', fontWeight: 'bold' }}>
+          <Typography component="span" variant="h6" sx={{ color: '#00ff88', fontWeight: 'bold' }}>
             RIMURU
           </Typography>
         </ListItem>
         
         {menuItems.map((item) => (
-          <ListItem
-            button
+          <ListItemButton
             key={item.text}
             onClick={() => navigate(item.path)}
+            aria-current={location.pathname === item.path ? 'page' : undefined}
             sx={{
               mb: 1,
               borderRadius: 1,
@@ -64,7 +64,7 @@ const Navigation: React.FC = () => {
                 color: location.pathname === item.path ? '#00ff88' : '#fff',
               }}
             />
-          </ListItem>
+          </ListItemButton>
         ))}
       </List>
       

@@ -5,8 +5,10 @@ Self-learning AI system with Ollama integration
 """
 
 import asyncio
+import functools
 import logging
 import json
+import os
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, asdict
 from datetime import datetime
@@ -19,15 +21,10 @@ try:
     from sklearn.ensemble import RandomForestClassifier
     from sklearn.preprocessing import StandardScaler
     from sklearn.model_selection import train_test_split
-except ImportError:
-    print("Installing ML libraries...")
-    import os
-    os.system("pip install scikit-learn pandas numpy")
-    import requests
-    import pandas as pd
-    from sklearn.ensemble import RandomForestClassifier
-    from sklearn.preprocessing import StandardScaler
-    from sklearn.model_selection import train_test_split
+except ImportError as e:
+    raise ImportError(
+        f"Required ML libraries not installed. Run: pip install scikit-learn pandas numpy requests\n{e}"
+    ) from e
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -78,7 +75,7 @@ class RimuruAICore:
         self.performance_history: List[Dict] = []
         
         # Ollama configuration
-        self.ollama_url = "http://localhost:11434"
+        self.ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
         self.ollama_model = "llama2"  # Default model
         
         # Knowledge base
@@ -89,45 +86,56 @@ class RimuruAICore:
         }
         
         logger.info("🧠 Rimuru AI Core initialized")
+        self.load_knowledge()
     
     async def check_ollama_connection(self) -> bool:
         """Check if Ollama is running"""
         try:
-            response = requests.get(f"{self.ollama_url}/api/tags", timeout=5)
+            loop = asyncio.get_event_loop()
+            response = await loop.run_in_executor(
+                None, functools.partial(requests.get, f"{self.ollama_url}/api/tags", timeout=5)
+            )
             return response.status_code == 200
-        except:
-            logger.warning("⚠️ Ollama not connected. Using local ML models only.")
+        except Exception as e:
+            logger.warning("Ollama not connected: %s", e)
             return False
     
-    async def query_ollama(self, prompt: str) -> str:
+    async def query_ollama(self, prompt: str, model: str = None) -> str:
         """
         Query Ollama for advanced AI reasoning
         
         Args:
             prompt: Input prompt for Ollama
+            model: Optional model override; falls back to self.ollama_model
             
         Returns:
             Ollama response text
         """
+        use_model = model or self.ollama_model
         try:
-            response = requests.post(
-                f"{self.ollama_url}/api/generate",
-                json={
-                    "model": self.ollama_model,
-                    "prompt": prompt,
-                    "stream": False
-                },
-                timeout=30
+            loop = asyncio.get_event_loop()
+            response = await loop.run_in_executor(
+                None,
+                functools.partial(
+                    requests.post,
+                    f"{self.ollama_url}/api/generate",
+                    json={
+                        "model": use_model,
+                        "prompt": prompt,
+                        "stream": False,
+                    },
+                    timeout=30,
+                ),
             )
             
             if response.status_code == 200:
                 return response.json().get('response', '')
             else:
-                logger.error(f"❌ Ollama query failed: {response.status_code}")
+                logger.error("Ollama query failed: %s", response.status_code)
                 return ""
                 
         except Exception as e:
-            logger.error(f"❌ Error querying Ollama: {e}")
+            logger.error("Error querying Ollama: %s", e)
             return ""
     
     async def analyze_with_ollama(self, market_data: Dict, indicators: Dict) -> str:
@@ -352,10 +360,13 @@ class RimuruAICore:
             
             logger.info(f"📚 Learned from outcome: {decision.action} -> ${outcome:.2f}")
             
-            # Retrain model periodically
-            if len(self.performance_history) % 50 == 0:
-                logger.info("🔄 Retraining model with new data...")
-                # In production, implement incremental learning
+            # Retrain model every 50 outcomes (incremental learning)
+            if len(self.performance_history) % 50 == 0 and self.learning_data:
+                logger.info("🔄 Retraining model with accumulated learning data...")
+                if self.train_model(self.learning_data):
+                    self._model_version = getattr(self, '_model_version', 1) + 1
+                    logger.info("✅ Model retrained, version %d", self._model_version)
+                    self.save_knowledge()
                 
         except Exception as e:
             logger.error(f"❌ Error learning from outcome: {e}")
@@ -382,14 +393,45 @@ class RimuruAICore:
         }
     
     def save_knowledge(self):
-        """Save knowledge base to file"""
+        """Save knowledge base and performance history to file"""
         try:
             knowledge_file = self.model_path / "knowledge_base.json"
             with open(knowledge_file, 'w') as f:
-                json.dump(self.knowledge_base, f, indent=2)
+                json.dump({
+                    'knowledge_base': self.knowledge_base,
+                    'performance_history': self.performance_history,
+                    'learning_data': [asdict(d) for d in self.learning_data],
+                    'model_version': getattr(self, '_model_version', 1),
+                }, f, indent=2, default=str)
             logger.info("✅ Knowledge base saved")
         except Exception as e:
             logger.error(f"❌ Error saving knowledge: {e}")
+
+    def load_knowledge(self):
+        """Load knowledge base from file if it exists"""
+        try:
+            knowledge_file = self.model_path / "knowledge_base.json"
+            if not knowledge_file.exists():
+                return
+            with open(knowledge_file) as f:
+                data = json.load(f)
+            self.knowledge_base = data.get('knowledge_base', self.knowledge_base)
+            self.performance_history = data.get('performance_history', [])
+            self._model_version = data.get('model_version', 1)
+            raw_ld = data.get('learning_data', [])
+            self.learning_data = [
+                LearningData(
+                    features=d['features'],
+                    label=d['label'],
+                    outcome=d['outcome'],
+                    timestamp=datetime.fromisoformat(d['timestamp']) if isinstance(d['timestamp'], str) else d['timestamp'],
+                    confidence=d['confidence'],
+                )
+                for d in raw_ld
+            ]
+            logger.info("✅ Knowledge base loaded (%d history entries)", len(self.performance_history))
+        except Exception as e:
+            logger.warning("Could not load knowledge base: %s", e)
 
 
 # Example usage
