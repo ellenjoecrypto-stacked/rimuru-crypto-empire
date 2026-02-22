@@ -388,10 +388,10 @@ if __name__ == "__main__":
             os.getenv("RIMURU_PROJECT_PATH_3", ""),
         ]
 
-        # Additional paths from a colon/semicolon-separated env var
+        # Additional paths from a separator-delimited env var (os.pathsep on current OS)
         extra = os.getenv("RIMURU_SCAN_PATHS", "")
         if extra:
-            default_paths.extend(p.strip() for p in extra.replace(";", ":").split(":") if p.strip())
+            default_paths.extend(p.strip() for p in extra.split(os.pathsep) if p.strip())
 
         project_paths = [p for p in default_paths if p]
 

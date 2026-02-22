@@ -371,7 +371,7 @@ class RimuruAICore:
                 if self.train_model(self.learning_data):
                     # Increment model version
                     try:
-                        version_parts = decision.model_version.split(".")
+                        version_parts = self._model_version.split(".")
                         new_minor = int(version_parts[-1]) + 1
                         self._model_version = ".".join(version_parts[:-1] + [str(new_minor)])
                     except (ValueError, IndexError):

@@ -414,7 +414,7 @@ def main():
 
     # Initialize database
     logger.info(f"\n📝 Creating database: {db_path}")
-    os.makedirs(os.path.dirname(db_path) if os.path.dirname(db_path) else ".", exist_ok=True)
+    os.makedirs(os.path.dirname(db_path) or ".", exist_ok=True)
     db = CryptoFindingsDB(db_path)
 
     # Initialize scanner
