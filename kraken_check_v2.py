@@ -10,8 +10,11 @@ import time
 import json
 import os
 from dotenv import load_dotenv
+import logging
 load_dotenv()
 
+logging.basicConfig(level=logging.INFO, format='%(message)s')
+logger = logging.getLogger(__name__)
 KRAKEN_KEY = os.getenv("KRAKEN_API_KEY", "")
 KRAKEN_SECRET = os.getenv("KRAKEN_SECRET_KEY", "")
 
@@ -64,88 +67,88 @@ def kraken_request(endpoint, extra_data=None):
 # Debug: verify secret decodes correctly
 try:
     decoded = base64.b64decode(KRAKEN_SECRET)
-    print(f"Secret decoded: {len(decoded)} bytes (expected 64)")
+    logger.info("Secret decoded: %s bytes (expected 64)", len(decoded))
 except Exception as e:
-    print(f"Secret decode error: {e}")
+    logger.error("Secret decode error: %s", e)
 
-print("=" * 60)
-print("  KRAKEN BALANCE CHECK v2")
-print("=" * 60)
+logger.info("=" * 60)
+logger.info("  KRAKEN BALANCE CHECK v2")
+logger.info("=" * 60)
 
 # Test with simple Balance endpoint
-print("\n[1] Checking Balance...")
+logger.info("\n[1] Checking Balance...")
 result = kraken_request('/0/private/Balance')
-print(f"  Raw response: {json.dumps(result, indent=2)}")
+logger.info("  Raw response: %s", json.dumps(result, indent=2))
 
 if not result.get('error') or len(result['error']) == 0:
     balances = result.get('result', {})
     if not balances:
-        print("  >> No balances (empty account)")
+        logger.info("  >> No balances (empty account)")
     else:
         total_usd = 0
-        print(f"\n  Found {len(balances)} asset(s):")
+        logger.info("\n  Found %s asset(s):", len(balances))
         for asset, amount in sorted(balances.items()):
             amt = float(amount)
             marker = " *** HAS BALANCE ***" if amt > 0 else ""
-            print(f"    {asset}: {amount}{marker}")
+            logger.info("    %s: %s%s", asset, amount, marker)
 
     # Trade Balance
-    print("\n[2] Checking Trade Balance...")
+    logger.info("\n[2] Checking Trade Balance...")
     result2 = kraken_request('/0/private/TradeBalance', {'asset': 'ZUSD'})
     if not result2.get('error') or len(result2['error']) == 0:
         tb = result2.get('result', {})
-        print(f"  Equivalent Balance: ${tb.get('eb', '0')}")
-        print(f"  Trade Balance: ${tb.get('tb', '0')}")
-        print(f"  Free Margin: ${tb.get('mf', '0')}")
-        print(f"  Unrealized P&L: ${tb.get('n', '0')}")
+        logger.info("  Equivalent Balance: $%s", tb.get('eb', '0'))
+        logger.info("  Trade Balance: $%s", tb.get('tb', '0'))
+        logger.info("  Free Margin: $%s", tb.get('mf', '0'))
+        logger.info("  Unrealized P&L: $%s", tb.get('n', '0'))
     else:
-        print(f"  ERROR: {result2['error']}")
+        logger.error("  ERROR: %s", result2['error'])
 
     # Open Orders
-    print("\n[3] Open Orders...")
+    logger.info("\n[3] Open Orders...")
     result3 = kraken_request('/0/private/OpenOrders')
     if not result3.get('error') or len(result3['error']) == 0:
         orders = result3.get('result', {}).get('open', {})
-        print(f"  Open orders: {len(orders)}")
+        logger.info("  Open orders: %s", len(orders))
     else:
-        print(f"  ERROR: {result3['error']}")
+        logger.error("  ERROR: %s", result3['error'])
 
     # Closed Orders (recent)
-    print("\n[4] Recent Closed Orders...")
+    logger.info("\n[4] Recent Closed Orders...")
     result4 = kraken_request('/0/private/ClosedOrders')
     if not result4.get('error') or len(result4['error']) == 0:
         closed = result4.get('result', {}).get('closed', {})
         count = result4.get('result', {}).get('count', 0)
-        print(f"  Total closed orders: {count}")
+        logger.info("  Total closed orders: %s", count)
         for oid, order in list(closed.items())[:3]:
             desc = order.get('descr', {})
             status = order.get('status', '?')
-            print(f"    [{status}] {desc.get('order', 'N/A')}")
+            logger.info("    [%s] %s", status, desc.get('order', 'N/A'))
     else:
-        print(f"  ERROR: {result4['error']}")
+        logger.error("  ERROR: %s", result4['error'])
 
     # Ledger
-    print("\n[5] Recent Ledger...")
+    logger.info("\n[5] Recent Ledger...")
     result5 = kraken_request('/0/private/Ledgers')
     if not result5.get('error') or len(result5['error']) == 0:
         ledger = result5.get('result', {}).get('ledger', {})
         count = result5.get('result', {}).get('count', 0)
-        print(f"  Total entries: {count}")
+        logger.info("  Total entries: %s", count)
         for lid, entry in list(ledger.items())[:5]:
             t = entry.get('type', '?')
             asset = entry.get('asset', '?')
             amt = entry.get('amount', '0')
             fee = entry.get('fee', '0')
-            print(f"    {t}: {asset} {amt} (fee: {fee})")
+            logger.info("    %s: %s %s (fee: %s)", t, asset, amt, fee)
     else:
-        print(f"  ERROR: {result5['error']}")
+        logger.error("  ERROR: %s", result5['error'])
 
 else:
-    print(f"\n  Auth failed: {result['error']}")
-    print("\n  Debugging signature computation...")
+    logger.error("\n  Auth failed: %s", result['error'])
+    logger.info("\n  Debugging signature computation...")
     
     # Try with microsecond nonce
-    print("\n  Trying microsecond nonce...")
+    logger.info("\n  Trying microsecond nonce...")
     nonce = str(int(time.time() * 1000000))
     data = {'nonce': nonce}
     sig = kraken_signature('/0/private/Balance', data, KRAKEN_SECRET)
@@ -157,13 +160,13 @@ else:
     try:
         resp = urllib.request.urlopen(req, timeout=15)
         raw = resp.read().decode('utf-8')
-        print(f"  Result: {raw}")
+        logger.info("  Result: %s", raw)
     except urllib.error.HTTPError as e:
         body = e.read().decode('utf-8')
-        print(f"  Result: HTTP {e.code}: {body}")
+        logger.info("  Result: HTTP %s: %s", e.code, body)
     
     # Try with OTP field
-    print("\n  Trying with otp=000000...")
+    logger.info("\n  Trying with otp=000000...")
     nonce = str(int(time.time() * 1000))
     data = {'nonce': nonce, 'otp': '000000'}
     sig = kraken_signature('/0/private/Balance', data, KRAKEN_SECRET)
@@ -175,21 +178,21 @@ else:
     try:
         resp = urllib.request.urlopen(req, timeout=15)
         raw = resp.read().decode('utf-8')
-        print(f"  Result: {raw}")
+        logger.info("  Result: %s", raw)
     except urllib.error.HTTPError as e:
         body = e.read().decode('utf-8')
-        print(f"  Result: HTTP {e.code}: {body}")
+        logger.info("  Result: HTTP %s: %s", e.code, body)
 
 # Prices for reference
-print("\n[PRICES] Current Market...")
+logger.info("\n[PRICES] Current Market...")
 try:
     req = urllib.request.Request("https://api.kraken.com/0/public/Ticker?pair=XBTUSD,ETHUSD,SOLUSD")
     resp = urllib.request.urlopen(req, timeout=10)
     data = json.loads(resp.read().decode())
     for pair, info in data.get('result', {}).items():
         last = info.get('c', ['?'])[0]
-        print(f"  {pair}: ${float(last):,.2f}")
-except:
-    pass
+        logger.info("  %s: $%s", pair, "{:,.2f}".format(float(last)))
+except Exception as e:
+    logger.debug("Skipped: %s", e)
 
-print("\n" + "=" * 60)
+logger.info("%s", "\n" + "=" * 60)

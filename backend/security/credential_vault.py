@@ -4,6 +4,7 @@ RIMURU CRYPTO EMPIRE - Secure Credential Vault
 Military-grade encryption for API keys and secrets
 """
 
+import logging
 import os
 import json
 import sqlite3
@@ -14,13 +15,15 @@ from dataclasses import dataclass, asdict
 from datetime import datetime
 import base64
 
+logger = logging.getLogger(__name__)
+
 try:
     from cryptography.fernet import Fernet
     from cryptography.hazmat.primitives import hashes
     from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2
     import argon2
 except ImportError:
-    print("Installing required security packages...")
+    logger.warning("Required security packages not installed; installing now...")
     os.system("pip install cryptography argon2-cffi")
     from cryptography.fernet import Fernet
     from cryptography.hazmat.primitives import hashes
@@ -153,7 +156,7 @@ class CredentialVault:
             return True
             
         except Exception as e:
-            print(f"❌ Error storing credential: {e}")
+            logger.error("Error storing credential: %s", e)
             return False
     
     def retrieve_credential(self, exchange: str) -> Optional[Credential]:
@@ -198,7 +201,7 @@ class CredentialVault:
             return Credential(**credential_dict)
             
         except Exception as e:
-            print(f"❌ Error retrieving credential: {e}")
+            logger.error("Error retrieving credential: %s", e)
             return None
     
     def list_exchanges(self) -> List[str]:
@@ -214,7 +217,7 @@ class CredentialVault:
             return exchanges
             
         except Exception as e:
-            print(f"❌ Error listing exchanges: {e}")
+            logger.error("Error listing exchanges: %s", e)
             return []
     
     def delete_credential(self, exchange: str) -> bool:
@@ -234,7 +237,7 @@ class CredentialVault:
             return True
             
         except Exception as e:
-            print(f"❌ Error deleting credential: {e}")
+            logger.error("Error deleting credential: %s", e)
             return False
     
     def _log_action(self, action: str, exchange: str, details: str):
@@ -258,7 +261,7 @@ class CredentialVault:
             conn.close()
             
         except Exception as e:
-            print(f"⚠️ Warning: Could not log action: {e}")
+            logger.warning("Could not log action: %s", e)
     
     def get_audit_log(self, limit: int = 100) -> List[Dict]:
         """Retrieve audit log entries"""
@@ -287,7 +290,7 @@ class CredentialVault:
             return logs
             
         except Exception as e:
-            print(f"❌ Error retrieving audit log: {e}")
+            logger.error("Error retrieving audit log: %s", e)
             return []
     
     def test_encryption(self) -> bool:
@@ -298,7 +301,7 @@ class CredentialVault:
             decrypted = self.cipher.decrypt(encrypted).decode()
             return test_data == decrypted
         except Exception as e:
-            print(f"❌ Encryption test failed: {e}")
+            logger.error("Encryption test failed: %s", e)
             return False
 
 

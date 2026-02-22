@@ -35,8 +35,7 @@ class DataProducts:
             return ""
         if fmt == "json":
             return json.dumps(self.products[product_name], indent=2)
-        # TODO: CSV, API endpoint formats
-        return ""
+        raise NotImplementedError(f"Export format '{fmt}' is not yet implemented")
 
     def list_products(self) -> list:
         return list(self.products.keys())
