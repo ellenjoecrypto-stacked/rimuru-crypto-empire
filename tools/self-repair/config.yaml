@@ -1,0 +1,66 @@
+# Rimuru Repair — Configuration
+# Scan rules, thresholds, and paths
+
+# Project root (relative to repo root; override with env var REPAIR_PROJECT_ROOT)
+project_root: "."
+
+# Directories to skip during scanning
+exclude_dirs:
+  - ".git"
+  - ".venv"
+  - "venv"
+  - "node_modules"
+  - "__pycache__"
+  - ".mypy_cache"
+  - ".ruff_cache"
+  - "dist"
+  - "build"
+  - "data"
+  - "logs"
+  - "tools/self-repair/learning"
+  - "tools/self-repair/reports"
+
+# File extensions to scan
+python_extensions:
+  - ".py"
+
+typescript_extensions:
+  - ".ts"
+  - ".tsx"
+  - ".js"
+  - ".jsx"
+
+config_extensions:
+  - ".yaml"
+  - ".yml"
+  - ".toml"
+  - ".json"
+  - ".env"
+  - ".cfg"
+  - ".ini"
+
+# Health score category weights (must sum to 100)
+score_weights:
+  logging: 20
+  error_handling: 20
+  hardcoded_paths: 15
+  type_safety: 15
+  security: 20
+  dead_code: 10
+
+# Thresholds for fix auto-approval
+# If a fix type has been reverted more than this fraction of the time, stop auto-fixing
+revert_threshold: 0.3
+
+# Minimum number of applications before revert-rate is considered reliable
+min_applications_for_revert_check: 3
+
+# Severity for health score deduction
+severity_weights:
+  critical: 5
+  high: 3
+  medium: 1
+  low: 0
+
+# Max issues per file to report in top-issues list
+top_issues_count: 5

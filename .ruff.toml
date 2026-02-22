@@ -100,6 +100,8 @@ exclude = [
 "tests/**/*.py" = ["S101", "ANN", "PLR2004"]
 # Scripts
 "*.py" = ["T20"]  # Allow print in scripts
+# self-repair tool: directory name uses a hyphen (not a valid Python module identifier)
+"tools/self-repair/**/*.py" = ["N999"]
 
 [lint.isort]
 known-first-party = ["backend", "services"]
