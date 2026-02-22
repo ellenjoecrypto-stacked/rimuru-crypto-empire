@@ -133,7 +133,6 @@ const Dashboard: React.FC = () => {
           label={isConnected ? 'Connected' : 'Disconnected'}
           color={isConnected ? 'success' : 'error'}
           sx={{ mr: 2 }}
-          icon={<span aria-hidden="true">{isConnected ? '🟢' : '🔴'}</span>}
         />
         <Typography variant="caption" color="textSecondary">
           Real-time updates {isConnected ? 'enabled' : 'disabled'}
@@ -187,7 +186,7 @@ const Dashboard: React.FC = () => {
               </Typography>
               <div role="img" aria-labelledby="chart-title" aria-describedby="chart-desc">
                 <span id="chart-desc" className="visually-hidden">
-                  Line chart showing portfolio value over time, from $124,000 at 00:00 to approximately $125,800 at 20:00.
+                  Line chart showing portfolio value over time, from ${chartData[0]?.value?.toLocaleString()} at {chartData[0]?.time} to ${chartData[chartData.length - 1]?.value?.toLocaleString()} at {chartData[chartData.length - 1]?.time}.
                 </span>
                 <ResponsiveContainer width="100%" height={320}>
                   <LineChart data={chartData}>

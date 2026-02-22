@@ -64,8 +64,6 @@ class Rimuru:
             return "emergency_shutdown"
         if risk >= 6:
             return "quarantine"
-        if risk >= 5:
-            return "freeze_sandbox"
         if risk >= 4:
             return "freeze_sandbox"
         if risk >= 3:

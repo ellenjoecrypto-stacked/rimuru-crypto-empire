@@ -269,7 +269,15 @@ const OpportunitiesDashboard: React.FC = () => {
       dataIndex: 'title',
       key: 'title',
       width: 200,
-      render: (text: string) => <button type="button" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', padding: 0 }}>{text}</button>,
+      render: (text: string) => (
+        <button
+          type="button"
+          aria-label={`View details for ${text}`}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', padding: 0 }}
+        >
+          {text}
+        </button>
+      ),
     },
     {
       title: 'Type',

@@ -394,14 +394,14 @@ if __name__ == "__main__":
         
         # Print summary
         summary = scanner.get_summary()
-        print(f"\n=== PROJECT SCAN SUMMARY ({scanned} projects) ===")
-        print(json.dumps(summary, indent=2))
+        logger.info("=== PROJECT SCAN SUMMARY (%d projects) ===", scanned)
+        logger.info(json.dumps(summary, indent=2))
         
         # Export findings
         output_dir = os.getenv('RIMURU_DATA_OUTPUT_DIR', 'data')
         os.makedirs(output_dir, exist_ok=True)
         output_path = os.path.join(output_dir, "project_findings.json")
         scanner.export_findings(output_path)
-        print(f"\nExported to: {output_path}")
+        logger.info("Exported to: %s", output_path)
     
     asyncio.run(main())
