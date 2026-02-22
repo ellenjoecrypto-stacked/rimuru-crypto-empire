@@ -36,9 +36,10 @@ function App() {
       <CssBaseline />
       <WebSocketProvider>
         <Router>
+          <a href="#main-content" className="skip-link">Skip to main content</a>
           <div style={{ display: 'flex' }}>
-            <Navigation />
-            <main style={{ flexGrow: 1, padding: '20px' }}>
+            <Navigation aria-label="Main navigation" />
+            <main id="main-content" style={{ flexGrow: 1, padding: '20px' }}>
               <Routes>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/trading" element={<Trading />} />

@@ -3,7 +3,7 @@
  * Displays opportunities, approval workflow, and statistics
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './OpportunitiesDashboard.css';
 import {
   Table,
@@ -23,6 +23,7 @@ import {
   Pagination,
   DatePicker,
 } from 'antd';
+import type { InputRef } from 'antd';
 import {
   CheckCircleOutlined,
   CloseCircleOutlined,
@@ -71,6 +72,17 @@ const OpportunitiesDashboard: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
+  const triggerRef = useRef<HTMLElement | null>(null);
+  const firstModalInputRef = useRef<InputRef>(null);
+
+  useEffect(() => {
+    if (modalVisible && firstModalInputRef.current) {
+      firstModalInputRef.current.focus();
+    }
+    if (!modalVisible && triggerRef.current) {
+      (triggerRef.current as HTMLElement).focus();
+    }
+  }, [modalVisible]);
 
   // Fetch opportunities
   const fetchOpportunities = async () => {
@@ -278,7 +290,18 @@ const OpportunitiesDashboard: React.FC = () => {
       dataIndex: 'title',
       key: 'title',
       width: 200,
-      render: (text: string) => <a href="#" onClick={(e) => e.preventDefault()}>{text}</a>,
+      render: (text: string, record: Opportunity) => (
+        <button
+          style={{ background: 'none', border: 'none', padding: 0, color: '#1677ff', cursor: 'pointer', textAlign: 'left' }}
+          onClick={(e) => {
+            triggerRef.current = e.currentTarget;
+            setSelectedOpp(record);
+            setModalVisible(true);
+          }}
+        >
+          {text}
+        </button>
+      ),
     },
     {
       title: 'Type',
@@ -489,6 +512,8 @@ const OpportunitiesDashboard: React.FC = () => {
             }))}
             pagination={false}
             scroll={{ x: 1200 }}
+            aria-label="Crypto opportunities"
+            caption="List of discovered crypto opportunities with approval status"
           />
         </Spin>
 
@@ -509,7 +534,7 @@ const OpportunitiesDashboard: React.FC = () => {
 
       {/* Approval Modal */}
       <Modal
-        title={selectedOpp ? `Review: ${selectedOpp.title}` : 'Review Opportunity'}
+        title={<span id="modal-title">{selectedOpp ? `Review: ${selectedOpp.title}` : 'Review Opportunity'}</span>}
         open={modalVisible}
         onCancel={() => {
           setModalVisible(false);
@@ -519,9 +544,14 @@ const OpportunitiesDashboard: React.FC = () => {
         }}
         footer={null}
         width={600}
+        aria-labelledby="modal-title"
+        aria-describedby="modal-desc"
       >
         {selectedOpp && (
           <Form layout="vertical">
+            <p id="modal-desc" className="visually-hidden">
+              Review opportunity details and approve, reject, or claim this opportunity.
+            </p>
             <Form.Item label="Title" labelCol={{ span: 24 }}>
               <Input disabled defaultValue={selectedOpp.title} />
             </Form.Item>
@@ -557,9 +587,11 @@ const OpportunitiesDashboard: React.FC = () => {
 
             <Form.Item label="Operator Name" labelCol={{ span: 24 }}>
               <Input
+                ref={firstModalInputRef}
                 value={operator}
                 onChange={(e) => setOperator(e.target.value)}
                 placeholder="Enter your operator ID"
+                aria-required="true"
               />
             </Form.Item>
 
