@@ -109,6 +109,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Create missing secrets placeholder
+        run: touch .env.security
       - name: Validate team compose
         run: docker compose -f docker-compose.team.yml config --quiet
       - name: Validate traders compose

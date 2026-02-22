@@ -108,8 +108,8 @@ def check_kraken_balance():
 def check_coinbase_cdp():
     """Check balance using Coinbase Developer Platform (CDP) API"""
     
-    # Read CDP key from the JSON file we found
-    cdp_key_path = r"C:\Users\Admin\OneDrive\Documents\Crypto-Automate-Systemzip\attached_assets\cdp_api_key_1766794874206.json"
+    # Read CDP key path from environment variable
+    cdp_key_path = os.getenv('CDP_KEY_PATH', 'cdp_api_key.json')
     
     if not os.path.exists(cdp_key_path):
         print("Coinbase CDP: Key file not found")

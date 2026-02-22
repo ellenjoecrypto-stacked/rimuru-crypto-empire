@@ -403,7 +403,7 @@ def main():
     print("=" * 60)
     
     # Database path
-    db_path = r"C:\Users\Admin\OneDrive\Videos\rimuru_empire\crypto_findings.db"
+    db_path = os.getenv('CRYPTO_DB_PATH', 'data/crypto_findings.db')
     
     # Initialize database
     print(f"\n📝 Creating database: {db_path}")
@@ -413,7 +413,7 @@ def main():
     scanner = ComprehensiveCryptoScanner(db)
     
     # Directories to scan
-    base = r"C:\Users\Admin"
+    base = os.getenv('SCAN_BASE_DIR', os.path.expanduser('~'))
     scan_dirs = [
         os.path.join(base, "OneDrive"),
         os.path.join(base, "Documents"),

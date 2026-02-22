@@ -17,6 +17,23 @@ from pathlib import Path
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Cached singleton for AI core to avoid re-instantiation on every call
+_ai_core = None
+
+
+def _get_ai_core(data_dir: Path):
+    """Return a cached singleton RimuruAICore instance."""
+    global _ai_core
+    if _ai_core is None:
+        try:
+            from core.rimuru_ai import RimuruAICore
+        except ImportError:
+            import sys
+            sys.path.insert(0, str(Path(__file__).parent.parent))
+            from core.rimuru_ai import RimuruAICore
+        _ai_core = RimuruAICore(model_path=str(data_dir / "ai_models"))
+    return _ai_core
+
 
 class RimuruBridge:
     """
@@ -195,13 +212,9 @@ class RimuruBridge:
         # Build context from all data sources
         context = self._build_ai_context(symbol, market_data, indicators)
         
-        # Use local AI core
+        # Use local AI core (cached singleton)
         try:
-            import sys
-            sys.path.insert(0, str(Path(__file__).parent.parent))
-            from core.rimuru_ai import RimuruAICore
-            
-            ai = RimuruAICore(model_path=str(self.data_dir / "ai_models"))
+            ai = _get_ai_core(self.data_dir)
             
             if not market_data:
                 market_data = {
@@ -269,9 +282,12 @@ class RimuruBridge:
         
         # Stage 2: Price data
         try:
-            import sys
-            sys.path.insert(0, str(Path(__file__).parent.parent))
-            from services.price_engine import PriceEngine
+            try:
+                from services.price_engine import PriceEngine
+            except ImportError:
+                import sys
+                sys.path.insert(0, str(Path(__file__).parent.parent))
+                from services.price_engine import PriceEngine
             
             engine = PriceEngine()
             prices = await engine.get_top_coins(25)
@@ -399,8 +415,8 @@ class RimuruBridge:
             try:
                 count = conn.execute("SELECT COUNT(*) FROM scan_files").fetchone()
                 findings["files_scanned"] = count[0] if count else 0
-            except:
-                pass
+            except Exception as e:
+                logger.debug("Skipped: %s", e)
             
             conn.close()
         except Exception as e:

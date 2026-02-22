@@ -87,7 +87,6 @@ const OpportunitiesDashboard: React.FC = () => {
       setOpportunities(response.data.opportunities);
     } catch (error) {
       message.error('Failed to fetch opportunities');
-      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -100,7 +99,6 @@ const OpportunitiesDashboard: React.FC = () => {
       setStats(response.data);
     } catch (error) {
       message.error('Failed to fetch statistics');
-      console.error(error);
     }
   };
 
@@ -108,9 +106,7 @@ const OpportunitiesDashboard: React.FC = () => {
   const fetchPendingApprovals = async () => {
     try {
       const response = await axios.get('/api/opportunities/pending/approval');
-      console.log('Pending approvals:', response.data);
     } catch (error) {
-      console.error('Failed to fetch pending approvals', error);
     }
   };
 
@@ -152,7 +148,6 @@ const OpportunitiesDashboard: React.FC = () => {
       fetchStatistics();
     } catch (error) {
       message.error('Failed to approve opportunity');
-      console.error(error);
     }
   };
 
@@ -179,7 +174,6 @@ const OpportunitiesDashboard: React.FC = () => {
       fetchStatistics();
     } catch (error) {
       message.error('Failed to reject opportunity');
-      console.error(error);
     }
   };
 
@@ -200,7 +194,6 @@ const OpportunitiesDashboard: React.FC = () => {
       fetchStatistics();
     } catch (error) {
       message.error('Failed to claim opportunity');
-      console.error(error);
     }
   };
 
@@ -216,7 +209,6 @@ const OpportunitiesDashboard: React.FC = () => {
       }, 2000);
     } catch (error) {
       message.error('Failed to start scan');
-      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -235,7 +227,6 @@ const OpportunitiesDashboard: React.FC = () => {
       message.success('Opportunities exported');
     } catch (error) {
       message.error('Failed to export opportunities');
-      console.error(error);
     }
   };
 
@@ -278,7 +269,15 @@ const OpportunitiesDashboard: React.FC = () => {
       dataIndex: 'title',
       key: 'title',
       width: 200,
-      render: (text: string) => <a href="#" onClick={(e) => e.preventDefault()}>{text}</a>,
+      render: (text: string) => (
+        <button
+          type="button"
+          aria-label={`View details for ${text}`}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', padding: 0 }}
+        >
+          {text}
+        </button>
+      ),
     },
     {
       title: 'Type',

@@ -381,25 +381,9 @@ if __name__ == "__main__":
     async def main():
         scanner = ProjectScanner()
         
-        # Real local project directories
-        project_paths = [
-            r"C:\Users\Admin\OneDrive\Videos\rimuru_empire",
-            r"C:\Users\Admin\OneDrive\crypto_empire",
-            r"C:\Users\Admin\OneDrive\CRYPTO_EMPIRE_AWAKENED",
-            r"C:\Users\Admin\OneDrive\CRYPTO_EMPIRE_COMPLETE_PACKAGE",
-            r"C:\Users\Admin\OneDrive\ninja-ai-rimuru",
-            r"C:\Users\Admin\OneDrive\acop_mega",
-            r"C:\Users\Admin\OneDrive\acop_platform",
-            r"C:\Users\Admin\OneDrive\great_sage",
-            r"C:\Users\Admin\OneDrive\rimuru_assistant",
-            r"C:\Users\Admin\OneDrive\rimuru_ollama",
-            r"C:\Users\Admin\OneDrive\secure_vault",
-            r"C:\Users\Admin\OneDrive\dashboard",
-            r"C:\Users\Admin\OneDrive\deploy",
-            r"C:\Users\Admin\source\repos\Project Qrow",
-            r"C:\Users\Admin\source\repos\Qrow",
-            r"C:\Users\Admin\source\repos\AvoidthaVoid",
-        ]
+        # Load project paths from environment (comma-separated) or use empty list
+        scan_paths_env = os.getenv('RIMURU_SCAN_PATHS', '')
+        project_paths = [p.strip() for p in scan_paths_env.split(',') if p.strip()]
         
         scanned = 0
         for project_path in project_paths:
@@ -410,14 +394,14 @@ if __name__ == "__main__":
         
         # Print summary
         summary = scanner.get_summary()
-        print(f"\n=== PROJECT SCAN SUMMARY ({scanned} projects) === - project_scanner.py:413")
-        print(json.dumps(summary, indent=2))
+        logger.info("=== PROJECT SCAN SUMMARY (%d projects) ===", scanned)
+        logger.info(json.dumps(summary, indent=2))
         
         # Export findings
-        output_dir = r"C:\Users\Admin\OneDrive\Videos\rimuru_empire\data"
+        output_dir = os.getenv('RIMURU_DATA_OUTPUT_DIR', 'data')
         os.makedirs(output_dir, exist_ok=True)
         output_path = os.path.join(output_dir, "project_findings.json")
         scanner.export_findings(output_path)
-        print(f"\nExported to: {output_path} - project_scanner.py:421")
+        logger.info("Exported to: %s", output_path)
     
     asyncio.run(main())

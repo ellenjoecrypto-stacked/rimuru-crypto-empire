@@ -180,13 +180,7 @@ async def query_ollama(query: OllamaQuery):
     if not connected:
         raise HTTPException(status_code=503, detail="Ollama not connected")
     
-    # Temporarily set model
-    original_model = ai.ollama_model
-    ai.ollama_model = query.model
-    
-    response = await ai.query_ollama(query.prompt)
-    
-    ai.ollama_model = original_model
+    response = await ai.query_ollama(query.prompt, model=query.model)
     
     return {
         "model": query.model,
@@ -244,8 +238,8 @@ async def ollama_status():
             resp = requests.get(f"{ai.ollama_url}/api/tags", timeout=5)
             if resp.status_code == 200:
                 models = [m["name"] for m in resp.json().get("models", [])]
-        except:
-            pass
+        except Exception as e:
+            logger.debug("Failed to fetch Ollama models: %s", e)
     
     return {
         "connected": connected,
@@ -258,5 +252,5 @@ async def ollama_status():
 
 if __name__ == "__main__":
     port = int(os.getenv("AI_SERVICE_PORT", "8300"))
-    print(f"🧠 Rimuru AI Service starting on port {port} - ai_service.py:261")
+    logger.info("🧠 Rimuru AI Service starting on port %d", port)
     uvicorn.run(app, host="0.0.0.0", port=port)
