@@ -4,6 +4,7 @@ Works for: Kraken, Coinbase CDP
 For Texas users - no geo restrictions
 """
 
+import logging
 import os
 import hmac
 import hashlib
@@ -13,6 +14,8 @@ import json
 import urllib.parse
 from datetime import datetime
 from typing import Dict, Optional
+
+logger = logging.getLogger(__name__)
 
 try:
     import requests
@@ -32,7 +35,7 @@ def check_kraken_balance():
     api_secret = os.getenv('KRAKEN_SECRET_KEY', '')
     
     if not api_key or not api_secret or len(api_secret) < 30:
-        print("Kraken: API keys not properly configured")
+        logger.warning("Kraken: API keys not properly configured")
         return None
     
     try:
@@ -48,7 +51,7 @@ def check_kraken_balance():
         try:
             secret_decoded = base64.b64decode(api_secret)
         except Exception as e:
-            print(f"Kraken: API secret format invalid - {e}")
+            logger.error("Kraken: API secret format invalid - %s", e)
             return None
             
         signature = hmac.new(secret_decoded, message, hashlib.sha512)
@@ -70,7 +73,7 @@ def check_kraken_balance():
         data = response.json()
         
         if data.get('error') and len(data['error']) > 0:
-            print(f"Kraken API Error: {data['error']}")
+            logger.error("Kraken API Error: %s", data['error'])
             return None
         
         balances = data.get('result', {})
@@ -86,8 +89,8 @@ def check_kraken_balance():
         prices = {'BTC': 67500, 'ETH': 3450, 'SOL': 145, 'USD': 1, 'USDT': 1, 'USDC': 1}
         
         total_usd = 0
-        print("\nKraken Balances:")
-        print("-" * 40)
+        logger.info("Kraken Balances:")
+        logger.info("-" * 40)
         
         for asset, amount in balances.items():
             amount = float(amount)
@@ -95,24 +98,24 @@ def check_kraken_balance():
                 standard = asset_map.get(asset, asset)
                 usd_val = amount * prices.get(standard, 0)
                 total_usd += usd_val
-                print(f"  {standard}: {amount:.6f} (~${usd_val:,.2f})")
+                logger.info("  %s: %.6f (~$%,.2f)", standard, amount, usd_val)
         
-        print(f"\nKraken Total: ${total_usd:,.2f}")
+        logger.info("Kraken Total: $%,.2f", total_usd)
         return total_usd
         
     except Exception as e:
-        print(f"Kraken error: {e}")
+        logger.error("Kraken error: %s", e)
         return None
 
 
 def check_coinbase_cdp():
     """Check balance using Coinbase Developer Platform (CDP) API"""
     
-    # Read CDP key from the JSON file we found
-    cdp_key_path = r"C:\Users\Admin\OneDrive\Documents\Crypto-Automate-Systemzip\attached_assets\cdp_api_key_1766794874206.json"
+    # Read CDP key path from environment variable or default
+    cdp_key_path = os.getenv('CDP_KEY_PATH', 'cdp_api_key.json')
     
     if not os.path.exists(cdp_key_path):
-        print("Coinbase CDP: Key file not found")
+        logger.warning("Coinbase CDP: Key file not found at %s", cdp_key_path)
         return None
     
     try:
@@ -123,16 +126,16 @@ def check_coinbase_cdp():
         private_key = cdp_data.get('privateKey', '')
         
         if not key_id or not private_key:
-            print("Coinbase CDP: Invalid key format")
+            logger.warning("Coinbase CDP: Invalid key format")
             return None
         
-        print(f"\nCoinbase CDP Key ID: {key_id[:8]}...{key_id[-4:]}")
-        print("Attempting to connect to Coinbase CDP API...")
+        logger.info("Coinbase CDP Key ID: %s...%s", key_id[:8], key_id[-4:])
+        logger.info("Attempting to connect to Coinbase CDP API...")
         
         # CDP uses a different auth method - JWT token
         # For now, let's verify the key format
-        print(f"Private key length: {len(private_key)} chars")
-        print("CDP API requires JWT authentication - need to implement full auth flow")
+        logger.debug("Private key length: %d chars", len(private_key))
+        logger.info("CDP API requires JWT authentication - need to implement full auth flow")
         
         # Would need to implement:
         # 1. Create JWT with ES256 signing
@@ -142,15 +145,15 @@ def check_coinbase_cdp():
         return None
         
     except Exception as e:
-        print(f"Coinbase CDP error: {e}")
+        logger.error("Coinbase CDP error: %s", e)
         return None
 
 
 def check_etherscan_wallets(addresses: list):
     """Check ETH balances via Etherscan (no API key needed for basic)"""
     
-    print("\nEtherscan Wallet Check:")
-    print("-" * 40)
+    logger.info("Etherscan Wallet Check:")
+    logger.info("-" * 40)
     
     total_eth = 0
     total_usd = 0
@@ -170,25 +173,25 @@ def check_etherscan_wallets(addresses: list):
                     usd = eth * eth_price
                     total_eth += eth
                     total_usd += usd
-                    print(f"  {addr[:10]}...{addr[-6:]}: {eth:.4f} ETH (~${usd:,.2f})")
+                    logger.info("  %s...%s: %.4f ETH (~$%,.2f)", addr[:10], addr[-6:], eth, usd)
             
             time.sleep(0.25)  # Rate limit
             
         except Exception as e:
-            print(f"  Error checking {addr[:10]}: {e}")
+            logger.error("  Error checking %s: %s", addr[:10], e)
     
     if total_eth > 0:
-        print(f"\nTotal ETH found: {total_eth:.4f} (~${total_usd:,.2f})")
+        logger.info("Total ETH found: %.4f (~$%,.2f)", total_eth, total_usd)
     else:
-        print("\nNo ETH balances found in scanned addresses")
+        logger.info("No ETH balances found in scanned addresses")
     
     return total_usd
 
 
 def main():
-    print("=" * 60)
-    print("MULTI-EXCHANGE BALANCE CHECKER")
-    print("=" * 60)
+    logger.info("=" * 60)
+    logger.info("MULTI-EXCHANGE BALANCE CHECKER")
+    logger.info("=" * 60)
     
     total = 0
     
@@ -213,9 +216,9 @@ def main():
     if eth_total:
         total += eth_total
     
-    print("\n" + "=" * 60)
-    print(f"GRAND TOTAL: ${total:,.2f}")
-    print("=" * 60)
+    logger.info("=" * 60)
+    logger.info("GRAND TOTAL: $%,.2f", total)
+    logger.info("=" * 60)
     
     return total
 

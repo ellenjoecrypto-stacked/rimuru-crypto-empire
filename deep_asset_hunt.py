@@ -4,6 +4,7 @@ DEEP ASSET HUNT - Find EVERYTHING that could have value
 Searches for browser wallets, desktop wallets, private keys, 
 exchange sessions, gift cards, and more.
 """
+import logging
 import os
 import re
 import json
@@ -11,6 +12,9 @@ import glob
 import base64
 import sqlite3
 from pathlib import Path
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 print("=" * 60)
 print("DEEP ASSET HUNT")
@@ -63,10 +67,9 @@ try:
             print(f"  Content: {decoded[:1000]}")
             decrypted = True
             break
-        except:
+        except Exception as e:
+            logger.debug("Decryption attempt failed: %s", e)
             continue
-    
-    if not decrypted:
         # Try with salt from _SENSITIVE folder
         salt_path = os.path.join(BASE, r'OneDrive\Videos\rimuru_empire\_SENSITIVE\VAULT_DATA\.salt')
         if os.path.exists(salt_path):
@@ -90,7 +93,8 @@ try:
                     print(f"  Content: {decoded[:1000]}")
                     decrypted = True
                     break
-                except:
+                except Exception as e:
+                    logger.debug("Decryption attempt failed: %s", e)
                     continue
         
         if not decrypted:
@@ -129,8 +133,8 @@ for name, path in browser_paths.items():
         try:
             versions = os.listdir(path)
             print(f"    Versions: {versions}")
-        except:
-            pass
+        except Exception as e:
+            logger.debug("Could not list versions for %s: %s", name, e)
     else:
         print(f"  Not found: {name}")
 
@@ -151,8 +155,8 @@ for profile in chrome_profiles:
             for db_dir in os.listdir(indexed_db):
                 if any(w in db_dir.lower() for w in ['metamask', 'coinbase', 'phantom', 'wallet', 'rabby']):
                     print(f"  FOUND WALLET DB: {browser_name} / {db_dir}")
-        except:
-            pass
+        except Exception as e:
+            logger.debug("Could not list IndexedDB for %s: %s", browser_name, e)
 
 # ============================================================
 # 3. SEARCH FOR DESKTOP WALLETS
@@ -190,8 +194,8 @@ for name, path in desktop_wallets.items():
                     if any(kw in fl for kw in ['wallet', 'keystore', 'key', 'seed', 'backup', 'vault']):
                         fpath = os.path.join(dp, f)
                         print(f"    KEY FILE: {f} ({os.path.getsize(fpath)} bytes)")
-        except:
-            pass
+        except Exception as e:
+            logger.debug("Could not inspect wallet directory %s: %s", name, e)
     else:
         pass  # Only print found ones
 
@@ -247,10 +251,10 @@ for loc in key_locations:
                                 preview = m[:20] + "..." if len(m) > 20 else m
                                 print(f"    {preview}")
                             found_keys.append((f, loc, matches))
-                except:
-                    pass
-    except:
-        pass
+                except Exception as e:
+                    logger.debug("Skipped file during key scan: %s", e)
+    except Exception as e:
+        logger.debug("Skipped location during key scan: %s", e)
 
 if not found_keys:
     print("  No private keys or seed phrases found in common locations")
@@ -300,7 +304,8 @@ for browser_name, cookie_path in cookie_dbs:
                                 is_valid = exp_date > datetime.datetime.now()
                                 status = "ACTIVE" if is_valid else "expired"
                                 print(f"      {row[1]}: {status} (exp: {exp_date.strftime('%Y-%m-%d')})")
-                            except:
+                            except Exception as e:
+                                logger.debug("Could not parse cookie expiry for %s: %s", row[1], e)
                                 print(f"      {row[1]}: unknown expiry")
             
             conn.close()
@@ -360,10 +365,10 @@ for scan_dir in scan_dirs:
                             for m in matches:
                                 if 'example' not in m.lower() and 'test' not in m.lower():
                                     print(f"  {gc_type} reference in {f}: {m.strip()}")
-                except:
-                    pass
-    except:
-        pass
+                except Exception as e:
+                    logger.debug("Skipped file during gift card scan: %s", e)
+    except Exception as e:
+        logger.debug("Skipped directory during gift card scan: %s", e)
 
 if not gc_found:
     print("  No gift card codes found in common locations")
@@ -412,8 +417,8 @@ for pd in payment_dirs:
                 dl = d.lower()
                 if any(kw in dl for kw in ['paypal', 'venmo', 'cashapp', 'cash.app', 'zelle']):
                     print(f"  FOUND: {d}")
-        except:
-            pass
+        except Exception as e:
+            logger.debug("Could not list payment app packages: %s", e)
 
 # ============================================================
 # SUMMARY

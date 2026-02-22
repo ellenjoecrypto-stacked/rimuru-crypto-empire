@@ -87,7 +87,6 @@ const OpportunitiesDashboard: React.FC = () => {
       setOpportunities(response.data.opportunities);
     } catch (error) {
       message.error('Failed to fetch opportunities');
-      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -100,17 +99,16 @@ const OpportunitiesDashboard: React.FC = () => {
       setStats(response.data);
     } catch (error) {
       message.error('Failed to fetch statistics');
-      console.error(error);
     }
   };
 
   // Fetch pending approvals
   const fetchPendingApprovals = async () => {
     try {
-      const response = await axios.get('/api/opportunities/pending/approval');
-      console.log('Pending approvals:', response.data);
+      // Trigger pending approval fetch; response is handled by fetchOpportunities
+      await axios.get('/api/opportunities/pending/approval');
     } catch (error) {
-      console.error('Failed to fetch pending approvals', error);
+      message.error('Failed to fetch pending approvals');
     }
   };
 
@@ -152,7 +150,6 @@ const OpportunitiesDashboard: React.FC = () => {
       fetchStatistics();
     } catch (error) {
       message.error('Failed to approve opportunity');
-      console.error(error);
     }
   };
 
@@ -179,7 +176,6 @@ const OpportunitiesDashboard: React.FC = () => {
       fetchStatistics();
     } catch (error) {
       message.error('Failed to reject opportunity');
-      console.error(error);
     }
   };
 
@@ -200,7 +196,6 @@ const OpportunitiesDashboard: React.FC = () => {
       fetchStatistics();
     } catch (error) {
       message.error('Failed to claim opportunity');
-      console.error(error);
     }
   };
 
@@ -216,7 +211,6 @@ const OpportunitiesDashboard: React.FC = () => {
       }, 2000);
     } catch (error) {
       message.error('Failed to start scan');
-      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -235,7 +229,6 @@ const OpportunitiesDashboard: React.FC = () => {
       message.success('Opportunities exported');
     } catch (error) {
       message.error('Failed to export opportunities');
-      console.error(error);
     }
   };
 
