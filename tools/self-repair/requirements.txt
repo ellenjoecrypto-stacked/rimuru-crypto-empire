@@ -1,0 +1,2 @@
+# Rimuru Repair — Dependencies
+pyyaml>=6.0.1

@@ -1,0 +1,873 @@
+{
+  "version": "1.0",
+  "total_scans": 1,
+  "total_issues_found": 2718,
+  "total_fixes_applied": 0,
+  "fix_success_rate": 0.0,
+  "issue_patterns": {},
+  "hot_files": [
+    "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/demo.py",
+    "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/tools/exchange_tester.py",
+    "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/credential_manager.py",
+    "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/credential_manager_old.py",
+    "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/find_my_money.py",
+    "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/rimuru_auto_trader.py",
+    "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/deep_asset_hunt.py",
+    "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/tools/cdp_tester.py",
+    "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/start_all_bots.py",
+    "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/services/price_engine.py"
+  ],
+  "lessons_learned": [],
+  "last_scan": "2026-02-22T11:01:42.871242+00:00",
+  "last_score": 0,
+  "pattern_memory": {
+    "file_counts": {
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/kraken_balances.py": {
+        "print_statement": 30,
+        "bare_except": 1,
+        "hardcoded_secret": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/kraken_check_v2.py": {
+        "missing_type_hints": 2,
+        "missing_docstring": 1,
+        "print_statement": 38,
+        "generic_except": 2,
+        "bare_except": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/coinbase_check.py": {
+        "missing_type_hints": 1,
+        "print_statement": 34
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/credential_manager_old.py": {
+        "os_system": 2,
+        "missing_type_hints": 10,
+        "print_statement": 74,
+        "generic_except": 9
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/coinbase_balances.py": {
+        "missing_docstring": 1,
+        "missing_type_hints": 1,
+        "print_statement": 39
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/deep_asset_hunt.py": {
+        "hardcoded_path": 2,
+        "print_statement": 51,
+        "generic_except": 2,
+        "bare_except": 11
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/credential_manager.py": {
+        "os_system": 2,
+        "missing_type_hints": 10,
+        "print_statement": 76,
+        "generic_except": 9
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/credential_manager_api.py": {
+        "print_statement": 8,
+        "generic_except": 1,
+        "hardcoded_secret": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/cdp_sdk_test.py": {
+        "print_statement": 33,
+        "generic_except": 3,
+        "hardcoded_secret": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/start_all_bots.py": {
+        "missing_docstring": 5,
+        "missing_type_hints": 9,
+        "print_statement": 46,
+        "generic_except": 2
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/find_my_money.py": {
+        "hardcoded_path": 4,
+        "print_statement": 77,
+        "missing_type_hints": 3,
+        "generic_except": 5,
+        "bare_except": 3
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/rimuru_auto_trader.py": {
+        "missing_docstring": 21,
+        "missing_type_hints": 9,
+        "print_statement": 31,
+        "bare_except": 5,
+        "generic_except": 9
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/trading_bot.py": {
+        "missing_docstring": 17,
+        "missing_type_hints": 2,
+        "print_statement": 11,
+        "generic_except": 4,
+        "bare_except": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/coinbase_probe.py": {
+        "missing_docstring": 1,
+        "missing_type_hints": 1,
+        "print_statement": 22,
+        "bare_except": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/kraken_check.py": {
+        "missing_docstring": 2,
+        "missing_type_hints": 2,
+        "print_statement": 41,
+        "bare_except": 1,
+        "generic_except": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/check_edge_wallets.py": {
+        "hardcoded_path": 2,
+        "print_statement": 34,
+        "generic_except": 2,
+        "bare_except": 3
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/test_fib.py": {
+        "print_statement": 18
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/coinbase_live_check.py": {
+        "print_statement": 30,
+        "missing_type_hints": 2
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/check_inventory.py": {
+        "print_statement": 11
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/coinbase_auth_test.py": {
+        "print_statement": 17,
+        "missing_docstring": 7,
+        "missing_type_hints": 7,
+        "bare_except": 4,
+        "generic_except": 1,
+        "hardcoded_secret": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/run_empire.py": {
+        "missing_type_hints": 1,
+        "print_statement": 40
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/demo.py": {
+        "missing_docstring": 12,
+        "missing_type_hints": 12,
+        "print_statement": 89
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/main.py": {
+        "missing_docstring": 1,
+        "missing_type_hints": 1,
+        "print_statement": 11
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/services/executor/app.py": {
+        "missing_docstring": 7,
+        "missing_type_hints": 8,
+        "generic_except": 4
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/services/orchestrator/app.py": {
+        "missing_docstring": 5,
+        "missing_type_hints": 9,
+        "generic_except": 10
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/services/backtester/app.py": {
+        "missing_docstring": 4,
+        "missing_type_hints": 9,
+        "generic_except": 2
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/services/data-ingest/app.py": {
+        "missing_docstring": 8,
+        "missing_type_hints": 10,
+        "generic_except": 7
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/services/shared/kraken_client.py": {
+        "missing_docstring": 11
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/services/shared/security.py": {
+        "missing_docstring": 3,
+        "missing_type_hints": 3,
+        "generic_except": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/services/shared/config.py": {
+        "missing_type_hints": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/services/shared/models.py": {
+        "missing_docstring": 23
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/services/indicators/app.py": {
+        "missing_docstring": 17,
+        "missing_type_hints": 5
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/services/strategies/lstm/app.py": {
+        "missing_docstring": 3,
+        "missing_type_hints": 3
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/services/strategies/bollinger/app.py": {
+        "missing_docstring": 3,
+        "missing_type_hints": 3
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/services/strategies/rsi/app.py": {
+        "missing_docstring": 3,
+        "missing_type_hints": 3
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/services/strategies/volume/app.py": {
+        "missing_docstring": 3,
+        "missing_type_hints": 3
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/services/strategies/ma_crossover/app.py": {
+        "missing_docstring": 3,
+        "missing_type_hints": 3
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/services/strategies/momentum/app.py": {
+        "missing_docstring": 3,
+        "missing_type_hints": 3
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/blockchain/block.py": {
+        "print_statement": 13
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/blockchain/wallet_sim.py": {
+        "print_statement": 16
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/blockchain/transaction.py": {
+        "missing_docstring": 7,
+        "print_statement": 8
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/blockchain/chain.py": {
+        "missing_docstring": 2,
+        "missing_type_hints": 1,
+        "print_statement": 36
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/blockchain/vault.py": {
+        "missing_type_hints": 1,
+        "print_statement": 11,
+        "generic_except": 3
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/blockchain/merkle.py": {
+        "missing_type_hints": 1,
+        "print_statement": 15
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/blockchain/wallet.py": {
+        "print_statement": 37,
+        "generic_except": 2
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/mining/auto_miner.py": {
+        "missing_docstring": 6,
+        "missing_type_hints": 3,
+        "print_statement": 26,
+        "generic_except": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/network/consensus.py": {
+        "print_statement": 23
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/network/node.py": {
+        "missing_type_hints": 7,
+        "missing_docstring": 3,
+        "print_statement": 21
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/trackers/whale_tracker.py": {
+        "missing_docstring": 9,
+        "missing_type_hints": 4,
+        "print_statement": 25
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/mining_pool/reward.py": {
+        "missing_docstring": 1,
+        "missing_type_hints": 1,
+        "print_statement": 11
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/mining_pool/pool_server.py": {
+        "missing_docstring": 3,
+        "missing_type_hints": 7,
+        "print_statement": 7
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/mining_pool/miner.py": {
+        "missing_type_hints": 3,
+        "print_statement": 13,
+        "generic_except": 3
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/sandbox/sandbox_runner.py": {
+        "missing_docstring": 1,
+        "print_statement": 2
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/apis/blockchain_api.py": {
+        "missing_docstring": 4
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/apis/developer_api.py": {
+        "todo_comment": 3,
+        "missing_docstring": 3
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/apis/exchange_api.py": {
+        "missing_docstring": 3
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/apis/news_api.py": {
+        "todo_comment": 3,
+        "missing_docstring": 3
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/apis/social_api.py": {
+        "todo_comment": 3,
+        "missing_docstring": 3
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/intelligence/narrative_engine.py": {
+        "missing_docstring": 3,
+        "missing_type_hints": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/intelligence/clustering.py": {
+        "missing_docstring": 4,
+        "missing_type_hints": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/intelligence/sentiment_engine.py": {
+        "missing_type_hints": 2,
+        "missing_docstring": 2
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/intelligence/shadow_briefing.py": {
+        "missing_docstring": 2,
+        "missing_type_hints": 1,
+        "print_statement": 5
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/income/data_products.py": {
+        "todo_comment": 1,
+        "missing_docstring": 4,
+        "missing_type_hints": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/income/automation_services.py": {
+        "todo_comment": 1,
+        "missing_docstring": 2
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/income/airdrop_engine.py": {
+        "todo_comment": 3,
+        "missing_docstring": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/income/narrative_trading.py": {
+        "todo_comment": 1,
+        "missing_docstring": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/bots/narrative_bot.py": {
+        "missing_docstring": 1,
+        "missing_type_hints": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/bots/data_miner_bot.py": {
+        "missing_docstring": 1,
+        "missing_type_hints": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/bots/automation_bot.py": {
+        "missing_docstring": 1,
+        "missing_type_hints": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/bots/onchain_bot.py": {
+        "missing_docstring": 1,
+        "missing_type_hints": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/bots/airdrop_bot.py": {
+        "missing_docstring": 1,
+        "missing_type_hints": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/bots/market_bot.py": {
+        "missing_docstring": 1,
+        "missing_type_hints": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/core/sandbox_manager.py": {
+        "missing_docstring": 3,
+        "missing_type_hints": 2
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/core/rimuru_intelligence.py": {
+        "missing_docstring": 5,
+        "missing_type_hints": 4
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/core/qrow_orchestrator.py": {
+        "missing_docstring": 2,
+        "missing_type_hints": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/core/watchtower.py": {
+        "missing_docstring": 2,
+        "missing_type_hints": 1,
+        "print_statement": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/tools/self-repair/rimuru_repair.py": {
+        "print_statement": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/tools/self-repair/fixers/path_fixer.py": {
+        "hardcoded_path": 4,
+        "missing_docstring": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/tools/self-repair/fixers/python_fixer.py": {
+        "os_system": 2,
+        "hardcoded_path": 2
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/tools/self-repair/scanners/python_scanner.py": {
+        "os_system": 3,
+        "todo_comment": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/api/ai_service.py": {
+        "missing_docstring": 7,
+        "missing_type_hints": 9,
+        "print_statement": 1,
+        "bare_except": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/api/main.py": {
+        "missing_docstring": 7,
+        "missing_type_hints": 24,
+        "print_statement": 2,
+        "generic_except": 5,
+        "bare_except": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/api/gateway.py": {
+        "missing_docstring": 5,
+        "missing_type_hints": 12,
+        "generic_except": 10
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/api/price_service.py": {
+        "missing_docstring": 9,
+        "missing_type_hints": 16,
+        "print_statement": 6,
+        "generic_except": 2
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/services/wallet_service.py": {
+        "missing_docstring": 5,
+        "missing_type_hints": 9,
+        "print_statement": 1,
+        "generic_except": 6,
+        "bare_except": 3
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/services/price_engine.py": {
+        "missing_type_hints": 9,
+        "print_statement": 32,
+        "generic_except": 13,
+        "missing_docstring": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/bots/spot_trader.py": {
+        "os_system": 1,
+        "missing_docstring": 1,
+        "missing_type_hints": 1,
+        "print_statement": 14,
+        "generic_except": 2
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/bots/base_bot.py": {
+        "missing_docstring": 2,
+        "missing_type_hints": 2,
+        "generic_except": 6
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/bots/bot_service.py": {
+        "missing_docstring": 7,
+        "missing_type_hints": 10,
+        "print_statement": 1,
+        "generic_except": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/tools/balance_checker.py": {
+        "missing_type_hints": 3,
+        "missing_docstring": 1,
+        "print_statement": 13,
+        "generic_except": 2
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/tools/cdp_tester.py": {
+        "os_system": 1,
+        "hardcoded_path": 6,
+        "missing_type_hints": 2,
+        "print_statement": 51,
+        "generic_except": 3
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/tools/exchange_tester.py": {
+        "os_system": 1,
+        "hardcoded_path": 6,
+        "missing_type_hints": 4,
+        "print_statement": 83,
+        "generic_except": 6
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/tools/multi_exchange_checker.py": {
+        "hardcoded_path": 2,
+        "missing_type_hints": 4,
+        "missing_docstring": 1,
+        "print_statement": 27,
+        "generic_except": 4
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/tools/check_balances.py": {
+        "hardcoded_path": 2,
+        "missing_docstring": 1,
+        "missing_type_hints": 1,
+        "print_statement": 16,
+        "generic_except": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/tools/full_crypto_scanner.py": {
+        "hardcoded_path": 4,
+        "missing_docstring": 8,
+        "missing_type_hints": 8,
+        "print_statement": 21,
+        "generic_except": 6
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/tools/generate_report.py": {
+        "hardcoded_path": 2,
+        "missing_docstring": 1,
+        "missing_type_hints": 1,
+        "print_statement": 48
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/security/credential_vault.py": {
+        "os_system": 1,
+        "print_statement": 29,
+        "generic_except": 7,
+        "hardcoded_secret": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/security/credential_vault_hardened.py": {
+        "os_system": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/security/secrets_manager.py": {
+        "print_statement": 18,
+        "generic_except": 8
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/core/exchange_manager.py": {
+        "os_system": 1,
+        "missing_docstring": 2,
+        "missing_type_hints": 2,
+        "print_statement": 9,
+        "generic_except": 10,
+        "bare_except": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/core/rimuru_ai.py": {
+        "os_system": 1,
+        "missing_type_hints": 3,
+        "missing_docstring": 1,
+        "print_statement": 15,
+        "bare_except": 1,
+        "generic_except": 5
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/core/risk_manager.py": {
+        "missing_docstring": 1,
+        "missing_type_hints": 6,
+        "print_statement": 16
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/integrators/scanner_price_pipeline.py": {
+        "missing_docstring": 1,
+        "missing_type_hints": 3,
+        "print_statement": 44,
+        "generic_except": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/integrators/rimuru_bridge.py": {
+        "missing_docstring": 3,
+        "missing_type_hints": 1,
+        "print_statement": 8,
+        "generic_except": 6,
+        "bare_except": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/integrators/project_scanner.py": {
+        "hardcoded_path": 34,
+        "missing_type_hints": 2,
+        "missing_docstring": 1,
+        "print_statement": 3,
+        "generic_except": 3
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/pipeline/stage2_quarantine.py": {
+        "missing_docstring": 3,
+        "missing_type_hints": 3,
+        "print_statement": 2,
+        "bare_except": 3
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/pipeline/stage4_holding.py": {
+        "missing_docstring": 6,
+        "missing_type_hints": 5,
+        "print_statement": 2
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/pipeline/stage5_vault.py": {
+        "missing_docstring": 5,
+        "missing_type_hints": 4,
+        "print_statement": 1,
+        "generic_except": 1,
+        "bare_except": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/pipeline/stage3_scanner.py": {
+        "missing_docstring": 9,
+        "missing_type_hints": 3,
+        "print_statement": 1,
+        "generic_except": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/pipeline/stage1_acquisition.py": {
+        "missing_docstring": 6,
+        "missing_type_hints": 4
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/pipeline/stage6_cashout.py": {
+        "missing_docstring": 8,
+        "missing_type_hints": 6,
+        "print_statement": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/aggregators/opportunity_scanner.py": {
+        "missing_docstring": 1,
+        "missing_type_hints": 1,
+        "print_statement": 9,
+        "generic_except": 5
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/frontend/src/services/websocket.tsx": {
+        "any_type": 4,
+        "hardcoded_url": 1,
+        "console_statement": 2
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/frontend/src/components/OpportunitiesDashboard.tsx": {
+        "any_type": 2,
+        "console_statement": 9
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/frontend/src/components/Bots.tsx": {
+        "hardcoded_url": 1,
+        "console_statement": 3
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/frontend/src/components/Security.tsx": {
+        "hardcoded_url": 1,
+        "console_statement": 3
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/frontend/src/components/Dashboard.tsx": {
+        "hardcoded_url": 1,
+        "console_statement": 1,
+        "any_type": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/pipeline-service-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05clogs-persistentVolumeClaim.yaml": {
+        "hardcoded_path": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/price-service-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05clogs-persistentVolumeClaim.yaml": {
+        "hardcoded_path": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/scanner-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05cdata\uf05cscans-persistentVolumeClaim.yaml": {
+        "hardcoded_path": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/postgres-deployment.yaml": {
+        "hardcoded_path": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/bot-service-deployment.yaml": {
+        "hardcoded_path": 2
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/price-service-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05cdata-persistentVolumeClaim.yaml": {
+        "hardcoded_path": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/ai-service-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05cdata-persistentVolumeClaim.yaml": {
+        "hardcoded_path": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/ollama-deployment.yaml": {
+        "hardcoded_path": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/project-integrator-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05cdata\uf05cintegrated-persistentVolumeClaim.yaml": {
+        "hardcoded_path": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/api-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05clogs-persistentVolumeClaim.yaml": {
+        "hardcoded_path": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/asset-scanner-deployment.yaml": {
+        "hardcoded_path": 2
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/wallet-service-deployment.yaml": {
+        "hardcoded_path": 2
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/price-service-deployment.yaml": {
+        "hardcoded_path": 2
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/project-integrator-deployment.yaml": {
+        "hardcoded_path": 2
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/postgres-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05cinit_db.sql-persistentVolumeClaim.yaml": {
+        "hardcoded_path": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/ai-service-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05clogs-persistentVolumeClaim.yaml": {
+        "hardcoded_path": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/scanner-deployment.yaml": {
+        "hardcoded_path": 2
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/scanner-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05clogs-persistentVolumeClaim.yaml": {
+        "hardcoded_path": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/analyzer-deployment.yaml": {
+        "hardcoded_path": 2
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/pipeline-service-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05cdata-persistentVolumeClaim.yaml": {
+        "hardcoded_path": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/analyzer-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05clogs-persistentVolumeClaim.yaml": {
+        "hardcoded_path": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/wallet-service-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05clogs-persistentVolumeClaim.yaml": {
+        "hardcoded_path": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/pipeline-service-deployment.yaml": {
+        "hardcoded_path": 2
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/project-integrator-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05clogs-persistentVolumeClaim.yaml": {
+        "hardcoded_path": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/wallet-service-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05cdata-persistentVolumeClaim.yaml": {
+        "hardcoded_path": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/asset-scanner-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05cdata-persistentVolumeClaim.yaml": {
+        "hardcoded_path": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/ai-service-deployment.yaml": {
+        "hardcoded_path": 2
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/asset-scanner-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05clogs-persistentVolumeClaim.yaml": {
+        "hardcoded_path": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/analyzer-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05cdata\uf05canalysis-persistentVolumeClaim.yaml": {
+        "hardcoded_path": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/bot-service-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05cdata-persistentVolumeClaim.yaml": {
+        "hardcoded_path": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/bot-service-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05clogs-persistentVolumeClaim.yaml": {
+        "hardcoded_path": 1
+      },
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/api-deployment.yaml": {
+        "hardcoded_path": 1
+      }
+    },
+    "type_counts": {
+      "print_statement": 1606,
+      "bare_except": 43,
+      "missing_type_hints": 342,
+      "missing_docstring": 353,
+      "generic_except": 197,
+      "os_system": 16,
+      "hardcoded_path": 111,
+      "todo_comment": 16,
+      "any_type": 7,
+      "hardcoded_url": 4,
+      "console_statement": 18,
+      "hardcoded_secret": 5
+    },
+    "last_seen": {
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/kraken_balances.py": "2026-02-22T11:01:42.870239+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/kraken_check_v2.py": "2026-02-22T11:01:42.866371+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/coinbase_check.py": "2026-02-22T11:01:42.866424+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/credential_manager_old.py": "2026-02-22T11:01:42.866564+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/coinbase_balances.py": "2026-02-22T11:01:42.866624+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/deep_asset_hunt.py": "2026-02-22T11:01:42.870241+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/credential_manager.py": "2026-02-22T11:01:42.866862+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/credential_manager_api.py": "2026-02-22T11:01:42.870243+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/cdp_sdk_test.py": "2026-02-22T11:01:42.870244+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/start_all_bots.py": "2026-02-22T11:01:42.867021+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/find_my_money.py": "2026-02-22T11:01:42.870247+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/rimuru_auto_trader.py": "2026-02-22T11:01:42.867263+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/trading_bot.py": "2026-02-22T11:01:42.867325+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/coinbase_probe.py": "2026-02-22T11:01:42.867365+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/kraken_check.py": "2026-02-22T11:01:42.867435+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/check_edge_wallets.py": "2026-02-22T11:01:42.870249+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/test_fib.py": "2026-02-22T11:01:42.867522+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/coinbase_live_check.py": "2026-02-22T11:01:42.867569+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/check_inventory.py": "2026-02-22T11:01:42.867586+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/coinbase_auth_test.py": "2026-02-22T11:01:42.870251+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/run_empire.py": "2026-02-22T11:01:42.867702+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/demo.py": "2026-02-22T11:01:42.867867+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/main.py": "2026-02-22T11:01:42.867887+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/services/executor/app.py": "2026-02-22T11:01:42.867916+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/services/orchestrator/app.py": "2026-02-22T11:01:42.867951+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/services/backtester/app.py": "2026-02-22T11:01:42.867974+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/services/data-ingest/app.py": "2026-02-22T11:01:42.868010+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/services/shared/kraken_client.py": "2026-02-22T11:01:42.868027+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/services/shared/security.py": "2026-02-22T11:01:42.868038+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/services/shared/config.py": "2026-02-22T11:01:42.868040+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/services/shared/models.py": "2026-02-22T11:01:42.868074+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/services/indicators/app.py": "2026-02-22T11:01:42.868106+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/services/strategies/lstm/app.py": "2026-02-22T11:01:42.868116+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/services/strategies/bollinger/app.py": "2026-02-22T11:01:42.868125+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/services/strategies/rsi/app.py": "2026-02-22T11:01:42.868135+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/services/strategies/volume/app.py": "2026-02-22T11:01:42.868144+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/services/strategies/ma_crossover/app.py": "2026-02-22T11:01:42.868154+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/services/strategies/momentum/app.py": "2026-02-22T11:01:42.868163+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/blockchain/block.py": "2026-02-22T11:01:42.868183+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/blockchain/wallet_sim.py": "2026-02-22T11:01:42.868207+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/blockchain/transaction.py": "2026-02-22T11:01:42.868229+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/blockchain/chain.py": "2026-02-22T11:01:42.868296+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/blockchain/vault.py": "2026-02-22T11:01:42.868320+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/blockchain/merkle.py": "2026-02-22T11:01:42.868345+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/blockchain/wallet.py": "2026-02-22T11:01:42.868402+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/mining/auto_miner.py": "2026-02-22T11:01:42.868455+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/network/consensus.py": "2026-02-22T11:01:42.868489+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/network/node.py": "2026-02-22T11:01:42.868535+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/trackers/whale_tracker.py": "2026-02-22T11:01:42.868591+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/mining_pool/reward.py": "2026-02-22T11:01:42.868611+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/mining_pool/pool_server.py": "2026-02-22T11:01:42.868638+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/crypto-pool-blockchain/mining_pool/miner.py": "2026-02-22T11:01:42.868667+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/sandbox/sandbox_runner.py": "2026-02-22T11:01:42.868673+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/apis/blockchain_api.py": "2026-02-22T11:01:42.868680+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/apis/developer_api.py": "2026-02-22T11:01:42.868689+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/apis/exchange_api.py": "2026-02-22T11:01:42.868694+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/apis/news_api.py": "2026-02-22T11:01:42.868704+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/apis/social_api.py": "2026-02-22T11:01:42.868713+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/intelligence/narrative_engine.py": "2026-02-22T11:01:42.868720+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/intelligence/clustering.py": "2026-02-22T11:01:42.868728+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/intelligence/sentiment_engine.py": "2026-02-22T11:01:42.868734+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/intelligence/shadow_briefing.py": "2026-02-22T11:01:42.868747+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/income/data_products.py": "2026-02-22T11:01:42.868756+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/income/automation_services.py": "2026-02-22T11:01:42.868761+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/income/airdrop_engine.py": "2026-02-22T11:01:42.868768+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/income/narrative_trading.py": "2026-02-22T11:01:42.868772+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/bots/narrative_bot.py": "2026-02-22T11:01:42.868775+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/bots/data_miner_bot.py": "2026-02-22T11:01:42.868779+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/bots/automation_bot.py": "2026-02-22T11:01:42.868783+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/bots/onchain_bot.py": "2026-02-22T11:01:42.868786+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/bots/airdrop_bot.py": "2026-02-22T11:01:42.868789+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/bots/market_bot.py": "2026-02-22T11:01:42.868793+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/core/sandbox_manager.py": "2026-02-22T11:01:42.868802+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/core/rimuru_intelligence.py": "2026-02-22T11:01:42.868815+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/core/qrow_orchestrator.py": "2026-02-22T11:01:42.868820+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/qrow/core/watchtower.py": "2026-02-22T11:01:42.868827+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/tools/self-repair/rimuru_repair.py": "2026-02-22T11:01:42.868829+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/tools/self-repair/fixers/path_fixer.py": "2026-02-22T11:01:42.870342+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/tools/self-repair/fixers/python_fixer.py": "2026-02-22T11:01:42.870345+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/tools/self-repair/scanners/python_scanner.py": "2026-02-22T11:01:42.868844+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/api/ai_service.py": "2026-02-22T11:01:42.868871+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/api/main.py": "2026-02-22T11:01:42.868928+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/api/gateway.py": "2026-02-22T11:01:42.868968+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/api/price_service.py": "2026-02-22T11:01:42.869016+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/services/wallet_service.py": "2026-02-22T11:01:42.869052+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/services/price_engine.py": "2026-02-22T11:01:42.869134+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/bots/spot_trader.py": "2026-02-22T11:01:42.869163+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/bots/base_bot.py": "2026-02-22T11:01:42.869179+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/bots/bot_service.py": "2026-02-22T11:01:42.869207+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/tools/balance_checker.py": "2026-02-22T11:01:42.869236+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/tools/cdp_tester.py": "2026-02-22T11:01:42.870350+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/tools/exchange_tester.py": "2026-02-22T11:01:42.870355+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/tools/multi_exchange_checker.py": "2026-02-22T11:01:42.870356+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/tools/check_balances.py": "2026-02-22T11:01:42.870358+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/tools/full_crypto_scanner.py": "2026-02-22T11:01:42.870361+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/tools/generate_report.py": "2026-02-22T11:01:42.870362+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/security/credential_vault.py": "2026-02-22T11:01:42.870364+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/security/credential_vault_hardened.py": "2026-02-22T11:01:42.869760+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/security/secrets_manager.py": "2026-02-22T11:01:42.869798+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/core/exchange_manager.py": "2026-02-22T11:01:42.869836+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/core/rimuru_ai.py": "2026-02-22T11:01:42.869876+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/core/risk_manager.py": "2026-02-22T11:01:42.869910+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/integrators/scanner_price_pipeline.py": "2026-02-22T11:01:42.869982+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/integrators/rimuru_bridge.py": "2026-02-22T11:01:42.870010+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/integrators/project_scanner.py": "2026-02-22T11:01:42.870389+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/pipeline/stage2_quarantine.py": "2026-02-22T11:01:42.870065+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/pipeline/stage4_holding.py": "2026-02-22T11:01:42.870085+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/pipeline/stage5_vault.py": "2026-02-22T11:01:42.870103+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/pipeline/stage3_scanner.py": "2026-02-22T11:01:42.870125+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/pipeline/stage1_acquisition.py": "2026-02-22T11:01:42.870140+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/pipeline/stage6_cashout.py": "2026-02-22T11:01:42.870162+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/backend/aggregators/opportunity_scanner.py": "2026-02-22T11:01:42.870186+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/frontend/src/services/websocket.tsx": "2026-02-22T11:01:42.870200+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/frontend/src/components/OpportunitiesDashboard.tsx": "2026-02-22T11:01:42.870218+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/frontend/src/components/Bots.tsx": "2026-02-22T11:01:42.870224+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/frontend/src/components/Security.tsx": "2026-02-22T11:01:42.870231+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/frontend/src/components/Dashboard.tsx": "2026-02-22T11:01:42.870237+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/pipeline-service-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05clogs-persistentVolumeClaim.yaml": "2026-02-22T11:01:42.870253+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/price-service-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05clogs-persistentVolumeClaim.yaml": "2026-02-22T11:01:42.870255+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/scanner-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05cdata\uf05cscans-persistentVolumeClaim.yaml": "2026-02-22T11:01:42.870258+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/postgres-deployment.yaml": "2026-02-22T11:01:42.870260+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/bot-service-deployment.yaml": "2026-02-22T11:01:42.870263+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/price-service-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05cdata-persistentVolumeClaim.yaml": "2026-02-22T11:01:42.870265+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/ai-service-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05cdata-persistentVolumeClaim.yaml": "2026-02-22T11:01:42.870276+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/ollama-deployment.yaml": "2026-02-22T11:01:42.870278+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/project-integrator-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05cdata\uf05cintegrated-persistentVolumeClaim.yaml": "2026-02-22T11:01:42.870280+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/api-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05clogs-persistentVolumeClaim.yaml": "2026-02-22T11:01:42.870282+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/asset-scanner-deployment.yaml": "2026-02-22T11:01:42.870286+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/wallet-service-deployment.yaml": "2026-02-22T11:01:42.870290+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/price-service-deployment.yaml": "2026-02-22T11:01:42.870293+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/project-integrator-deployment.yaml": "2026-02-22T11:01:42.870297+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/postgres-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05cinit_db.sql-persistentVolumeClaim.yaml": "2026-02-22T11:01:42.870299+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/ai-service-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05clogs-persistentVolumeClaim.yaml": "2026-02-22T11:01:42.870301+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/scanner-deployment.yaml": "2026-02-22T11:01:42.870304+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/scanner-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05clogs-persistentVolumeClaim.yaml": "2026-02-22T11:01:42.870306+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/analyzer-deployment.yaml": "2026-02-22T11:01:42.870310+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/pipeline-service-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05cdata-persistentVolumeClaim.yaml": "2026-02-22T11:01:42.870312+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/analyzer-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05clogs-persistentVolumeClaim.yaml": "2026-02-22T11:01:42.870314+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/wallet-service-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05clogs-persistentVolumeClaim.yaml": "2026-02-22T11:01:42.870316+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/pipeline-service-deployment.yaml": "2026-02-22T11:01:42.870319+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/project-integrator-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05clogs-persistentVolumeClaim.yaml": "2026-02-22T11:01:42.870321+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/wallet-service-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05cdata-persistentVolumeClaim.yaml": "2026-02-22T11:01:42.870324+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/asset-scanner-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05cdata-persistentVolumeClaim.yaml": "2026-02-22T11:01:42.870326+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/ai-service-deployment.yaml": "2026-02-22T11:01:42.870329+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/asset-scanner-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05clogs-persistentVolumeClaim.yaml": "2026-02-22T11:01:42.870331+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/analyzer-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05cdata\uf05canalysis-persistentVolumeClaim.yaml": "2026-02-22T11:01:42.870333+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/bot-service-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05cdata-persistentVolumeClaim.yaml": "2026-02-22T11:01:42.870335+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/bot-service-C\uf03a\uf05cUsers\uf05cAdmin\uf05cOneDrive\uf05cVideos\uf05crimuru_empire\uf05clogs-persistentVolumeClaim.yaml": "2026-02-22T11:01:42.870337+00:00",
+      "/home/runner/work/rimuru-crypto-empire/rimuru-crypto-empire/bridge/base/api-deployment.yaml": "2026-02-22T11:01:42.870339+00:00"
+    }
+  },
+  "fix_tracker": {
+    "records": [],
+    "revert_threshold": 0.3,
+    "min_applications": 3
+  }
+}
