@@ -105,6 +105,7 @@ const OpportunitiesDashboard: React.FC = () => {
   // Fetch pending approvals
   const fetchPendingApprovals = async () => {
     try {
+      // Trigger pending approval fetch; response is handled by fetchOpportunities
       await axios.get('/api/opportunities/pending/approval');
     } catch (error) {
       message.error('Failed to fetch pending approvals');

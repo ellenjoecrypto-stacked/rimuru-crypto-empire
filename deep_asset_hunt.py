@@ -67,10 +67,9 @@ try:
             print(f"  Content: {decoded[:1000]}")
             decrypted = True
             break
-        except Exception:
+        except Exception as e:
+            logger.debug("Decryption attempt failed: %s", e)
             continue
-    
-    if not decrypted:
         # Try with salt from _SENSITIVE folder
         salt_path = os.path.join(BASE, r'OneDrive\Videos\rimuru_empire\_SENSITIVE\VAULT_DATA\.salt')
         if os.path.exists(salt_path):
@@ -94,7 +93,8 @@ try:
                     print(f"  Content: {decoded[:1000]}")
                     decrypted = True
                     break
-                except Exception:
+                except Exception as e:
+                    logger.debug("Decryption attempt failed: %s", e)
                     continue
         
         if not decrypted:

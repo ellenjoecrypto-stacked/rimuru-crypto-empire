@@ -51,5 +51,5 @@ class ShadowBriefing:
         logger.info(separator)
         logger.info("       SHADOW BRIEFING — RIMURU INTELLIGENCE")
         logger.info(separator)
-        logger.info(json.dumps(briefing, indent=2))
+        logger.debug(json.dumps(briefing, indent=2))
         logger.info(separator)
