@@ -11,11 +11,34 @@ import logging
 import os
 import sqlite3
 from datetime import datetime
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 from pathlib import Path
+
+try:
+    from core.rimuru_ai import RimuruAICore
+except ImportError:
+    try:
+        import sys
+        _backend_path = str(Path(__file__).parent.parent)
+        if _backend_path not in sys.path:
+            sys.path.insert(0, _backend_path)
+        from core.rimuru_ai import RimuruAICore
+    except ImportError:
+        RimuruAICore = None  # type: ignore[assignment,misc]
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Module-level cached AI core instance so learned state is preserved between calls
+_ai_core: Optional["RimuruAICore"] = None  # type: ignore[type-arg]
+
+
+def _get_ai_core(model_path: str) -> Optional["RimuruAICore"]:  # type: ignore[type-arg]
+    """Return a cached RimuruAICore instance, creating it on first call."""
+    global _ai_core
+    if _ai_core is None and RimuruAICore is not None:
+        _ai_core = RimuruAICore(model_path=model_path)
+    return _ai_core
 
 
 class RimuruBridge:
@@ -195,13 +218,9 @@ class RimuruBridge:
         # Build context from all data sources
         context = self._build_ai_context(symbol, market_data, indicators)
         
-        # Use local AI core
+        # Use local AI core (cached singleton)
         try:
-            import sys
-            sys.path.insert(0, str(Path(__file__).parent.parent))
-            from core.rimuru_ai import RimuruAICore
-            
-            ai = RimuruAICore(model_path=str(self.data_dir / "ai_models"))
+            ai = _get_ai_core(str(self.data_dir / "ai_models"))
             
             if not market_data:
                 market_data = {
@@ -269,8 +288,6 @@ class RimuruBridge:
         
         # Stage 2: Price data
         try:
-            import sys
-            sys.path.insert(0, str(Path(__file__).parent.parent))
             from services.price_engine import PriceEngine
             
             engine = PriceEngine()
@@ -399,7 +416,7 @@ class RimuruBridge:
             try:
                 count = conn.execute("SELECT COUNT(*) FROM scan_files").fetchone()
                 findings["files_scanned"] = count[0] if count else 0
-            except:
+            except Exception:
                 pass
             
             conn.close()
@@ -474,26 +491,26 @@ class RimuruBridge:
 
 if __name__ == "__main__":
     async def test_bridge():
-        print("🔗 RIMURU BRIDGE TEST")
-        print("=" * 60)
-        
+        logger.info("🔗 RIMURU BRIDGE TEST")
+        logger.info("=" * 60)
+
         bridge = RimuruBridge()
-        
+
         # Run full analysis
         report = await bridge.run_full_analysis()
-        
-        print(f"\n📋 Analysis Summary:")
+
+        logger.info("\n📋 Analysis Summary:")
         summary = report.get("summary", {})
         for key, value in summary.items():
-            print(f"   {key}: {value}")
-        
+            logger.info(f"   {key}: {value}")
+
         decisions = report.get("stages", {}).get("ai_decisions", {}).get("decisions", [])
         if decisions:
-            print(f"\n🧠 AI Decisions:")
+            logger.info("\n🧠 AI Decisions:")
             for d in decisions:
-                print(f"   {d['symbol']}: {d['action'].upper()} ({d['confidence']:.1%}) - Risk: {d['risk_assessment']}")
-        
-        print(f"\n✅ Bridge test complete!")
-        print(f"   Status: {bridge.get_system_status()}")
-    
+                logger.info(f"   {d['symbol']}: {d['action'].upper()} ({d['confidence']:.1%}) - Risk: {d['risk_assessment']}")
+
+        logger.info("\n✅ Bridge test complete!")
+        logger.info(f"   Status: {bridge.get_system_status()}")
+
     asyncio.run(test_bridge())

@@ -4,6 +4,7 @@ Scans all user directories for crypto credentials, wallets, seeds, and API keys
 Saves everything to SQLite database for analysis
 """
 
+import logging
 import os
 import re
 import json
@@ -13,6 +14,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 import time
+
+logger = logging.getLogger(__name__)
 
 
 class CryptoFindingsDB:
@@ -249,25 +252,25 @@ class ComprehensiveCryptoScanner:
     
     def scan_directory(self, base_path: str, max_files: int = 5000):
         """Recursively scan directory for crypto data"""
-        
-        print(f"\n📁 Scanning: {base_path}")
-        
+
+        logger.info(f"\n📁 Scanning: {base_path}")
+
         try:
             for root, dirs, files in os.walk(base_path):
                 # Skip ignored directories
                 dirs[:] = [d for d in dirs if d not in self.IGNORE_DIRS]
-                
+
                 for file in files:
                     if self.files_scanned >= max_files:
-                        print(f"   Reached max files limit ({max_files})")
+                        logger.info(f"   Reached max files limit ({max_files})")
                         return
-                    
+
                     file_path = os.path.join(root, file)
-                    
+
                     # Check extension or specific file names
                     ext = os.path.splitext(file)[1].lower()
                     name_lower = file.lower()
-                    
+
                     should_scan = (
                         ext in self.SCAN_EXTENSIONS or
                         'wallet' in name_lower or
@@ -279,14 +282,14 @@ class ComprehensiveCryptoScanner:
                         'backup' in name_lower or
                         '.env' in name_lower
                     )
-                    
+
                     if should_scan:
                         self._scan_file(file_path)
-                        
+
         except PermissionError:
-            print(f"   ⚠️ Permission denied: {base_path}")
+            logger.warning(f"   ⚠️ Permission denied: {base_path}")
         except Exception as e:
-            print(f"   ❌ Error: {e}")
+            logger.error(f"   ❌ Error: {e}")
     
     def _scan_file(self, file_path: str):
         """Scan individual file for crypto data"""
@@ -349,7 +352,7 @@ class ComprehensiveCryptoScanner:
             self.db.add_scanned_file(file_path, size, ext, has_crypto, wallets_in_file, keys_in_file)
             
             if has_crypto:
-                print(f"   ✅ {os.path.basename(file_path)}: {wallets_in_file} wallets, {keys_in_file} keys")
+                logger.info(f"   ✅ {os.path.basename(file_path)}: {wallets_in_file} wallets, {keys_in_file} keys")
                 
         except Exception as e:
             pass
@@ -393,60 +396,65 @@ class ComprehensiveCryptoScanner:
         return phrases
     
     def print_progress(self):
-        """Print current progress"""
-        print(f"\n📊 Progress: {self.files_scanned} files | {self.wallets_found} wallets | {self.keys_found} keys | {self.seeds_found} seeds")
+        """Log current progress."""
+        logger.info(f"\n📊 Progress: {self.files_scanned} files | {self.wallets_found} wallets | {self.keys_found} keys | {self.seeds_found} seeds")
 
 
 def main():
-    print("=" * 60)
-    print("🔍 COMPREHENSIVE CRYPTO DATA SCANNER")
-    print("=" * 60)
-    
-    # Database path
-    db_path = r"C:\Users\Admin\OneDrive\Videos\rimuru_empire\crypto_findings.db"
-    
+    logging.basicConfig(level=logging.INFO)
+    logger.info("=" * 60)
+    logger.info("🔍 COMPREHENSIVE CRYPTO DATA SCANNER")
+    logger.info("=" * 60)
+
+    # Database path — configurable via environment variable
+    db_path = os.getenv(
+        "CRYPTO_DB_PATH",
+        os.path.join("data", "crypto_findings.db"),
+    )
+
     # Initialize database
-    print(f"\n📝 Creating database: {db_path}")
+    logger.info(f"\n📝 Creating database: {db_path}")
+    os.makedirs(os.path.dirname(db_path) if os.path.dirname(db_path) else ".", exist_ok=True)
     db = CryptoFindingsDB(db_path)
-    
+
     # Initialize scanner
     scanner = ComprehensiveCryptoScanner(db)
-    
-    # Directories to scan
-    base = r"C:\Users\Admin"
+
+    # Directories to scan — configurable via environment variable
+    base = os.getenv("SCAN_BASE_DIR", os.path.expanduser("~"))
     scan_dirs = [
         os.path.join(base, "OneDrive"),
         os.path.join(base, "Documents"),
         os.path.join(base, "source"),
         os.path.join(base, "Desktop"),
     ]
-    
+
     # Scan each directory
     for directory in scan_dirs:
         if os.path.exists(directory):
             scanner.scan_directory(directory, max_files=3000)
             scanner.print_progress()
-    
-    # Get and print summary
+
+    # Get and log summary
     summary = db.get_summary()
-    
-    print("\n" + "=" * 60)
-    print("📊 FINAL SUMMARY")
-    print("=" * 60)
-    print(f"Total files scanned:  {summary['total_files_scanned']}")
-    print(f"Total wallets found:  {summary['total_wallets']}")
-    print(f"Total API keys found: {summary['total_api_keys']}")
-    print(f"Total seed phrases:   {summary['total_seed_phrases']}")
-    print(f"Total USD value:      ${summary['total_usd_value']:,.2f}")
-    
+
+    logger.info("\n" + "=" * 60)
+    logger.info("📊 FINAL SUMMARY")
+    logger.info("=" * 60)
+    logger.info(f"Total files scanned:  {summary['total_files_scanned']}")
+    logger.info(f"Total wallets found:  {summary['total_wallets']}")
+    logger.info(f"Total API keys found: {summary['total_api_keys']}")
+    logger.info(f"Total seed phrases:   {summary['total_seed_phrases']}")
+    logger.info(f"Total USD value:      ${summary['total_usd_value']:,.2f}")
+
     # Show all wallets found
     wallets = db.get_all_wallets()
     if wallets:
-        print("\n🔐 WALLETS FOUND:")
+        logger.info("\n🔐 WALLETS FOUND:")
         for w in wallets[:30]:
-            print(f"   [{w['blockchain']}] {w['address'][:20]}...{w['address'][-8:]}")
-    
-    print(f"\n✅ Results saved to: {db_path}")
+            logger.info(f"   [{w['blockchain']}] {w['address'][:20]}...{w['address'][-8:]}")
+
+    logger.info(f"\n✅ Results saved to: {db_path}")
     
     db.close()
     return summary

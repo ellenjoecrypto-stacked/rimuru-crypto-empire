@@ -7,6 +7,8 @@ Run this file to boot the full ecosystem:
 All subsystems initialise in safe mode by default.
 """
 
+import logging
+
 from core.rimuru_intelligence import Rimuru
 from core.watchtower import Watchtower
 from core.sandbox_manager import SandboxManager
@@ -29,11 +31,14 @@ from income.narrative_trading import NarrativeTrading
 from income.data_products import DataProducts
 from income.automation_services import AutomationServices
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 
 def main():
-    print("= - main.py:34" * 60)
-    print("QROW + RIMURU CRYPTO INTELLIGENCE ENGINE  BOOTING - main.py:35")
-    print("= - main.py:36" * 60)
+    logger.info("=" * 60)
+    logger.info("QROW + RIMURU CRYPTO INTELLIGENCE ENGINE  BOOTING")
+    logger.info("=" * 60)
 
     # ── Core ────────────────────────────────────────────────
     rimuru = Rimuru()
@@ -83,23 +88,23 @@ def main():
         "automation_bot": AutomationBot(),
     }
 
-    print("\n[QROW] Running all bots through sandboxed orchestrator...\n - main.py:86")
+    logger.info("[QROW] Running all bots through sandboxed orchestrator...")
     for name, bot in bots.items():
         qrow.run_bot(bot, name)
 
     # ── Generate shadow briefing ────────────────────────────
-    print()
     briefing.print_briefing()
 
     # ── Income engine reports ───────────────────────────────
-    print("\n[AIRDROP ENGINE] - main.py:95", airdrop_engine.discover())
-    print("[NARRATIVE TRADING] - main.py:96", narrative_trading.generate_signals())
-    print("[AUTOMATION] - main.py:97", automation.run_due_tasks())
+    logger.info("[AIRDROP ENGINE] %s", airdrop_engine.discover())
+    logger.info("[NARRATIVE TRADING] %s", narrative_trading.generate_signals())
+    logger.info("[AUTOMATION] %s", automation.run_due_tasks())
 
-    print("\n - main.py:99" + "=" * 60)
-    print("ALL SYSTEMS ONLINE  QROW + RIMURU OPERATIONAL - main.py:100")
-    print("= - main.py:101" * 60)
+    logger.info("=" * 60)
+    logger.info("ALL SYSTEMS ONLINE  QROW + RIMURU OPERATIONAL")
+    logger.info("=" * 60)
 
 
 if __name__ == "__main__":
     main()
+

@@ -1,6 +1,10 @@
 """Shadow Briefing — generates daily / on-demand intelligence reports."""
 
+import json
+import logging
 from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 
 class ShadowBriefing:
@@ -42,10 +46,10 @@ class ShadowBriefing:
         return recs
 
     def print_briefing(self):
-        import json
         briefing = self.generate()
-        print("=" * 60)
-        print("       SHADOW BRIEFING — RIMURU INTELLIGENCE")
-        print("=" * 60)
-        print(json.dumps(briefing, indent=2))
-        print("=" * 60)
+        logger.info("=" * 60)
+        logger.info("       SHADOW BRIEFING — RIMURU INTELLIGENCE")
+        logger.info("=" * 60)
+        logger.info(json.dumps(briefing, indent=2))
+        logger.info("=" * 60)
+

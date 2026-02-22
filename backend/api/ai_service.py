@@ -244,8 +244,8 @@ async def ollama_status():
             resp = requests.get(f"{ai.ollama_url}/api/tags", timeout=5)
             if resp.status_code == 200:
                 models = [m["name"] for m in resp.json().get("models", [])]
-        except:
-            pass
+        except Exception as e:
+            logger.debug(f"Could not fetch Ollama models: {e}")
     
     return {
         "connected": connected,
