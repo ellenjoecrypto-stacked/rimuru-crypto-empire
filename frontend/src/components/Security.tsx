@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Grid,
@@ -27,7 +27,7 @@ import {
   ListItemIcon
 } from '@mui/material';
 import {
-  Security,
+  Security as SecurityIcon,
   VpnKey,
   Delete,
   Add,
@@ -65,6 +65,13 @@ const Security: React.FC = () => {
     secret_key: '',
     sandbox: true
   });
+  const firstInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (open && firstInputRef.current) {
+      firstInputRef.current.focus();
+    }
+  }, [open]);
 
   useEffect(() => {
     fetchData();
@@ -111,7 +118,7 @@ const Security: React.FC = () => {
 
   return (
     <Box>
-      <Typography variant="h4" gutterBottom sx={{ color: '#00ff88', fontWeight: 'bold' }}>
+      <Typography variant="h4" component="h1" gutterBottom sx={{ color: '#00ff88', fontWeight: 'bold' }}>
         Security Center
       </Typography>
 
@@ -126,27 +133,27 @@ const Security: React.FC = () => {
           <Card sx={{ bgcolor: '#1a1a1a', height: '100%' }}>
             <CardContent>
               <Box display="flex" alignItems="center" mb={2}>
-                <Security sx={{ color: '#00ff88', fontSize: 32, mr: 2 }} />
-                <Typography variant="h6" sx={{ color: '#00ff88' }}>
+                <SecurityIcon sx={{ color: '#00ff88', fontSize: 32, mr: 2 }} aria-hidden="true" />
+                <Typography variant="h6" component="h2" sx={{ color: '#00ff88' }}>
                   Security Status
                 </Typography>
               </Box>
               
               <List>
                 <ListItem>
-                  <ListItemIcon><CheckCircle sx={{ color: '#00ff88' }} /></ListItemIcon>
+                  <ListItemIcon><CheckCircle sx={{ color: '#00ff88' }} aria-hidden="true" /></ListItemIcon>
                   <ListItemText primary="Credential Vault Active" secondary="AES-256-GCM encryption" />
                 </ListItem>
                 <ListItem>
-                  <ListItemIcon><CheckCircle sx={{ color: '#00ff88' }} /></ListItemIcon>
+                  <ListItemIcon><CheckCircle sx={{ color: '#00ff88' }} aria-hidden="true" /></ListItemIcon>
                   <ListItemText primary="Audit Logging Enabled" secondary={`${auditLogs.length} entries`} />
                 </ListItem>
                 <ListItem>
-                  <ListItemIcon><CheckCircle sx={{ color: '#00ff88' }} /></ListItemIcon>
+                  <ListItemIcon><CheckCircle sx={{ color: '#00ff88' }} aria-hidden="true" /></ListItemIcon>
                   <ListItemText primary="2FA Supported" secondary="Use exchange 2FA" />
                 </ListItem>
                 <ListItem>
-                  <ListItemIcon><ErrorIcon sx={{ color: '#ffaa00' }} /></ListItemIcon>
+                  <ListItemIcon><ErrorIcon sx={{ color: '#ffaa00' }} aria-hidden="true" /></ListItemIcon>
                   <ListItemText primary="IP Whitelisting" secondary="Configure on exchange" />
                 </ListItem>
               </List>
@@ -160,8 +167,8 @@ const Security: React.FC = () => {
             <CardContent>
               <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                 <Box display="flex" alignItems="center">
-                  <VpnKey sx={{ color: '#00ff88', mr: 1 }} />
-                  <Typography variant="h6" sx={{ color: '#00ff88' }}>
+                  <VpnKey sx={{ color: '#00ff88', mr: 1 }} aria-hidden="true" />
+                  <Typography variant="h6" component="h2" sx={{ color: '#00ff88' }}>
                     Connected Exchanges
                   </Typography>
                 </Box>
@@ -177,7 +184,7 @@ const Security: React.FC = () => {
 
               {exchanges.length === 0 ? (
                 <Box textAlign="center" py={4}>
-                  <Lock sx={{ fontSize: 48, color: '#666', mb: 2 }} />
+                  <Lock sx={{ fontSize: 48, color: '#666', mb: 2 }} aria-hidden="true" />
                   <Typography variant="body1" color="textSecondary">
                     No exchanges connected
                   </Typography>
@@ -187,20 +194,21 @@ const Security: React.FC = () => {
                 </Box>
               ) : (
                 <TableContainer>
-                  <Table>
+                  <Table aria-label="Connected exchanges">
+                    <caption className="visually-hidden">List of connected exchange accounts and their status</caption>
                     <TableHead>
                       <TableRow>
-                        <TableCell sx={{ color: '#666' }}>Name</TableCell>
-                        <TableCell sx={{ color: '#666' }}>Type</TableCell>
-                        <TableCell sx={{ color: '#666' }}>Mode</TableCell>
-                        <TableCell sx={{ color: '#666' }}>Status</TableCell>
-                        <TableCell sx={{ color: '#666' }}>Actions</TableCell>
+                        <TableCell component="th" scope="col" sx={{ color: '#666' }}>Name</TableCell>
+                        <TableCell component="th" scope="col" sx={{ color: '#666' }}>Type</TableCell>
+                        <TableCell component="th" scope="col" sx={{ color: '#666' }}>Mode</TableCell>
+                        <TableCell component="th" scope="col" sx={{ color: '#666' }}>Status</TableCell>
+                        <TableCell component="th" scope="col" sx={{ color: '#666' }}>Actions</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {exchanges.map((exchange) => (
                         <TableRow key={exchange.name}>
-                          <TableCell sx={{ color: '#fff' }}>{exchange.name}</TableCell>
+                          <TableCell component="th" scope="row" sx={{ color: '#fff' }}>{exchange.name}</TableCell>
                           <TableCell sx={{ color: '#fff' }}>{exchange.type.toUpperCase()}</TableCell>
                           <TableCell>
                             <Chip 
@@ -226,8 +234,9 @@ const Security: React.FC = () => {
                             <IconButton 
                               color="error" 
                               onClick={() => handleRemoveExchange(exchange.name)}
+                              aria-label={`Remove exchange ${exchange.name}`}
                             >
-                              <Delete />
+                              <Delete aria-hidden="true" />
                             </IconButton>
                           </TableCell>
                         </TableRow>
@@ -244,8 +253,8 @@ const Security: React.FC = () => {
         <Grid item xs={12}>
           <Card sx={{ bgcolor: '#1a1a1a' }}>
             <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ color: '#00ff88' }}>
-                <Warning sx={{ verticalAlign: 'middle', mr: 1 }} />
+              <Typography variant="h6" component="h2" gutterBottom sx={{ color: '#00ff88' }}>
+                <Warning sx={{ verticalAlign: 'middle', mr: 1 }} aria-hidden="true" />
                 Security Best Practices
               </Typography>
               
@@ -289,7 +298,7 @@ const Security: React.FC = () => {
         <Grid item xs={12}>
           <Card sx={{ bgcolor: '#1a1a1a' }}>
             <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ color: '#00ff88' }}>
+              <Typography variant="h6" component="h2" gutterBottom sx={{ color: '#00ff88' }}>
                 Recent Activity (Audit Log)
               </Typography>
               
@@ -299,19 +308,20 @@ const Security: React.FC = () => {
                 </Typography>
               ) : (
                 <TableContainer>
-                  <Table>
+                  <Table aria-label="Audit log">
+                    <caption className="visually-hidden">Recent audit log entries showing actions performed on exchange accounts</caption>
                     <TableHead>
                       <TableRow>
-                        <TableCell sx={{ color: '#666' }}>Timestamp</TableCell>
-                        <TableCell sx={{ color: '#666' }}>Action</TableCell>
-                        <TableCell sx={{ color: '#666' }}>Exchange</TableCell>
-                        <TableCell sx={{ color: '#666' }}>Details</TableCell>
+                        <TableCell component="th" scope="col" sx={{ color: '#666' }}>Timestamp</TableCell>
+                        <TableCell component="th" scope="col" sx={{ color: '#666' }}>Action</TableCell>
+                        <TableCell component="th" scope="col" sx={{ color: '#666' }}>Exchange</TableCell>
+                        <TableCell component="th" scope="col" sx={{ color: '#666' }}>Details</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {auditLogs.slice(0, 10).map((log, index) => (
                         <TableRow key={index}>
-                          <TableCell sx={{ color: '#fff', fontSize: '0.875rem' }}>
+                          <TableCell component="th" scope="row" sx={{ color: '#fff', fontSize: '0.875rem' }}>
                             {new Date(log.timestamp).toLocaleString()}
                           </TableCell>
                           <TableCell>
@@ -339,37 +349,54 @@ const Security: React.FC = () => {
       </Grid>
 
       {/* Add Exchange Dialog */}
-      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ color: '#00ff88' }}>Add Exchange</DialogTitle>
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        aria-labelledby="add-exchange-dialog-title"
+        aria-describedby="add-exchange-dialog-desc"
+      >
+        <DialogTitle id="add-exchange-dialog-title" sx={{ color: '#00ff88' }}>Add Exchange</DialogTitle>
         <DialogContent>
+          <Typography id="add-exchange-dialog-desc" variant="body2" color="textSecondary" sx={{ mb: 1 }}>
+            Enter your exchange API credentials. Keys are encrypted before storage.
+          </Typography>
           <TextField
             fullWidth
+            id="exchange-name"
             label="Exchange Name"
             margin="normal"
             value={newExchange.name}
             onChange={(e) => setNewExchange({ ...newExchange, name: e.target.value })}
             sx={{ '& .MuiInputBase-root': { bgcolor: '#0a0a0a' } }}
+            inputRef={firstInputRef}
+            inputProps={{ 'aria-required': 'true' }}
           />
           <Alert severity="info" sx={{ mt: 2 }}>
             API keys are encrypted with AES-256-GCM before storage.
           </Alert>
           <TextField
             fullWidth
+            id="exchange-api-key"
             label="API Key"
             margin="normal"
             type="password"
             value={newExchange.api_key}
             onChange={(e) => setNewExchange({ ...newExchange, api_key: e.target.value })}
             sx={{ '& .MuiInputBase-root': { bgcolor: '#0a0a0a' } }}
+            inputProps={{ autoComplete: 'off', 'aria-required': 'true' }}
           />
           <TextField
             fullWidth
+            id="exchange-secret-key"
             label="Secret Key"
             margin="normal"
             type="password"
             value={newExchange.secret_key}
             onChange={(e) => setNewExchange({ ...newExchange, secret_key: e.target.value })}
             sx={{ '& .MuiInputBase-root': { bgcolor: '#0a0a0a' } }}
+            inputProps={{ autoComplete: 'off', 'aria-required': 'true' }}
           />
           <Alert severity="warning" sx={{ mt: 2 }}>
             Make sure this API key does NOT have withdrawal permissions!

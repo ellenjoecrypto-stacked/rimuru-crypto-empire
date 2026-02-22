@@ -1,5 +1,5 @@
 import React from 'react';
-import { Drawer, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
+import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
@@ -22,6 +22,7 @@ const Navigation: React.FC = () => {
   return (
     <Drawer
       variant="permanent"
+      aria-label="Main navigation"
       sx={{
         width: 240,
         flexShrink: 0,
@@ -35,15 +36,16 @@ const Navigation: React.FC = () => {
     >
       <List>
         <ListItem sx={{ mb: 2 }}>
-          <Typography variant="h6" sx={{ color: '#00ff88', fontWeight: 'bold' }}>
+          <Typography variant="h6" component="span" sx={{ color: '#00ff88', fontWeight: 'bold' }}>
             RIMURU
           </Typography>
         </ListItem>
         
         {menuItems.map((item) => (
-          <ListItem
-            button
+          <ListItemButton
             key={item.text}
+            selected={location.pathname === item.path}
+            aria-current={location.pathname === item.path ? 'page' : undefined}
             onClick={() => navigate(item.path)}
             sx={{
               mb: 1,
@@ -55,7 +57,7 @@ const Navigation: React.FC = () => {
               },
             }}
           >
-            <ListItemIcon sx={{ color: location.pathname === item.path ? '#00ff88' : '#666' }}>
+            <ListItemIcon sx={{ color: location.pathname === item.path ? '#00ff88' : '#666' }} aria-hidden="true">
               {item.icon}
             </ListItemIcon>
             <ListItemText
@@ -64,7 +66,7 @@ const Navigation: React.FC = () => {
                 color: location.pathname === item.path ? '#00ff88' : '#fff',
               }}
             />
-          </ListItem>
+          </ListItemButton>
         ))}
       </List>
       

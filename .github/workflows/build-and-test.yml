@@ -109,6 +109,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Create placeholder env files for validation
+        run: |
+          touch .env.security
+          cp .env.example .env 2>/dev/null || touch .env
       - name: Validate team compose
         run: docker compose -f docker-compose.team.yml config --quiet
       - name: Validate traders compose

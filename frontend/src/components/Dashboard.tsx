@@ -6,14 +6,19 @@ import {
   Typography,
   Box,
   Chip,
-  LinearProgress
+  LinearProgress,
+  IconButton
 } from '@mui/material';
 import {
   TrendingUp,
   TrendingDown,
   AccountBalance,
   Security,
-  SmartToy
+  SmartToy,
+  PlayArrow,
+  Pause,
+  Stop,
+  Error as ErrorIcon
 } from '@mui/icons-material';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useWebSocket } from '../services/websocket';
@@ -93,26 +98,27 @@ const Dashboard: React.FC = () => {
       <CardContent>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Box>
-            <Typography variant="h6" color="textSecondary" gutterBottom>
+            <Typography variant="h6" component="h3" color="textSecondary" gutterBottom>
               {title}
             </Typography>
-            <Typography variant="h4" color={color} fontWeight="bold">
+            <Typography variant="h4" component="p" color={color} fontWeight="bold">
               {value}
             </Typography>
             {trend !== undefined && (
               <Box display="flex" alignItems="center" mt={1}>
                 {trend >= 0 ? (
-                  <TrendingUp sx={{ color: '#00ff88', mr: 0.5 }} />
+                  <TrendingUp sx={{ color: '#00ff88', mr: 0.5 }} aria-hidden="true" />
                 ) : (
-                  <TrendingDown sx={{ color: '#ff4444', mr: 0.5 }} />
+                  <TrendingDown sx={{ color: '#ff4444', mr: 0.5 }} aria-hidden="true" />
                 )}
                 <Typography variant="body2" color={trend >= 0 ? '#00ff88' : '#ff4444'}>
                   {trend >= 0 ? '+' : ''}{trend}%
+                  <span className="visually-hidden">{trend >= 0 ? ' (gain)' : ' (loss)'}</span>
                 </Typography>
               </Box>
             )}
           </Box>
-          <Box sx={{ fontSize: '48px', color }}>
+          <Box sx={{ fontSize: '48px', color }} aria-hidden="true">
             {icon}
           </Box>
         </Box>
@@ -122,20 +128,22 @@ const Dashboard: React.FC = () => {
 
   return (
     <Box>
-      <Typography variant="h4" gutterBottom sx={{ color: '#00ff88', fontWeight: 'bold' }}>
+      <Typography variant="h4" component="h1" gutterBottom sx={{ color: '#00ff88', fontWeight: 'bold' }}>
         RIMURU CRYPTO EMPIRE
       </Typography>
       
       {/* Connection Status */}
       <Box mb={3}>
-        <Chip 
-          label={isConnected ? '🟢 Connected' : '🔴 Disconnected'}
-          color={isConnected ? 'success' : 'error'}
-          sx={{ mr: 2 }}
-        />
-        <Typography variant="caption" color="textSecondary">
-          Real-time updates {isConnected ? 'enabled' : 'disabled'}
-        </Typography>
+        <div role="status" aria-live="polite" aria-atomic="true">
+          <Chip 
+            label={isConnected ? 'Connected' : 'Disconnected'}
+            color={isConnected ? 'success' : 'error'}
+            sx={{ mr: 2 }}
+          />
+          <Typography variant="caption" color="textSecondary">
+            Real-time updates {isConnected ? 'enabled' : 'disabled'}
+          </Typography>
+        </div>
       </Box>
 
       {/* Main Stats */}
@@ -154,7 +162,7 @@ const Dashboard: React.FC = () => {
             title="Daily P&L"
             value={`$${riskSummary?.daily_pnl?.toFixed(2) || '0.00'}`}
             icon={<TrendingUp />}
-            color={riskSummary?.daily_pnl >= 0 ? '#00ff88' : '#ff4444'}
+            color={riskSummary?.daily_pnl !== null && riskSummary?.daily_pnl !== undefined && riskSummary.daily_pnl >= 0 ? '#00ff88' : '#ff4444'}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
@@ -180,21 +188,27 @@ const Dashboard: React.FC = () => {
         <Grid item xs={12} md={8}>
           <Card sx={{ bgcolor: '#1a1a1a', height: '400px' }}>
             <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ color: '#00ff88' }}>
+              <Typography variant="h6" component="h2" gutterBottom sx={{ color: '#00ff88' }}>
                 Portfolio Performance
               </Typography>
-              <ResponsiveContainer width="100%" height={320}>
-                <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                  <XAxis dataKey="time" stroke="#666" />
-                  <YAxis stroke="#666" />
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }}
-                  />
-                  <Legend />
-                  <Line type="monotone" dataKey="value" stroke="#00ff88" strokeWidth={2} />
-                </LineChart>
-              </ResponsiveContainer>
+              <div role="img" aria-labelledby="portfolio-chart-title" aria-describedby="portfolio-chart-desc">
+                <span id="portfolio-chart-title" className="visually-hidden">Portfolio Performance Chart</span>
+                <span id="portfolio-chart-desc" className="visually-hidden">
+                  Line chart showing portfolio value over time, from $124,000 at midnight to $125,800 at 8pm.
+                </span>
+                <ResponsiveContainer width="100%" height={320} aria-hidden="true">
+                  <LineChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                    <XAxis dataKey="time" stroke="#666" />
+                    <YAxis stroke="#666" />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }}
+                    />
+                    <Legend />
+                    <Line type="monotone" dataKey="value" stroke="#00ff88" strokeWidth={2} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
             </CardContent>
           </Card>
         </Grid>
@@ -202,7 +216,7 @@ const Dashboard: React.FC = () => {
         <Grid item xs={12} md={4}>
           <Card sx={{ bgcolor: '#1a1a1a', height: '400px' }}>
             <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ color: '#00ff88' }}>
+              <Typography variant="h6" component="h2" gutterBottom sx={{ color: '#00ff88' }}>
                 Bot Status
               </Typography>
               <Box mt={2}>
@@ -223,6 +237,7 @@ const Dashboard: React.FC = () => {
                       variant="determinate" 
                       value={bot.total_trades * 10}
                       sx={{ mt: 1, bgcolor: '#333' }}
+                      aria-label={`${bot.name} trade progress`}
                     />
                   </Box>
                 ))}
@@ -235,16 +250,18 @@ const Dashboard: React.FC = () => {
       {/* Emergency Warning */}
       {riskSummary?.emergency_stop_triggered && (
         <Box mt={3}>
-          <Card sx={{ bgcolor: '#ff0000', border: '2px solid #ff4444' }}>
-            <CardContent>
-              <Typography variant="h6" color="white" fontWeight="bold">
-                🚨 EMERGENCY STOP TRIGGERED
-              </Typography>
-              <Typography variant="body2" color="white">
-                All trading operations have been halted. Check risk management settings.
-              </Typography>
-            </CardContent>
-          </Card>
+          <div role="alert" aria-live="assertive">
+            <Card sx={{ bgcolor: '#ff0000', border: '2px solid #ff4444' }}>
+              <CardContent>
+                <Typography variant="h6" component="h2" color="white" fontWeight="bold">
+                  EMERGENCY STOP TRIGGERED
+                </Typography>
+                <Typography variant="body2" color="white">
+                  All trading operations have been halted. Check risk management settings.
+                </Typography>
+              </CardContent>
+            </Card>
+          </div>
         </Box>
       )}
     </Box>
