@@ -19,15 +19,10 @@ try:
     from sklearn.ensemble import RandomForestClassifier
     from sklearn.preprocessing import StandardScaler
     from sklearn.model_selection import train_test_split
-except ImportError:
-    print("Installing ML libraries...")
-    import os
-    os.system("pip install scikit-learn pandas numpy")
-    import requests
-    import pandas as pd
-    from sklearn.ensemble import RandomForestClassifier
-    from sklearn.preprocessing import StandardScaler
-    from sklearn.model_selection import train_test_split
+except ImportError as e:
+    raise ImportError(
+        f"Required ML libraries not installed. Run: pip install scikit-learn pandas numpy requests\n{e}"
+    ) from e
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -89,13 +84,16 @@ class RimuruAICore:
         }
         
         logger.info("🧠 Rimuru AI Core initialized")
+        self._model_version = "1.0"
+        self._last_features: List[float] = []
+        self.load_knowledge()
     
     async def check_ollama_connection(self) -> bool:
         """Check if Ollama is running"""
         try:
             response = requests.get(f"{self.ollama_url}/api/tags", timeout=5)
             return response.status_code == 200
-        except:
+        except Exception:
             logger.warning("⚠️ Ollama not connected. Using local ML models only.")
             return False
     
@@ -180,7 +178,8 @@ class RimuruAICore:
             market_data.get('volume', 0) / 1e9,  # Normalize volume
             market_data.get('change_24h', 0) / 100,  # Normalize price change
         ]
-        
+
+        self._last_features = features
         return features
     
     def train_model(self, data: List[LearningData]) -> bool:
@@ -332,31 +331,55 @@ class RimuruAICore:
     def learn_from_outcome(self, decision: AIDecision, outcome: float):
         """
         Learn from trade outcome
-        
+
         Args:
             decision: The decision that was made
             outcome: The actual PnL from following the decision
         """
         try:
             # Create learning data point
-            label = 1 if decision.action == 'buy' else 2 if decision.action == 'sell' else 0
-            
+            label = 1 if decision.action == "buy" else 2 if decision.action == "sell" else 0
+
             # Record outcome
-            self.performance_history.append({
-                'timestamp': datetime.now().isoformat(),
-                'action': decision.action,
-                'confidence': decision.confidence,
-                'outcome': outcome,
-                'model_version': decision.model_version
-            })
-            
+            record = {
+                "timestamp": datetime.now().isoformat(),
+                "action": decision.action,
+                "confidence": decision.confidence,
+                "outcome": outcome,
+                "model_version": decision.model_version,
+                "label": label,
+            }
+            self.performance_history.append(record)
+
+            # Accumulate learning data points from the last decision's features (if available)
+            if hasattr(self, "_last_features") and self._last_features:
+                self.learning_data.append(
+                    LearningData(
+                        features=self._last_features,
+                        label=label,
+                        outcome=outcome,
+                        timestamp=datetime.now(),
+                        confidence=decision.confidence,
+                    )
+                )
+
             logger.info(f"📚 Learned from outcome: {decision.action} -> ${outcome:.2f}")
-            
-            # Retrain model periodically
-            if len(self.performance_history) % 50 == 0:
+
+            # Retrain model every 50 data points
+            if len(self.learning_data) >= 50 and len(self.learning_data) % 50 == 0:
                 logger.info("🔄 Retraining model with new data...")
-                # In production, implement incremental learning
-                
+                if self.train_model(self.learning_data):
+                    # Increment model version
+                    try:
+                        version_parts = self._model_version.split(".")
+                        new_minor = int(version_parts[-1]) + 1
+                        self._model_version = ".".join(version_parts[:-1] + [str(new_minor)])
+                    except (ValueError, IndexError):
+                        self._model_version = "1.1"
+                    logger.info(f"✅ Model retrained. New version: {self._model_version}")
+                    # Persist updated model
+                    self.save_knowledge()
+
         except Exception as e:
             logger.error(f"❌ Error learning from outcome: {e}")
     
@@ -382,37 +405,91 @@ class RimuruAICore:
         }
     
     def save_knowledge(self):
-        """Save knowledge base to file"""
+        """Save knowledge base, performance history, and learning data to disk."""
         try:
             knowledge_file = self.model_path / "knowledge_base.json"
-            with open(knowledge_file, 'w') as f:
+            with open(knowledge_file, "w") as f:
                 json.dump(self.knowledge_base, f, indent=2)
+
+            perf_file = self.model_path / "performance_history.json"
+            with open(perf_file, "w") as f:
+                json.dump(self.performance_history, f, indent=2, default=str)
+
+            learning_file = self.model_path / "learning_data.json"
+            serializable = [
+                {
+                    "features": ld.features,
+                    "label": ld.label,
+                    "outcome": ld.outcome,
+                    "timestamp": ld.timestamp.isoformat(),
+                    "confidence": ld.confidence,
+                }
+                for ld in self.learning_data
+            ]
+            with open(learning_file, "w") as f:
+                json.dump(serializable, f, indent=2)
+
             logger.info("✅ Knowledge base saved")
         except Exception as e:
             logger.error(f"❌ Error saving knowledge: {e}")
+
+    def load_knowledge(self):
+        """Reload persisted state (knowledge base, performance history, learning data) on init."""
+        try:
+            knowledge_file = self.model_path / "knowledge_base.json"
+            if knowledge_file.exists():
+                with open(knowledge_file) as f:
+                    self.knowledge_base = json.load(f)
+
+            perf_file = self.model_path / "performance_history.json"
+            if perf_file.exists():
+                with open(perf_file) as f:
+                    self.performance_history = json.load(f)
+
+            learning_file = self.model_path / "learning_data.json"
+            if learning_file.exists():
+                with open(learning_file) as f:
+                    raw = json.load(f)
+                self.learning_data = [
+                    LearningData(
+                        features=r["features"],
+                        label=r["label"],
+                        outcome=r["outcome"],
+                        timestamp=datetime.fromisoformat(r["timestamp"]),
+                        confidence=r["confidence"],
+                    )
+                    for r in raw
+                ]
+
+            logger.info(
+                f"✅ Knowledge loaded: {len(self.performance_history)} history records, "
+                f"{len(self.learning_data)} learning points"
+            )
+        except Exception as e:
+            logger.error(f"❌ Error loading knowledge: {e}")
 
 
 # Example usage
 if __name__ == "__main__":
     async def test_rimuru_ai():
-        print("🧠 RIMURU AI CORE TEST")
-        print("=" * 60)
-        
+        logger.info("🧠 RIMURU AI CORE TEST")
+        logger.info("=" * 60)
+
         ai = RimuruAICore()
-        
+
         # Test Ollama connection
-        print("\n1. Testing Ollama connection...")
+        logger.info("\n1. Testing Ollama connection...")
         ollama_connected = await ai.check_ollama_connection()
-        print(f"   Ollama connected: {ollama_connected}")
-        
+        logger.info(f"   Ollama connected: {ollama_connected}")
+
         # Test decision making
-        print("\n2. Testing AI decision making...")
+        logger.info("\n2. Testing AI decision making...")
         market_data = {
             'price': 50000,
             'volume': 1e9,
             'change_24h': 2.5
         }
-        
+
         indicators = {
             'rsi': 45,
             'macd': 100,
@@ -421,21 +498,21 @@ if __name__ == "__main__":
             'bb_upper': 52000,
             'bb_lower': 48000
         }
-        
+
         decision = await ai.make_decision(market_data, indicators)
-        print(f"   Action: {decision.action}")
-        print(f"   Confidence: {decision.confidence:.2%}")
-        print(f"   Risk Level: {decision.risk_assessment}")
-        print(f"   Predicted Return: {decision.predicted_return:.2%}")
-        print(f"   Reasoning: {decision.reasoning}")
-        
+        logger.info(f"   Action: {decision.action}")
+        logger.info(f"   Confidence: {decision.confidence:.2%}")
+        logger.info(f"   Risk Level: {decision.risk_assessment}")
+        logger.info(f"   Predicted Return: {decision.predicted_return:.2%}")
+        logger.info(f"   Reasoning: {decision.reasoning}")
+
         # Test learning
-        print("\n3. Testing learning from outcome...")
+        logger.info("\n3. Testing learning from outcome...")
         ai.learn_from_outcome(decision, 500.0)
         stats = ai.get_performance_stats()
-        print(f"   Performance stats: {stats}")
-        
-        print("\n" + "=" * 60)
-        print("✅ Rimuru AI Core test completed!")
-    
+        logger.info(f"   Performance stats: {stats}")
+
+        logger.info("\n" + "=" * 60)
+        logger.info("✅ Rimuru AI Core test completed!")
+
     asyncio.run(test_rimuru_ai())

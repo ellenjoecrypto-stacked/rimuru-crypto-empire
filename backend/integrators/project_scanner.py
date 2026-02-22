@@ -380,44 +380,38 @@ if __name__ == "__main__":
     
     async def main():
         scanner = ProjectScanner()
-        
-        # Real local project directories
-        project_paths = [
-            r"C:\Users\Admin\OneDrive\Videos\rimuru_empire",
-            r"C:\Users\Admin\OneDrive\crypto_empire",
-            r"C:\Users\Admin\OneDrive\CRYPTO_EMPIRE_AWAKENED",
-            r"C:\Users\Admin\OneDrive\CRYPTO_EMPIRE_COMPLETE_PACKAGE",
-            r"C:\Users\Admin\OneDrive\ninja-ai-rimuru",
-            r"C:\Users\Admin\OneDrive\acop_mega",
-            r"C:\Users\Admin\OneDrive\acop_platform",
-            r"C:\Users\Admin\OneDrive\great_sage",
-            r"C:\Users\Admin\OneDrive\rimuru_assistant",
-            r"C:\Users\Admin\OneDrive\rimuru_ollama",
-            r"C:\Users\Admin\OneDrive\secure_vault",
-            r"C:\Users\Admin\OneDrive\dashboard",
-            r"C:\Users\Admin\OneDrive\deploy",
-            r"C:\Users\Admin\source\repos\Project Qrow",
-            r"C:\Users\Admin\source\repos\Qrow",
-            r"C:\Users\Admin\source\repos\AvoidthaVoid",
+
+        # Real local project directories — configurable via environment variables
+        default_paths = [
+            os.getenv("RIMURU_PROJECT_PATH_1", ""),
+            os.getenv("RIMURU_PROJECT_PATH_2", ""),
+            os.getenv("RIMURU_PROJECT_PATH_3", ""),
         ]
-        
+
+        # Additional paths from a separator-delimited env var (os.pathsep on current OS)
+        extra = os.getenv("RIMURU_SCAN_PATHS", "")
+        if extra:
+            default_paths.extend(p.strip() for p in extra.split(os.pathsep) if p.strip())
+
+        project_paths = [p for p in default_paths if p]
+
         scanned = 0
         for project_path in project_paths:
             if os.path.exists(project_path):
                 result = await scanner.scan_project(project_path)
                 if result:
                     scanned += 1
-        
+
         # Print summary
         summary = scanner.get_summary()
-        print(f"\n=== PROJECT SCAN SUMMARY ({scanned} projects) === - project_scanner.py:413")
-        print(json.dumps(summary, indent=2))
-        
+        logger.info(f"\n=== PROJECT SCAN SUMMARY ({scanned} projects) ===")
+        logger.info(json.dumps(summary, indent=2))
+
         # Export findings
-        output_dir = r"C:\Users\Admin\OneDrive\Videos\rimuru_empire\data"
+        output_dir = os.getenv("RIMURU_DATA_OUTPUT_DIR", os.path.join("data", "project_findings"))
         os.makedirs(output_dir, exist_ok=True)
         output_path = os.path.join(output_dir, "project_findings.json")
         scanner.export_findings(output_path)
-        print(f"\nExported to: {output_path} - project_scanner.py:421")
+        logger.info(f"\nExported to: {output_path}")
     
     asyncio.run(main())
