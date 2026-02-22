@@ -125,3 +125,7 @@ Performance.pyperf
 *.tmp
 *.temp
 *.bak
+
+# ===== Rimuru Repair (generated outputs) =====
+tools/self-repair/reports/*.txt
+tools/self-repair/reports/*.json
